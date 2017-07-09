@@ -32,6 +32,7 @@ public:
 
 public slots:
     void toggleFullScreen();
+    void hideScrollBars();
 
 private slots:
     void acceptFullScreen(QWebEngineFullScreenRequest);

@@ -25,6 +25,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->setLayout(this->m_layout);
 
     QObject::connect(this->webView, &QWebEngineView::titleChanged, this, &BrowserWindow::setWindowTitle);
+    QObject::connect(this->webView, &QWebEngineView::loadFinished, this, &BrowserWindow::hideScrollBars);
 
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(toggleFullScreen()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
@@ -98,6 +99,11 @@ void BrowserWindow::reset()
 void BrowserWindow::toggleFullScreen()
 {
     this->isFullScreen() ? this->showNormal() : this->showFullScreen();
+}
+
+void BrowserWindow::hideScrollBars()
+{
+    this->webView->page()->runJavaScript("document.styleSheets[0].addRule('::-webkit-scrollbar', 'width: 0px; height: 0px', 0);");
 }
 
 void BrowserWindow::acceptFullScreen(QWebEngineFullScreenRequest req)
