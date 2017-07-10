@@ -13,6 +13,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightDRMStreamingViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
+    a.setApplicationVersion("0.9.1");
 
     StreamingProviderParser parser;
     parser.findAll();
