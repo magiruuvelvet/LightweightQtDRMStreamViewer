@@ -17,7 +17,7 @@ I'm releasing this here on GitHub in case anyone else is looking for web browser
 
 - Qt 5.9 ( sorry if you are using an older version of Qt :( )
 - Qt Web Engine built with proprietary codeces!! (important)
-- Adobe **PepperFlash** and the [**Widevine Content Decryptor**](https://www.widevine.com/) (both are included in Google Chrome, download and extract the following files - no need to install it)
+- Adobe **PepperFlash** and the [**Widevine Content Decryptor**](https://www.widevine.com/) (both are included in Google Chrome, download and extract the following files - no need to install the whole browser)
   - `/opt/google/chrome/PepperFlash` (the whole folder)
   - `/opt/google/chrome/libwidevinecdm.so`
   - `/opt/google/chrome/libwidevinecdmadapter.so`
@@ -25,6 +25,15 @@ I'm releasing this here on GitHub in case anyone else is looking for web browser
   - CLI: `qmake LightweightDRMStreamingViewer.pro`, `make`
   - Qt Creator: Open Project and push the hammer icon  :D
 
+**Note:** On some Linux distros you can find PepperFlash in the repositories for easy installation. You still need to download Widevine manually. Due to licensing issues I can't mirror it here.
+
+Qt is looking for PepperFlash at the following locations: *see the* [*Qt Web Engine Features*](https://doc.qt.io/qt-5/qtwebengine-features.html#pepper-flash-player-plugin-support) *overview for a detailed list of paths*
+
+Widevine must be obtained using Google Chrome, grep it from their Website. Qt is looking for it in either its plugin location or the browsers default install location.
+
+##### Arch Linux
+
+Just install `pepper-flash` and `qt5-webengine-widevine`<sup>[AUR](https://aur.archlinux.org/packages/qt5-webengine-widevine/)</sup> to get started.
 
 ## Main Interface
 
