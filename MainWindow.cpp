@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->_lH_titleBar = new QHBoxLayout();
     this->_lH_titleBar->setSizeConstraint(QLayout::SetMaximumSize);
     this->_lH_titleBar->setContentsMargins(0, 0, 0, 2);
-    this->_lH_titleBar->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    //this->_lH_titleBar->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     this->_lV_main->addLayout(this->_lH_titleBar);
 
     this->_titleBarText = new QLabel(qApp->applicationDisplayName());
@@ -68,8 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
                 "QPushButton:hover{outline: none; border: 1px solid #ffffff; padding: 0px; background-color: #555555;}"
                 "QPushButton:pressed{outline: none; border: 1px solid #ffffff; padding: 0px; background-color: #484848;}");
     QObject::connect(this->_titleBarBtn, &QPushButton::clicked, this, &MainWindow::close);
-    this->_lH_titleBar->addWidget(this->_titleBarText);
-    this->_lH_titleBar->addWidget(this->_titleBarBtn);
+    this->_lH_titleBar->addWidget(this->_titleBarText, 1, Qt::AlignCenter);
+    this->_lH_titleBar->addWidget(this->_titleBarBtn, 0, Qt::AlignRight);
 
     this->_lH_providerButtonList = new QHBoxLayout();
     this->_lH_providerButtonList->setSizeConstraint(QLayout::SetMaximumSize);
@@ -113,6 +113,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         QObject::connect(this->_providerBtns.last(), &QPushButton::clicked, this, &MainWindow::loadProfile);
     }
+
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
 }
 
 MainWindow::~MainWindow()

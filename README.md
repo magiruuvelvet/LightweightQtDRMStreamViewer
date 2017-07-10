@@ -94,3 +94,10 @@ Login credentials are remembered if you tick that "Remember me" checkbox. No nee
 #### Disclaimer
 
 The Qt Web Engine has plenty of settings. I tweaked the settings to be sufficient and optimized for streaming. Please do **not** use this app as a regular web browser! You have been warned.
+
+
+## Credits
+
+ - App Icon:
+   [movie protected](https://thenounproject.com/search/?q=movie&i=556272) by arjuazka from the Noun Project
+

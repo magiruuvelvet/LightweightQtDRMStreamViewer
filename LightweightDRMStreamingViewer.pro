@@ -21,3 +21,6 @@ HEADERS += \
     StreamingProviderStore.hpp \
     StreamingProviderParser.hpp \
     BrowserWindow.hpp
+
+RESOURCES += \
+    res/resources.qrc
