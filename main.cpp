@@ -11,9 +11,9 @@
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
-    a.setApplicationName(QLatin1String("LightweightDRMStreamingViewer"));
+    a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.9.1");
+    a.setApplicationVersion("0.9.2");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     StreamingProviderParser parser;

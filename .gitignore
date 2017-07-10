@@ -1,0 +1,10 @@
+# Qt Creator generated files
+*.pro.user
+
+# QMake
+*~
+*.o
+moc_*.c*
+moc_*.h*
+qrc_*.c*
+Makefile

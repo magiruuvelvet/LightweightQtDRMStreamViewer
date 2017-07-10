@@ -1,4 +1,4 @@
-# Lightweight Qt DRM Streaming Viewer
+# Lightweight Qt DRM Stream Viewer
 
 This application uses the [Qt Web Engine](https://wiki.qt.io/QtWebEngine) to implement a tiny and lightweight as possible way to view **DRM** (Digital Rights Management) streams (*Netflix, Amazon Video, Maxdome, etc.*) without any useless UI clutter which the average web browser is made of.
 
@@ -22,7 +22,7 @@ I'm releasing this here on GitHub in case anyone else is looking for web browser
   - `/opt/google/chrome/libwidevinecdm.so`
   - `/opt/google/chrome/libwidevinecdmadapter.so`
 - To build: QMake, Qt development headers and a C++11 compiler
-  - CLI: `qmake LightweightDRMStreamingViewer.pro`, `make`
+  - CLI: `qmake LightweightQtDRMStreamViewer.pro`, `make`
   - Qt Creator: Open Project and push the hammer icon  :D
 
 **Note:** On some Linux distros you can find PepperFlash in the repositories for easy installation. You still need to download Widevine manually. Due to licensing issues I can't mirror it here.
@@ -50,7 +50,7 @@ The main interface is just made of a client-side title bar, a really tiny close 
 
 Run the app for at least once (optimally from a terminal). It will create its configuration directory and tell you where it is.
 
-Default is `~/.config/LightweightDRMStreamingViewer` (on Linux) and `%LOCALAPPDATA%/LightweightDRMStreamingViewer` (on Windows).
+Default is `~/.config/LightweightQtDRMStreamViewer` (on Linux) and `%LOCALAPPDATA%/LightweightQtDRMStreamViewer` (on Windows).
 
 Once in the config directory there should be a `providers` subfolder in there (create if it doesn't exist). Inside that directory the app is looking for streaming services to generate the list in the user interface.
 

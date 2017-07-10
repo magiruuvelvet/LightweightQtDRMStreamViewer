@@ -1,0 +1,5 @@
+# GitHub Language Metrics Configuration
+# https://github.com/github/linguist#overrides
+
+# ignore the sample config
+sample-connfig/* linguist-vendored

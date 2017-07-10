@@ -1,6 +1,6 @@
 QT       += core gui widgets webengine webenginewidgets
 
-TARGET = LightweightDRMStreamingViewer
+TARGET = LightweightQtDRMStreamViewer
 TEMPLATE = app
 
 CONFIG += c++14
