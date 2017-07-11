@@ -10,6 +10,7 @@
 
 int main(int argc, char **argv)
 {
+    QApplication::setDesktopSettingsAware(false);
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));

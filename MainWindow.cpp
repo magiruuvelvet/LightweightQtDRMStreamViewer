@@ -43,6 +43,12 @@ MainWindow::MainWindow(QWidget *parent)
     this->setPalette(rootWinColorScheme);
     this->setStyle(new StyleOverrides);
 
+    QPalette toolTipPalette = QToolTip::palette();
+    toolTipPalette.setColor(QPalette::All, QPalette::ToolTipBase, QColor( 70,  70,  70, 255));
+    toolTipPalette.setColor(QPalette::All, QPalette::ToolTipText, QColor(255, 255, 255, 255));
+    QToolTip::setPalette(toolTipPalette);
+    QToolTip::setFont(QFont("Sans Serif", 10, QFont::Medium, false));
+
     this->_lV_main = new QVBoxLayout();
     this->_lV_main->setSizeConstraint(QLayout::SetMaximumSize);
     this->_lV_main->setContentsMargins(5, 8, 5, 5);
@@ -57,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->_titleBarText = new QLabel(qApp->applicationDisplayName());
     this->_titleBarText->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     this->_titleBarText->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->_titleBarText->setFont(QFont("Sans Serif", 10, QFont::Medium, false));
     this->_titleBarBtn = new QPushButton(QString::fromUtf8("×"));
     this->_titleBarBtn->setFlat(true);
     this->_titleBarBtn->setFixedSize(15, 15);
@@ -120,6 +127,16 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     this->_providerBtns.clear();
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *e)
+{
+    this->m_clickPos = e->pos();
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *e)
+{
+    this->move(e->globalPos() - this->m_clickPos);
 }
 
 void MainWindow::loadProfile()

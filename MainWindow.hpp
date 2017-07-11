@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QWidget>
+#include <QMouseEvent>
+#include <QPoint>
 #include <QLayout>
 #include <QPushButton>
 #include <QLabel>
@@ -19,6 +21,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void mousePressEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
+
 private slots:
     void loadProfile();
 
@@ -32,6 +38,8 @@ private:
     QList<QPushButton*> _providerBtns;
 
     BrowserWindow *browser;
+
+    QPoint m_clickPos;
 };
 
 #endif // MAINWINDOW_HPP
