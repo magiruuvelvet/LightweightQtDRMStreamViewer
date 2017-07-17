@@ -17,8 +17,10 @@ public:
     { return this->m_providers; }
 
 private:
-    QString m_configPath;
     QStringList m_providers;
+
+    static const char *extension;
+    static const char *search_pattern;
 };
 
 #endif // STREAMINGPROVIDERPARSER_HPP

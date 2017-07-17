@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>app-icon.svgz</file>
+        <file>hide-scrollbars.js</file>
     </qresource>
 </RCC>

@@ -1,6 +1,8 @@
 #include "StreamingProviderParser.hpp"
 #include "StreamingProviderStore.hpp"
 
+#include "ConfigManager.hpp"
+
 #include <QApplication>
 #include <QStandardPaths>
 #include <QFile>
@@ -13,36 +15,25 @@
 
 #include <QDebug>
 
+const char *StreamingProviderParser::extension = ".p";
+const char *StreamingProviderParser::search_pattern = "*.p";
+
 StreamingProviderParser::StreamingProviderParser()
 {
-    const QString location = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
-                           + '/'
-                           + qApp->applicationName();
-    qDebug() << "Using configuration directory" << location;
-
-    QDir config_dir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));
-    if (!config_dir.mkpath(qApp->applicationName() + '/' + "providers"))
-    {
-        qDebug() << "Unable to create the configuration path!";
-        return;
-    }
-
-    this->m_configPath = location;
-    StreamingProviderStore::instance()->setProviderStorePath(this->m_configPath + '/' + "providers");
 }
 
 StreamingProviderParser::~StreamingProviderParser()
 {
-    this->m_configPath.clear();
     this->m_providers.clear();
 }
 
 void StreamingProviderParser::findAll()
 {
-    if (this->m_configPath.isEmpty())
+    if (StreamingProviderStore::instance()->providerStorePath().isEmpty())
         return;
 
-    QDirIterator providers(StreamingProviderStore::instance()->providerStorePath(), QStringList{"*.p"},
+    QDirIterator providers(StreamingProviderStore::instance()->providerStorePath(),
+                           QStringList{StreamingProviderParser::search_pattern},
                            QDir::Files | QDir::Readable | QDir::NoDotAndDotDot,
                            QDirIterator::FollowSymlinks | QDirIterator::Subdirectories);
     while (providers.hasNext())
@@ -56,10 +47,11 @@ void StreamingProviderParser::findAll()
 
 bool StreamingProviderParser::parse(const QString &provider_name) const
 {
-    if (this->m_configPath.isEmpty() || !this->m_providers.contains(provider_name))
+    if (StreamingProviderStore::instance()->providerStorePath().isEmpty() ||
+        !this->m_providers.contains(provider_name))
         return false;
 
-    QFile file(StreamingProviderStore::instance()->providerStorePath() + '/' + provider_name + ".p");
+    QFile file(StreamingProviderStore::instance()->providerStorePath() + '/' + provider_name + StreamingProviderParser::extension);
     QString data;
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -81,47 +73,46 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
     QStringList props = data.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
     data.clear();
 
-    QString pName, pIcon, pUrl;
-    bool pTitleBarVisible = false;
-    QColor pTitleBarColor, pTitleBarTextColor;
+    Provider provider;
+    provider.id = provider_name;
     bool hasErrors = false;
 
     for (auto&& i : props)
     {
-        i.startsWith("name:") ? pName = i.mid(5).simplified() : QString();
-        i.startsWith("icon:") ? pIcon = i.mid(5).simplified() : QString();
-        i.startsWith("url:")  ? pUrl  = i.mid(4).simplified() : QString();
+        i.startsWith("name:") ? provider.name = i.mid(5).simplified() : QString();
+        i.startsWith("icon:") ? provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + i.mid(5).simplified()) : QIcon();
+        i.startsWith("url:")  ? provider.url  = QUrl(i.mid(4).simplified()) : QUrl();
 
-        i.startsWith("titlebar:") ? pTitleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
-        i.startsWith("titlebar-color:") ? pTitleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);
-        i.startsWith("titlebar-text:") ? pTitleBarTextColor = QColor(i.mid(14).simplified()) : QColor(255, 255, 255, 255);
+        i.startsWith("titlebar:") ? provider.titleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
+        i.startsWith("titlebar-color:") ? provider.titleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);
+        i.startsWith("titlebar-text-color:") ? provider.titleBarTextColor = QColor(i.mid(20).simplified()) : QColor(255, 255, 255, 255);
     }
 
-    if (pName.isEmpty())
+    if (provider.name.isEmpty())
     {
         qDebug() << provider_name << "Field 'name' must not be empty.";
         hasErrors = true;
     }
-    if (pIcon.isEmpty())
+    if (provider.icon.isNull())
     {
         qDebug() << provider_name << "Field 'icon' is empty. Falling back to text name.";
     }
-    if (pUrl.isEmpty())
+    if (provider.url.isEmpty())
     {
         qDebug() << provider_name << "Field 'url' must not be empty.";
         hasErrors = true;
     }
-    if (pTitleBarVisible && !pTitleBarColor.isValid())
+    if (provider.titleBarVisible && !provider.titleBarColor.isValid())
     {
         qDebug() << provider_name << "Field 'titlebar-color' is not a valid color. See the Qt doc on how to set this field correctly."
                                   << "Falling back to the default color which is #323232.";
-        pTitleBarColor = QColor(50, 50, 50, 255);
+        provider.titleBarColor = QColor(50, 50, 50, 255);
     }
-    if (pTitleBarVisible && !pTitleBarTextColor.isValid())
+    if (provider.titleBarVisible && !provider.titleBarTextColor.isValid())
     {
-        qDebug() << provider_name << "Field 'titlebar-text' is not a valid color. See the Qt doc on how to set this field correctly."
+        qDebug() << provider_name << "Field 'titlebar-text-color' is not a valid color. See the Qt doc on how to set this field correctly."
                                   << "Falling back to the default color which is #ffffff.";
-        pTitleBarTextColor = QColor(255, 255, 255, 255);
+        provider.titleBarTextColor = QColor(255, 255, 255, 255);
     }
 
     if (hasErrors)
@@ -130,12 +121,7 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         return false;
     }
 
-    StreamingProviderStore::instance()->addProvider(provider_name, pName, pIcon, pUrl,
-                                                    pTitleBarVisible, pTitleBarColor, pTitleBarTextColor);
-
-    pName.clear();
-    pIcon.clear();
-    pUrl.clear();
+    StreamingProviderStore::instance()->addProvider(provider);
 
     return true;
 }

@@ -1,8 +1,15 @@
 #include "StreamingProviderStore.hpp"
+#include "ConfigManager.hpp"
+
+StreamingProviderStore *StreamingProviderStore::instance()
+{
+    static StreamingProviderStore *i = new StreamingProviderStore();
+    return i;
+}
 
 StreamingProviderStore::StreamingProviderStore()
 {
-
+    this->m_providerStorePath = Config()->providerStoreDir();
 }
 
 StreamingProviderStore::~StreamingProviderStore()
@@ -11,34 +18,18 @@ StreamingProviderStore::~StreamingProviderStore()
     delete this;
 }
 
-StreamingProviderStore *StreamingProviderStore::instance()
-{
-    static StreamingProviderStore *m_instance = new StreamingProviderStore();
-    return m_instance;
-}
-
-void StreamingProviderStore::setProviderStorePath(const QString &path)
-{
-    this->m_providerStorePath = path;
-}
-
 const QString &StreamingProviderStore::providerStorePath() const
 {
     return this->m_providerStorePath;
 }
 
-void StreamingProviderStore::addProvider(const QString &id, const QString &name, const QString &icon, const QUrl &provider,
-                                         bool titleBarVisible, const QColor &titleBarColor, const QColor &titleBarTextColor)
+void StreamingProviderStore::addProvider(const Provider &provider)
 {
-    this->m_providers.append(Provider{id, name, icon, provider,
-                                      titleBarVisible, titleBarColor, titleBarTextColor});
+    this->m_providers.append(provider);
 }
 
-const StreamingProviderStore::Provider &StreamingProviderStore::provider(const QString &id) const
+const Provider &StreamingProviderStore::provider(const QString &id) const
 {
-    static const Provider null{QString(), QString(), QString(), QUrl(),
-                               false, QColor(), QColor()};
-
     for (auto&& i : this->m_providers)
     {
         if (i.id == id)
@@ -47,5 +38,6 @@ const StreamingProviderStore::Provider &StreamingProviderStore::provider(const Q
         }
     }
 
-    return null;
+    // if the provider wasn't found return an empty one
+    return this->m_null;
 }

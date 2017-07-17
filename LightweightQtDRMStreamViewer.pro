@@ -15,14 +15,16 @@ SOURCES += \
     Core/StreamingProviderParser.cpp \
     Gui/TitleBar.cpp \
     Widgets/MainWindow.cpp \
-    Widgets/BrowserWindow.cpp
+    Widgets/BrowserWindow.cpp \
+    Core/ConfigManager.cpp
 
 HEADERS += \
     Core/StreamingProviderStore.hpp \
     Core/StreamingProviderParser.hpp \
     Gui/TitleBar.hpp \
     Widgets/MainWindow.hpp \
-    Widgets/BrowserWindow.hpp
+    Widgets/BrowserWindow.hpp \
+    Core/ConfigManager.hpp
 
 RESOURCES += \
     Resources/Resources.qrc

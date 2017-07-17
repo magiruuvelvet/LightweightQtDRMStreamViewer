@@ -5,28 +5,33 @@
 #include <QUrl>
 #include <QList>
 #include <QColor>
+#include <QIcon>
+
+class Provider
+{
+public:
+    Provider() {}
+
+    QString    id;
+
+    QString    name;
+    QIcon      icon;
+    QUrl       url = QUrl(QLatin1String("about:blank"));
+
+    QColor     titleBarColor;
+    QColor     titleBarTextColor;
+    bool       titleBarVisible = false;
+};
 
 class StreamingProviderStore
 {
 public:
-    ~StreamingProviderStore();
     static StreamingProviderStore *instance();
+    ~StreamingProviderStore();
 
-    void setProviderStorePath(const QString &path);
     const QString &providerStorePath() const;
 
-    struct Provider {
-        QString id;
-        QString name;
-        QString icon;
-        QUrl url;
-        bool titleBarVisible;
-        QColor titleBarColor;
-        QColor titleBarTextColor;
-    };
-
-    void addProvider(const QString &id, const QString &name, const QString &icon, const QUrl &url,
-                     bool titleBarVisible, const QColor &titleBarColor, const QColor &titleBarTextColor);
+    void addProvider(const Provider &provider);
     const QList<Provider> &providers() const
     { return this->m_providers; }
     const Provider &providerAt(int index) const
@@ -37,6 +42,8 @@ private:
     StreamingProviderStore();
     QList<Provider> m_providers;
     QString m_providerStorePath;
+
+    Provider m_null;
 };
 
 #endif // STREAMINGPROVIDERSTORE_HPP

@@ -22,7 +22,7 @@ class BrowserWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit BrowserWindow(bool titleBarVisible = false, QWidget *parent = nullptr);
+    explicit BrowserWindow(QWidget *parent = nullptr);
     ~BrowserWindow();
 
     void showNormal();
@@ -30,16 +30,16 @@ public:
 
     void setWindowTitle(const QString &title);
     void setWindowIcon(const QIcon &icon);
-    void setTitleBarVisibility(bool);
+    void setTitleBarVisibility(bool visible);
     void setTitleBarColor(const QColor &color, const QColor &textColor);
     void setBaseTitle(const QString &title);
     void setUrl(const QUrl &url);
-    void setCookieStoreId(const QString &id);
+    void setProfile(const QString &id);
 
     void reset();
 
 protected:
-//    bool eventFilter(QObject *obj, QEvent *e);
+    bool eventFilter(QObject *obj, QEvent *event);
 //    void enterEvent(QEvent*);
 //    void mouseMoveEvent(QMouseEvent*);
 //    void leaveEvent(QEvent*);
@@ -55,20 +55,21 @@ private slots:
     void hideCursor();
 
 private:
-    TitleBar *m_titleBar = nullptr;
-    void createTitleBar(bool visible = false);
     QVBoxLayout *m_layout;
+
+    void createTitleBar();
+    TitleBar *m_titleBar;
 
     QString m_baseTitle;
     QString m_cookieStoreId;
-
     QString m_engineProfilePath;
 
     QWebEngineView *webView;
     QWebEngineCookieStore *m_cookieStore;
     QVector<QNetworkCookie> m_cookies;
 
-    bool isMouseInsideWidget = false;
+    void loadEmbeddedScript(QString &target, const QString &filename);
+    QString mJs_hideScrollBars;
 };
 
 #endif // BROWSERWINDOW_HPP

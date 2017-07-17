@@ -1,12 +1,15 @@
-#include <Widgets/MainWindow.hpp>
 #include <QApplication>
+#include <QMessageBox>
 #include <QtWebEngine>
 
-#include <QDebug>
-
+#include <Core/ConfigManager.hpp>
 #include <Core/StreamingProviderParser.hpp>
 #include <Core/StreamingProviderStore.hpp>
+
+#include <Widgets/MainWindow.hpp>
 #include <Widgets/BrowserWindow.hpp>
+
+#include <QDebug>
 
 int main(int argc, char **argv)
 {
@@ -14,15 +17,18 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.9.2");
+    a.setApplicationVersion("0.9.8");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     StreamingProviderParser parser;
     parser.findAll();
     if (parser.providers().isEmpty())
     {
-        qDebug() << "WARNING: No providers found! There is nothing to do, exiting now...";
-        // TODO: implement a dialog to inform the user from the GUI environment
+        const char *msg = "WARNING: No providers found! There is nothing to do, exiting now...";
+        qDebug() << QObject::tr(msg);
+        QMessageBox::critical(nullptr, a.applicationDisplayName(),
+                              QObject::tr(msg),
+                              QMessageBox::Ok, QMessageBox::Ok);
         return 1;
     }
     else
@@ -45,47 +51,46 @@ int main(int argc, char **argv)
     qDebug() << "Initializing Qt Web Engine...";
     QtWebEngine::initialize();
 
-    QString startupProfile;
-    bool fullscreen = false; // only when using startup profile
-
     if (a.arguments().contains("--fullscreen", Qt::CaseInsensitive) ||
         a.arguments().contains("-fs", Qt::CaseInsensitive))
     {
-        fullscreen = true;
+        qDebug() << "Full screen mode was activated.";
+        Config()->fullScreenMode() = true;
     }
     for (auto&& i : a.arguments())
     {
         if (i.startsWith("--provider=", Qt::CaseInsensitive))
         {
-            startupProfile = i.mid(11);
+            Config()->startupProfile() = i.mid(11);
         }
     }
 
     // Skip main interface and directly load the given provider
-    if (!startupProfile.isEmpty())
+    if (!Config()->startupProfile().isEmpty())
     {
-        qDebug() << "Loading provider" << startupProfile;
+        qDebug() << "Loading provider" << Config()->startupProfile();
 
-        StreamingProviderStore::Provider pr = StreamingProviderStore::instance()->provider(startupProfile);
+        Provider pr = StreamingProviderStore::instance()->provider(Config()->startupProfile());
         if (pr.id.isEmpty())
         {
-            qDebug() << startupProfile << "No such provider! Exiting...";
+            qDebug() << Config()->startupProfile() << "No such provider! Exiting...";
             return 1;
         }
 
         qDebug() << "Loading browser window...";
-        BrowserWindow w(pr.titleBarVisible);
+        BrowserWindow w;
         w.reset();
 
         w.setBaseTitle(pr.name);
+        w.setTitleBarVisibility(pr.titleBarVisible);
         w.setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
         w.setWindowTitle("Loading...");
-        w.setWindowIcon(QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + pr.icon));
-        w.setCookieStoreId(pr.id);
-        w.setUrl(QUrl(pr.url));
+        w.setWindowIcon(pr.icon);
+        w.setProfile(pr.id);
+        w.setUrl(pr.url);
 
         qDebug() << "Everything done. Enjoy your shows/movies :D";
-        fullscreen ? w.showFullScreen() : w.show();
+        Config()->fullScreenMode() ? w.showFullScreen() : w.show();
 
         return a.exec();
     }

@@ -9,9 +9,9 @@ I made this for the only purpose to have something to watch (mainly) Netflix whi
 
 In the past I used Chrome (in `--app=... --kiosk` mode) but it spawns just too many different processes (10 tbh) with tons of threads (60+) I really don't understand what they are good for. On my laptop the total memory usage of all processes was over 4GB.
 
-One day I had enough of this nonsense and attempted to try something out with Qt and its Web Engine. Since I mainly develop in Qt this became very handy. Now this app was born. The total number of processes now is 4 (3 of `QtWebEngineProcess` [PepperFlash, Renderer, Zygote] and the main app process) with a total memory usage of just about 300MB maximum and about 20 threads. Over 1333% difference! Thats a lot.
+One day I had enough of this nonsense and attempted to try something out with Qt and its Web Engine. Since I mainly develop in Qt this became very handy. Now this app was born. The total number of processes now is 4 (3 of `QtWebEngineProcess` [PepperFlash, Renderer, Zygote] and the main app process) with a total memory usage of just about 300MB maximum and about 20 threads. Over 1333% difference! That's a lot.
 
-I'm releasing this here on GitHub in case anyone else is looking for web browser alternative to watch Netflix, Amazon and whatnot :D
+I'm releasing this here on GitHub in case anyone else is looking for web browser alternative to watch Netflix, Amazon and what not :D
 
 ### Requirements
 
@@ -80,7 +80,7 @@ url:https://www.netflix.com
  - `titlebar-color` (optimal, default is `#323232`):
    Colorize the title bar to match the primary color of the streaming website (example: Netflix has `#060606` on the very top).
 
- - `titlebar-text` (optimal, default is `#ffffff`):
+ - `titlebar-text-color` (optimal, default is `#ffffff`):
    Sets the title bar text color to keep it readable on the specified background color.
 
 
@@ -88,7 +88,7 @@ url:https://www.netflix.com
 
 There are command line arguments to skip the main UI and load straight into the browser window to start watching.
 
-- `--fullscreen`, `-fs`: starts the browser window in fullscreen mode (can only be used together with the `--provider` option)
+- `--fullscreen`, `-fs`: starts the browser window in fullscreen mode (the main UI is not affected by this)
 - `--provider={id}`: specify the streaming service to start
   - the `{id}` is the filename without the `.p` extension.
 
@@ -103,7 +103,15 @@ For my part I added this command line arguments mainly to skip the UI to create 
 - `Ctrl+F` toggle fullscreen mode
 - `Ctrl+Q` close browser window / or exit application when the main ui was skipped
 
-The application is completely frameless, while the main UI should be movable, the browser window is not. If you use window managers like KDE/KWin, Compiz or any tiling window manager this is no problem at all. On Windows you may experience some inconveniences. Sorry about that but window borders and decorations are ugly.
+- `Ctrl+H` (*temporary hack*) toggles the mouse cursor visibility (for buggy players \*cough*\ Maxdome \*cough*\)
+
+The application is completely frameless, while the main UI should be movable, the browser window is not. If you use window managers like KDE/KWin, Compiz or any tiling window manager this is no problem at all. On Windows you may want to take a look at the `titlebar` option (see above).
+
+## Script Injection
+
+I started to implement a JavaScript injection method to customize the user interface of the streaming websites. Currently there is only one hard-coded script which hides the scroll bars because I don't like them, they are disturbing. Once I got something better setup, scripts can be placed in the configuration directory and are executed in alphabetically order after the site finished loading.
+
+This is planned past the **v1.0** release!
 
 
 ## Browser Profiles and Caches

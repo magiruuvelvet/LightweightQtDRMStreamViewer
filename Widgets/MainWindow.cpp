@@ -1,5 +1,6 @@
 #include "MainWindow.hpp"
 
+#include <Core/ConfigManager.hpp>
 #include <Core/StreamingProviderStore.hpp>
 
 #include <QApplication>
@@ -34,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setMinimumHeight(this->height());
     QRect desktopSize = QApplication::desktop()->screenGeometry();
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
+
+    // Style Overrides
     this->setBackgroundRole(QPalette::Background);
     QPalette rootWinColorScheme;
     rootWinColorScheme.setColor(QPalette::All, QPalette::Background, QColor( 50,  50,  50, 255));
@@ -49,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     QToolTip::setPalette(toolTipPalette);
     QToolTip::setFont(QFont("Sans Serif", 10, QFont::Medium, false));
 
+    // Create Layout and Widgets
     this->_lV_main = new QVBoxLayout();
     this->_lV_main->setSizeConstraint(QLayout::SetMaximumSize);
     this->_lV_main->setContentsMargins(5, 8, 5, 5);
@@ -57,7 +61,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->_lH_titleBar = new QHBoxLayout();
     this->_lH_titleBar->setSizeConstraint(QLayout::SetMaximumSize);
     this->_lH_titleBar->setContentsMargins(0, 0, 0, 2);
-    //this->_lH_titleBar->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     this->_lV_main->addLayout(this->_lH_titleBar);
 
     this->_titleBarText = new QLabel(qApp->applicationDisplayName());
@@ -109,9 +112,9 @@ MainWindow::MainWindow(QWidget *parent)
                     "QPushButton:hover{outline: none; border: 1px solid #ffffff; padding: 5px; background-color: #555555;}"
                     "QPushButton:pressed{outline: none; border: 1px solid #ffffff; padding: 5px; background-color: #484848;}");
 
-        if (!i.icon.isEmpty())
+        if (!i.icon.isNull())
         {
-            this->_providerBtns.last()->setIcon(QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + i.icon));
+            this->_providerBtns.last()->setIcon(i.icon);
             this->_providerBtns.last()->setIconSize(QSize(80, 80));
             this->_providerBtns.last()->setText(QString());
             this->_providerBtns.last()->setToolTip(i.name);
@@ -143,17 +146,17 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
 void MainWindow::loadProfile()
 {
     QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
-    StreamingProviderStore::Provider pr = StreamingProviderStore::instance()->provider(button->objectName());
+    Provider pr = StreamingProviderStore::instance()->provider(button->objectName());
 
     this->browser->reset();
 
     this->browser->setBaseTitle(pr.name);
+    this->browser->setTitleBarVisibility(pr.titleBarVisible);
     this->browser->setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
     this->browser->setWindowTitle("Loading...");
-    this->browser->setTitleBarVisibility(pr.titleBarVisible);
-    this->browser->setWindowIcon(QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + pr.icon));
-    this->browser->setCookieStoreId(pr.id);
-    this->browser->setUrl(QUrl(pr.url));
+    this->browser->setWindowIcon(pr.icon);
+    this->browser->setProfile(pr.id);
+    this->browser->setUrl(pr.url);
 
-    this->browser->show();
+    Config()->fullScreenMode() ? this->browser->showFullScreen() : this->browser->showNormal();
 }
