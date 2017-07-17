@@ -30,12 +30,21 @@ public:
 
     void reset();
 
+protected:
+//    bool eventFilter(QObject *obj, QEvent *e);
+//    void enterEvent(QEvent*);
+//    void mouseMoveEvent(QMouseEvent*);
+//    void leaveEvent(QEvent*);
+
 public slots:
     void toggleFullScreen();
     void hideScrollBars();
 
 private slots:
     void acceptFullScreen(QWebEngineFullScreenRequest);
+    void toggleCursorVisibility();
+    void showCursor();
+    void hideCursor();
 
 private:
     QVBoxLayout *m_layout;
@@ -48,6 +57,8 @@ private:
     QWebEngineView *webView;
     QWebEngineCookieStore *m_cookieStore;
     QVector<QNetworkCookie> m_cookies;
+
+    bool isMouseInsideWidget = false;
 };
 
 #endif // BROWSERWINDOW_HPP

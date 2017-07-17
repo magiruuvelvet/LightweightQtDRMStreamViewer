@@ -14,6 +14,9 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->resize(desktopSize.width() / 1.2, desktopSize.height() / 1.2);
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
+//    this->installEventFilter(this);
+//    this->setMouseTracking(true);
+
     this->m_layout = new QVBoxLayout();
     this->m_layout->setContentsMargins(0, 0, 0, 0);
     this->m_layout->setMargin(0);
@@ -29,6 +32,11 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(toggleFullScreen()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
+
+    // temporary workaround until i figured out how to implement a player-like behavior
+    // note: the Maxdome player is buggy and slow, it also has major cursor visibility toggle issues,
+    //       that's why i want to implement such a feature client-side in this app
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this, SLOT(toggleCursorVisibility()));
 
     // Inject app name and version into the default Qt Web Engine user agent
     // the default looks like this:
@@ -103,9 +111,57 @@ void BrowserWindow::reset()
     this->close();
 }
 
+//bool BrowserWindow::eventFilter(QObject*, QEvent *e)
+//{
+//    if (e->type() == QEvent::MouseMove)
+//    {
+//         this->mouseMoveEvent(static_cast<QMouseEvent*>(e));
+//    }
+
+//    return false;
+//}
+
+//void BrowserWindow::enterEvent(QEvent*)
+//{
+//    qDebug() << "enterEvent";
+//    QTimer::singleShot(2000, this, &BrowserWindow::hideCursor);
+//}
+
+void BrowserWindow::hideCursor()
+{
+    this->setCursor(QCursor(Qt::BlankCursor));
+}
+
+//void BrowserWindow::leaveEvent(QEvent*)
+//{
+//    qDebug() << "leaveEvent";
+//    this->showCursor();
+//}
+
+void BrowserWindow::showCursor()
+{
+    this->setCursor(QCursor(Qt::ArrowCursor));
+}
+
+//void BrowserWindow::mouseMoveEvent(QMouseEvent*)
+//{
+//    qDebug() << "mouseMoveEvent";
+//    this->showCursor();
+//    QTimer::singleShot(2000, this, &BrowserWindow::hideCursor);
+//}
+
 void BrowserWindow::toggleFullScreen()
 {
     this->isFullScreen() ? this->showNormal() : this->showFullScreen();
+}
+
+void BrowserWindow::toggleCursorVisibility()
+{
+    // buggy as fuck and doesn't work most of the time
+    static bool hidden = false; // assume cursor is visible
+    this->unsetCursor();
+    hidden ? this->showCursor() : this->hideCursor();
+    hidden = !hidden;
 }
 
 void BrowserWindow::hideScrollBars()
