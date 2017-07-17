@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 
-#include <StreamingProviderStore.hpp>
+#include <Core/StreamingProviderStore.hpp>
 
 #include <QApplication>
 #include <QDesktopWidget>

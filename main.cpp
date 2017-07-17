@@ -1,12 +1,12 @@
-#include "MainWindow.hpp"
+#include <Widgets/MainWindow.hpp>
 #include <QApplication>
 #include <QtWebEngine>
 
 #include <QDebug>
 
-#include <StreamingProviderParser.hpp>
-#include <StreamingProviderStore.hpp>
-#include "BrowserWindow.hpp"
+#include <Core/StreamingProviderParser.hpp>
+#include <Core/StreamingProviderStore.hpp>
+#include <Widgets/BrowserWindow.hpp>
 
 int main(int argc, char **argv)
 {

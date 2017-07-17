@@ -11,18 +11,18 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 SOURCES += \
     main.cpp \
-    MainWindow.cpp \
-    StreamingProviderStore.cpp \
-    StreamingProviderParser.cpp \
-    BrowserWindow.cpp \
-    Gui/TitleBar.cpp
+    Core/StreamingProviderStore.cpp \
+    Core/StreamingProviderParser.cpp \
+    Gui/TitleBar.cpp \
+    Widgets/MainWindow.cpp \
+    Widgets/BrowserWindow.cpp
 
 HEADERS += \
-    MainWindow.hpp \
-    StreamingProviderStore.hpp \
-    StreamingProviderParser.hpp \
-    BrowserWindow.hpp \
-    Gui/TitleBar.hpp
+    Core/StreamingProviderStore.hpp \
+    Core/StreamingProviderParser.hpp \
+    Gui/TitleBar.hpp \
+    Widgets/MainWindow.hpp \
+    Widgets/BrowserWindow.hpp
 
 RESOURCES += \
-    res/resources.qrc
+    Resources/Resources.qrc

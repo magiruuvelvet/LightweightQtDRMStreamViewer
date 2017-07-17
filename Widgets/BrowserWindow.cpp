@@ -3,7 +3,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include <StreamingProviderStore.hpp>
+#include <Core/StreamingProviderStore.hpp>
 
 BrowserWindow::BrowserWindow(bool titleBarVisible, QWidget *parent)
     : QWidget(parent)
