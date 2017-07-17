@@ -105,6 +105,8 @@ For my part I added this command line arguments mainly to skip the UI to create 
 
 - `Ctrl+F` toggle fullscreen mode
 - `Ctrl+Q` close browser window / or exit application when the main ui was skipped
+- `F5` reload page
+- `Ctrl+F5` clear cache and reload page (force reload)
 
 - `Ctrl+H` (*temporary hack*) toggles the mouse cursor visibility (for buggy players \*cough*\ Maxdome \*cough*\)
 

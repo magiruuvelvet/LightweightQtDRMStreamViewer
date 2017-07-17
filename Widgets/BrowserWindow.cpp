@@ -37,6 +37,9 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(toggleFullScreen()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
 
+    new QShortcut(QKeySequence(Qt::Key_F5), this->webView, SLOT(reload()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F5), this, SLOT(forceReload()));
+
     // temporary workaround until i figured out how to implement a player-like behavior
     // note: the Maxdome player is buggy and slow, it also has major cursor visibility toggle issues,
     //       that's why i want to implement such a feature client-side in this app
@@ -263,6 +266,11 @@ bool BrowserWindow::eventFilter(QObject *, QEvent *event)
 void BrowserWindow::toggleFullScreen()
 {
     this->isFullScreen() ? this->showNormal() : this->showFullScreen();
+}
+
+void BrowserWindow::forceReload()
+{
+    this->webView->triggerPageAction(QWebEnginePage::ReloadAndBypassCache);
 }
 
 void BrowserWindow::onLoadProgress(int progress)
