@@ -5,7 +5,7 @@
 
 #include <StreamingProviderStore.hpp>
 
-BrowserWindow::BrowserWindow(QWidget *parent)
+BrowserWindow::BrowserWindow(bool titleBarVisible, QWidget *parent)
     : QWidget(parent)
 {
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::BypassGraphicsProxyWidget |
@@ -21,6 +21,8 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->m_layout->setContentsMargins(0, 0, 0, 0);
     this->m_layout->setMargin(0);
     this->m_layout->setSizeConstraint(QLayout::SetMaximumSize);
+
+    this->createTitleBar(titleBarVisible);
 
     this->webView = new QWebEngineView();
     this->webView->setContextMenuPolicy(Qt::NoContextMenu);
@@ -55,6 +57,24 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->webView->settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
 }
 
+void BrowserWindow::createTitleBar(bool visible)
+{
+    //this->setWindowFlag(Qt::FramelessWindowHint, false);
+    if (!this->m_titleBar)
+    {
+        this->m_titleBar = new TitleBar(this);
+        this->m_titleBar->setFixedHeight(25);
+        this->m_titleBar->setBackgroundRole(QPalette::Background);
+        QPalette titleBarScheme;
+        titleBarScheme.setColor(QPalette::All, QPalette::Background, QColor( 50,  50,  50, 255));
+        titleBarScheme.setColor(QPalette::All, QPalette::Text,       QColor(255, 255, 255, 255));
+        titleBarScheme.setColor(QPalette::All, QPalette::WindowText, QColor(255, 255, 255, 255));
+        this->m_titleBar->setPalette(titleBarScheme);
+        this->m_titleBar->setVisible(visible);
+        this->m_layout->addWidget(this->m_titleBar);
+    }
+}
+
 BrowserWindow::~BrowserWindow()
 {
     this->m_baseTitle.clear();
@@ -65,6 +85,35 @@ BrowserWindow::~BrowserWindow()
 void BrowserWindow::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title + QString::fromUtf8(" ─ ") + this->m_baseTitle);
+    if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
+}
+
+void BrowserWindow::setWindowIcon(const QIcon &icon)
+{
+    QWidget::setWindowIcon(icon);
+    if (this->m_titleBar) this->m_titleBar->setIcon(icon.pixmap(23, 23, QIcon::Normal, QIcon::On));
+}
+
+void BrowserWindow::setTitleBarVisibility(bool b)
+{
+    //this->setWindowFlag(Qt::FramelessWindowHint, !b);
+    if (this->m_titleBar)
+    {
+        this->m_titleBar->setVisible(b);
+    }
+}
+
+void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColor)
+{
+    if (this->m_titleBar)
+    {
+        QPalette titleBarScheme = this->m_titleBar->palette();
+        titleBarScheme.setColor(QPalette::All, QPalette::Background, color);
+        titleBarScheme.setColor(QPalette::All, QPalette::Text,       textColor);
+        titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
+        this->m_titleBar->setPalette(titleBarScheme);
+        this->setPalette(titleBarScheme);
+    }
 }
 
 void BrowserWindow::setBaseTitle(const QString &title)
@@ -149,6 +198,20 @@ void BrowserWindow::showCursor()
 //    this->showCursor();
 //    QTimer::singleShot(2000, this, &BrowserWindow::hideCursor);
 //}
+
+void BrowserWindow::showNormal()
+{
+    if (this->m_titleBar)
+        this->m_titleBar->setVisible(true);
+    QWidget::showNormal();
+}
+
+void BrowserWindow::showFullScreen()
+{
+    if (this->m_titleBar)
+        this->m_titleBar->setVisible(false);
+    QWidget::showFullScreen();
+}
 
 void BrowserWindow::toggleFullScreen()
 {

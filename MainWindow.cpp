@@ -99,6 +99,7 @@ MainWindow::MainWindow(QWidget *parent)
         this->_providerBtns.append(new QPushButton(i.name));
         this->_providerBtns.last()->setObjectName(i.id);
         this->_providerBtns.last()->setGeometry(-1, -1, 80, 80);
+        this->_providerBtns.last()->setMinimumWidth(80);
         this->_providerBtns.last()->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
         this->_providerBtns.last()->setFlat(true);
         this->_providerBtns.last()->setFocusPolicy(Qt::TabFocus);
@@ -147,7 +148,9 @@ void MainWindow::loadProfile()
     this->browser->reset();
 
     this->browser->setBaseTitle(pr.name);
+    this->browser->setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
     this->browser->setWindowTitle("Loading...");
+    this->browser->setTitleBarVisibility(pr.titleBarVisible);
     this->browser->setWindowIcon(QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + pr.icon));
     this->browser->setCookieStoreId(pr.id);
     this->browser->setUrl(QUrl(pr.url));

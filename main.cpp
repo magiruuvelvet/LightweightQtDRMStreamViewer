@@ -74,10 +74,11 @@ int main(int argc, char **argv)
         }
 
         qDebug() << "Loading browser window...";
-        BrowserWindow w;
+        BrowserWindow w(pr.titleBarVisible);
         w.reset();
 
         w.setBaseTitle(pr.name);
+        w.setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
         w.setWindowTitle("Loading...");
         w.setWindowIcon(QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + pr.icon));
         w.setCookieStoreId(pr.id);

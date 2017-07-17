@@ -4,6 +4,7 @@
 #include <QString>
 #include <QUrl>
 #include <QList>
+#include <QColor>
 
 class StreamingProviderStore
 {
@@ -19,9 +20,13 @@ public:
         QString name;
         QString icon;
         QUrl url;
+        bool titleBarVisible;
+        QColor titleBarColor;
+        QColor titleBarTextColor;
     };
 
-    void addProvider(const QString &id, const QString &name, const QString &icon, const QUrl &url);
+    void addProvider(const QString &id, const QString &name, const QString &icon, const QUrl &url,
+                     bool titleBarVisible, const QColor &titleBarColor, const QColor &titleBarTextColor);
     const QList<Provider> &providers() const
     { return this->m_providers; }
     const Provider &providerAt(int index) const

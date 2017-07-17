@@ -14,13 +14,15 @@ SOURCES += \
     MainWindow.cpp \
     StreamingProviderStore.cpp \
     StreamingProviderParser.cpp \
-    BrowserWindow.cpp
+    BrowserWindow.cpp \
+    Gui/TitleBar.cpp
 
 HEADERS += \
     MainWindow.hpp \
     StreamingProviderStore.hpp \
     StreamingProviderParser.hpp \
-    BrowserWindow.hpp
+    BrowserWindow.hpp \
+    Gui/TitleBar.hpp
 
 RESOURCES += \
     res/resources.qrc

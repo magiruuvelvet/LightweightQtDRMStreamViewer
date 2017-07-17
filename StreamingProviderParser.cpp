@@ -9,6 +9,7 @@
 #include <QDirIterator>
 #include <QByteArray>
 #include <QRegExp>
+#include <QColor>
 
 #include <QDebug>
 
@@ -41,7 +42,7 @@ void StreamingProviderParser::findAll()
     if (this->m_configPath.isEmpty())
         return;
 
-    QDirIterator providers(this->m_configPath + '/' + "providers", QStringList{"*.p"},
+    QDirIterator providers(StreamingProviderStore::instance()->providerStorePath(), QStringList{"*.p"},
                            QDir::Files | QDir::Readable | QDir::NoDotAndDotDot,
                            QDirIterator::FollowSymlinks | QDirIterator::Subdirectories);
     while (providers.hasNext())
@@ -58,7 +59,7 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
     if (this->m_configPath.isEmpty() || !this->m_providers.contains(provider_name))
         return false;
 
-    QFile file(this->m_configPath + '/' + "providers" + '/' + provider_name + ".p");
+    QFile file(StreamingProviderStore::instance()->providerStorePath() + '/' + provider_name + ".p");
     QString data;
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -81,6 +82,8 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
     data.clear();
 
     QString pName, pIcon, pUrl;
+    bool pTitleBarVisible = false;
+    QColor pTitleBarColor, pTitleBarTextColor;
     bool hasErrors = false;
 
     for (auto&& i : props)
@@ -88,6 +91,10 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         i.startsWith("name:") ? pName = i.mid(5).simplified() : QString();
         i.startsWith("icon:") ? pIcon = i.mid(5).simplified() : QString();
         i.startsWith("url:")  ? pUrl  = i.mid(4).simplified() : QString();
+
+        i.startsWith("titlebar:") ? pTitleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
+        i.startsWith("titlebar-color:") ? pTitleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);
+        i.startsWith("titlebar-text:") ? pTitleBarTextColor = QColor(i.mid(14).simplified()) : QColor(255, 255, 255, 255);
     }
 
     if (pName.isEmpty())
@@ -104,6 +111,18 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         qDebug() << provider_name << "Field 'url' must not be empty.";
         hasErrors = true;
     }
+    if (pTitleBarVisible && !pTitleBarColor.isValid())
+    {
+        qDebug() << provider_name << "Field 'titlebar-color' is not a valid color. See the Qt doc on how to set this field correctly."
+                                  << "Falling back to the default color which is #323232.";
+        pTitleBarColor = QColor(50, 50, 50, 255);
+    }
+    if (pTitleBarVisible && !pTitleBarTextColor.isValid())
+    {
+        qDebug() << provider_name << "Field 'titlebar-text' is not a valid color. See the Qt doc on how to set this field correctly."
+                                  << "Falling back to the default color which is #ffffff.";
+        pTitleBarTextColor = QColor(255, 255, 255, 255);
+    }
 
     if (hasErrors)
     {
@@ -111,7 +130,8 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         return false;
     }
 
-    StreamingProviderStore::instance()->addProvider(provider_name, pName, pIcon, pUrl);
+    StreamingProviderStore::instance()->addProvider(provider_name, pName, pIcon, pUrl,
+                                                    pTitleBarVisible, pTitleBarColor, pTitleBarTextColor);
 
     pName.clear();
     pIcon.clear();

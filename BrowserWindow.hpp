@@ -15,15 +15,23 @@
 
 #include <QShortcut>
 
+#include "Gui/TitleBar.hpp"
+
 class BrowserWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit BrowserWindow(QWidget *parent = nullptr);
+    explicit BrowserWindow(bool titleBarVisible = false, QWidget *parent = nullptr);
     ~BrowserWindow();
 
+    void showNormal();
+    void showFullScreen();
+
     void setWindowTitle(const QString &title);
+    void setWindowIcon(const QIcon &icon);
+    void setTitleBarVisibility(bool);
+    void setTitleBarColor(const QColor &color, const QColor &textColor);
     void setBaseTitle(const QString &title);
     void setUrl(const QUrl &url);
     void setCookieStoreId(const QString &id);
@@ -47,6 +55,8 @@ private slots:
     void hideCursor();
 
 private:
+    TitleBar *m_titleBar = nullptr;
+    void createTitleBar(bool visible = false);
     QVBoxLayout *m_layout;
 
     QString m_baseTitle;

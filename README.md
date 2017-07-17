@@ -63,6 +63,27 @@ icon:netflix.svgz
 url:https://www.netflix.com
 ```
 
+##### Options
+
+ - `name` (required):
+   Sets the display name of the provider. Used in the main UI and as window title.
+
+ - `icon` (optimal):
+   Sets the display icon of the provider. Used in the main UI and as window icon. If this field is omitted the window icon will be blank and the main UI shows the `name` instead of an icon.
+
+ - `url` (required):
+   The base URL the browser window should load. Set the root URL of the streaming service there.
+
+ - `titlebar` (optimal, default is `false`):
+   Set to `true` to show a client-side title bar for the browser window. The title bar can be used to move the window when your window manager doesn't support movement of frameless windows.
+
+ - `titlebar-color` (optimal, default is `#323232`):
+   Colorize the title bar to match the primary color of the streaming website (example: Netflix has `#060606` on the very top).
+
+ - `titlebar-text` (optimal, default is `#ffffff`):
+   Sets the title bar text color to keep it readable on the specified background color.
+
+
 #### Command line arguments
 
 There are command line arguments to skip the main UI and load straight into the browser window to start watching.
