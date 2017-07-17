@@ -47,7 +47,8 @@ protected:
 
 public slots:
     void toggleFullScreen();
-    void hideScrollBars();
+    void onLoadProgress(int);
+    void onLoadFinished(bool);
 
 private slots:
     void acceptFullScreen(QWebEngineFullScreenRequest);

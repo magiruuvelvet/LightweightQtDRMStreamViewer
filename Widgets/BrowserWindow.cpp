@@ -31,7 +31,8 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->setLayout(this->m_layout);
 
     QObject::connect(this->webView, &QWebEngineView::titleChanged, this, &BrowserWindow::setWindowTitle);
-    QObject::connect(this->webView, &QWebEngineView::loadFinished, this, &BrowserWindow::hideScrollBars);
+    QObject::connect(this->webView, &QWebEngineView::loadProgress, this, &BrowserWindow::onLoadProgress);
+    QObject::connect(this->webView, &QWebEngineView::loadFinished, this, &BrowserWindow::onLoadFinished);
 
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(toggleFullScreen()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
@@ -59,6 +60,16 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
     // load scripts for injection
     this->loadEmbeddedScript(this->mJs_hideScrollBars, "hide-scrollbars");
+
+    // a much better way to inject scripts
+    // make use of this when implementing a proper customizable js injector
+    // the scrollbar remover script is the only one for now
+    QWebEngineScriptCollection *scripts = this->webView->page()->profile()->scripts();
+    QWebEngineScript js_hideScrollBars;
+    js_hideScrollBars.setName("hide-scrollbars");
+    js_hideScrollBars.setInjectionPoint(QWebEngineScript::DocumentReady);
+    js_hideScrollBars.setSourceCode(this->mJs_hideScrollBars);
+    scripts->insert(js_hideScrollBars);
 }
 
 void BrowserWindow::createTitleBar()
@@ -254,9 +265,14 @@ void BrowserWindow::toggleFullScreen()
     this->isFullScreen() ? this->showNormal() : this->showFullScreen();
 }
 
-void BrowserWindow::hideScrollBars()
+void BrowserWindow::onLoadProgress(int progress)
 {
-    this->webView->page()->runJavaScript(this->mJs_hideScrollBars);
+    // soon™
+}
+
+void BrowserWindow::onLoadFinished(bool ok)
+{
+    // soon™
 }
 
 void BrowserWindow::acceptFullScreen(QWebEngineFullScreenRequest req)
