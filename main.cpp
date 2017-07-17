@@ -81,7 +81,9 @@ int main(int argc, char **argv)
         BrowserWindow w;
         w.reset();
 
-        w.setBaseTitle(pr.name);
+        pr.titleBarHasPermanentTitle ?
+            w.setBaseTitle(pr.titleBarPermanentTitle, true) :
+            w.setBaseTitle(pr.name);
         w.setTitleBarVisibility(pr.titleBarVisible);
         w.setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
         w.setWindowTitle("Loading...");

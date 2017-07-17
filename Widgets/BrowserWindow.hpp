@@ -33,7 +33,7 @@ public:
     void setWindowIcon(const QIcon &icon);
     void setTitleBarVisibility(bool visible);
     void setTitleBarColor(const QColor &color, const QColor &textColor);
-    void setBaseTitle(const QString &title);
+    void setBaseTitle(const QString &title, bool permanent = false);
     void setUrl(const QUrl &url);
     void setProfile(const QString &id);
 
@@ -63,6 +63,7 @@ private:
     bool m_titleBarVisibility = false;
 
     QString m_baseTitle;
+    bool m_permanentTitle = false;
     QString m_cookieStoreId;
     QString m_engineProfilePath;
 

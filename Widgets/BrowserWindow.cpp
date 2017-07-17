@@ -136,8 +136,11 @@ void BrowserWindow::showFullScreen()
 
 void BrowserWindow::setWindowTitle(const QString &title)
 {
-    QWidget::setWindowTitle(title + QString::fromUtf8(" ─ ") + this->m_baseTitle);
-    if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
+    if (!this->m_permanentTitle)
+    {
+        QWidget::setWindowTitle(title + QString::fromUtf8(" ─ ") + this->m_baseTitle);
+        if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
+    }
 }
 
 void BrowserWindow::setWindowIcon(const QIcon &icon)
@@ -187,9 +190,18 @@ void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColo
     }
 }
 
-void BrowserWindow::setBaseTitle(const QString &title)
+void BrowserWindow::setBaseTitle(const QString &title, bool permanent)
 {
-    this->m_baseTitle = title;
+    if (permanent)
+    {
+        this->m_permanentTitle = true;
+        QWidget::setWindowTitle(title);
+        if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
+    }
+    else
+    {
+        this->m_baseTitle = title;
+    }
 }
 
 void BrowserWindow::setUrl(const QUrl &url)

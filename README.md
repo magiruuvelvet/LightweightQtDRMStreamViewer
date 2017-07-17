@@ -77,6 +77,9 @@ url:https://www.netflix.com
  - `titlebar` (optimal, default is `false`):
    Set to `true` to show a client-side title bar for the browser window. The title bar can be used to move the window when your window manager doesn't support movement of frameless windows.
 
+ - `titlebar-text` (optimal):
+   Sets a permanent window title which never changes. Value can be empty to remove the window title. By default the title is constructed from the websites HTML `<title>` plus the providers `name` field separated by `─` and constantly changes depending on the current HTML loaded in the browser window.
+
  - `titlebar-color` (optimal, default is `#323232`):
    Colorize the title bar to match the primary color of the streaming website (example: Netflix has `#060606` on the very top).
 

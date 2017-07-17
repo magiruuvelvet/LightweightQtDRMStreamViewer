@@ -86,6 +86,12 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         i.startsWith("titlebar:") ? provider.titleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
         i.startsWith("titlebar-color:") ? provider.titleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);
         i.startsWith("titlebar-text-color:") ? provider.titleBarTextColor = QColor(i.mid(20).simplified()) : QColor(255, 255, 255, 255);
+
+        if (i.startsWith("titlebar-text:"))
+        {
+            provider.titleBarHasPermanentTitle = true;
+            provider.titleBarPermanentTitle = i.mid(14).simplified();
+        }
     }
 
     if (provider.name.isEmpty())

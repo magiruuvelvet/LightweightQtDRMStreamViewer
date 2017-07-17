@@ -150,7 +150,9 @@ void MainWindow::loadProfile()
 
     this->browser->reset();
 
-    this->browser->setBaseTitle(pr.name);
+    pr.titleBarHasPermanentTitle ?
+        this->browser->setBaseTitle(pr.titleBarPermanentTitle, true) :
+        this->browser->setBaseTitle(pr.name);
     this->browser->setTitleBarVisibility(pr.titleBarVisible);
     this->browser->setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
     this->browser->setWindowTitle("Loading...");

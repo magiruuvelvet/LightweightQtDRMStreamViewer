@@ -18,9 +18,11 @@ public:
     QIcon      icon;
     QUrl       url = QUrl(QLatin1String("about:blank"));
 
+    QString    titleBarPermanentTitle;
     QColor     titleBarColor;
     QColor     titleBarTextColor;
     bool       titleBarVisible = false;
+    bool       titleBarHasPermanentTitle = false;
 };
 
 class StreamingProviderStore
