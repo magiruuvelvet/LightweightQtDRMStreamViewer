@@ -135,3 +135,9 @@ The Qt Web Engine has plenty of settings. I tweaked the settings to be sufficien
  - App Icon:
    [movie protected](https://thenounproject.com/search/?q=movie&i=556272) by arjuazka from the Noun Project
 
+
+## Screenshots
+
+### Netflix as *"dedicated"* app <sup>(not really `:^)`)</sup>
+
+![Netflix](.github/netflix.png "Netflix")
