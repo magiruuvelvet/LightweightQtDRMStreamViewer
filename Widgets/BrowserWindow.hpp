@@ -25,6 +25,7 @@ public:
     explicit BrowserWindow(QWidget *parent = nullptr);
     ~BrowserWindow();
 
+    void show();
     void showNormal();
     void showFullScreen();
 
@@ -58,7 +59,8 @@ private:
     QVBoxLayout *m_layout;
 
     void createTitleBar();
-    TitleBar *m_titleBar;
+    TitleBar *m_titleBar = nullptr;
+    bool m_titleBarVisibility = false;
 
     QString m_baseTitle;
     QString m_cookieStoreId;

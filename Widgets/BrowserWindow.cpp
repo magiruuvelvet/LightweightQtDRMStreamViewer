@@ -74,7 +74,7 @@ void BrowserWindow::createTitleBar()
 
     this->m_titleBar->setPalette(titleBarScheme);
     this->m_titleBar->setVisible(false);
-    this->m_layout->addWidget(this->m_titleBar);
+    this->m_layout->insertWidget(0, this->m_titleBar);
 }
 
 void BrowserWindow::loadEmbeddedScript(QString &target, const QString &filename)
@@ -102,24 +102,42 @@ BrowserWindow::~BrowserWindow()
     this->mJs_hideScrollBars.clear();
 }
 
+void BrowserWindow::show()
+{
+    QWidget::show();
+
+    if (this->m_titleBar)
+    {
+        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+    }
+}
+
 void BrowserWindow::showNormal()
 {
-    if (this->m_titleBar)
-        this->m_titleBar->setVisible(true);
     QWidget::showNormal();
+
+    if (this->m_titleBar)
+    {
+        this->m_titleBarVisibility = true;
+        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+    }
 }
 
 void BrowserWindow::showFullScreen()
 {
-    if (this->m_titleBar)
-        this->m_titleBar->setVisible(false);
     QWidget::showFullScreen();
+
+    if (this->m_titleBar)
+    {
+        this->m_titleBarVisibility = false;
+        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+    }
 }
 
 void BrowserWindow::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title + QString::fromUtf8(" ─ ") + this->m_baseTitle);
-    this->m_titleBar->setTitle(QWidget::windowTitle());
+    if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
 }
 
 void BrowserWindow::setWindowIcon(const QIcon &icon)
@@ -127,28 +145,46 @@ void BrowserWindow::setWindowIcon(const QIcon &icon)
     if (icon.isNull())
     {
         QWidget::setWindowIcon(qApp->windowIcon());
-        this->m_titleBar->setIcon(qApp->windowIcon().pixmap(23, 23, QIcon::Normal, QIcon::On));
+        if (this->m_titleBar) this->m_titleBar->setIcon(qApp->windowIcon().pixmap(23, 23, QIcon::Normal, QIcon::On));
     }
     else
     {
         QWidget::setWindowIcon(icon);
-        this->m_titleBar->setIcon(icon.pixmap(23, 23, QIcon::Normal, QIcon::On));
+        if (this->m_titleBar) this->m_titleBar->setIcon(icon.pixmap(23, 23, QIcon::Normal, QIcon::On));
     }
 }
 
 void BrowserWindow::setTitleBarVisibility(bool visible)
 {
-    this->m_titleBar->setVisible(visible);
+    this->m_titleBarVisibility = visible;
+
+    if (this->m_titleBarVisibility)
+    {
+        if (!this->m_titleBar)
+        {
+            this->createTitleBar();
+        }
+
+        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+    }
+    else
+    {
+        delete this->m_titleBar;
+        this->m_titleBar = nullptr;
+    }
 }
 
 void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColor)
 {
-    QPalette titleBarScheme = this->m_titleBar->palette();
-    titleBarScheme.setColor(QPalette::All, QPalette::Background, color);
-    titleBarScheme.setColor(QPalette::All, QPalette::Text,       textColor);
-    titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
-    this->m_titleBar->setPalette(titleBarScheme);
-    this->setPalette(titleBarScheme);
+    if (this->m_titleBar)
+    {
+        QPalette titleBarScheme = this->m_titleBar->palette();
+        titleBarScheme.setColor(QPalette::All, QPalette::Background, color);
+        titleBarScheme.setColor(QPalette::All, QPalette::Text,       textColor);
+        titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
+        this->m_titleBar->setPalette(titleBarScheme);
+        this->setPalette(titleBarScheme);
+    }
 }
 
 void BrowserWindow::setBaseTitle(const QString &title)
