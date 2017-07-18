@@ -11,6 +11,30 @@
 
 #include <QDebug>
 
+#include <QFile>
+#include <QFileInfo>
+#include <QByteArray>
+void compress_plugin(const QString &in, int level = -1)
+{
+    if (!QFileInfo::exists(in))
+        return;
+
+    QFile ifile(in);
+    if (ifile.open(QFile::ReadOnly | QFile::Text))
+    {
+        QByteArray out = qCompress(ifile.readAll(), level);
+        ifile.close();
+
+        QFile ofile(in+".qgz");
+        if (ofile.open(QFile::WriteOnly))
+        {
+            ofile.write(out);
+            ofile.close();
+        }
+        out.clear();
+    }
+}
+
 int main(int argc, char **argv)
 {
     QApplication::setDesktopSettingsAware(false);
@@ -19,6 +43,12 @@ int main(int argc, char **argv)
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
     a.setApplicationVersion("0.9.9");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
+
+    if (a.arguments().contains("-c"))
+    {
+        compress_plugin(a.arguments().at(2), 9);
+        return 0;
+    }
 
     StreamingProviderParser parser;
     parser.findAll();

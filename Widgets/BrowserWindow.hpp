@@ -73,7 +73,7 @@ private:
     QWebEngineCookieStore *m_cookieStore;
     QVector<QNetworkCookie> m_cookies;
 
-    void loadEmbeddedScript(QString &target, const QString &filename);
+    void loadEmbeddedScript(QString &target, const QString &filename, bool compressed = false);
     QString mJs_hideScrollBars;
 };
 

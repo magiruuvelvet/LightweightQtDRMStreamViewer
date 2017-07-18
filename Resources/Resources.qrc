@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>app-icon.svgz</file>
-        <file>hide-scrollbars.js</file>
+        <file>hide-scrollbars.js.qgz</file>
     </qresource>
 </RCC>

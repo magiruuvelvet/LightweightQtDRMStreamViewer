@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     QRect desktopSize = QApplication::desktop()->screenGeometry();
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
+    this->setMouseTracking(true);
+    this->installEventFilter(this);
+
     // Style Overrides
     this->setBackgroundRole(QPalette::Background);
     QPalette rootWinColorScheme;
@@ -133,14 +136,124 @@ MainWindow::~MainWindow()
     this->_providerBtns.clear();
 }
 
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::HoverMove) {
+        QHoverEvent *mouseHoverEvent = static_cast<QHoverEvent *>(event);
+        this->mouseMove(mouseHoverEvent->pos(), mouseHoverEvent->oldPos());
+    }
+    // standard event processing
+    return QObject::eventFilter(obj, event);
+}
+
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
     this->m_clickPos = e->pos();
+
+    mMousePressed = e->button() == Qt::LeftButton;
+    if (mMousePressed)
+    {
+        if (left)
+        {
+            mClickedPos.setX(e->pos().x());
+        }
+        if (right)
+        {
+            mClickedPos.setX(width() - e->pos().x());
+        }
+        if (bottom)
+        {
+            mClickedPos.setY(height() - e->pos().y());
+        }
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (e->button() == Qt::LeftButton)
+    {
+        mMousePressed = false;
+    }
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
     this->move(e->globalPos() - this->m_clickPos);
+}
+
+// taken from https://github.com/alexcastano/borderless-qt
+// note: doesn't work as it should due to lazy integration in this app ¯\_(ツ)_/¯
+// needs more testing how this works and probably merge with `mouseMoveEvent`
+void MainWindow::mouseMove(QPoint newPos, QPoint oldPos)
+{
+    if (mMousePressed) {
+        int dx = newPos.x() - oldPos.x();
+        int dy = newPos.y() - oldPos.y();
+
+        QRect g = geometry();
+        QSize minSize = minimumSize();
+
+        // We don't resize if the windows has the minimum size
+        if (left) {
+            // Fix a bug when you try to resize to less than minimum size and
+            // then the mouse goes right again.
+            if (dx < 0 && oldPos.x() > mClickedPos.x() ) {
+                dx += oldPos.x() - mClickedPos.x();
+                if (dx > 0) {
+                    dx = 0;
+                }
+            } else if ( dx > 0 && g.width() - dx < minSize.width()) {
+                dx = g.width() - minSize.width();
+            }
+            g.setLeft(g.left() + dx);
+        }
+
+        if (right) {
+            // Fix a bug when you try to resize to less than minimum size and
+            // then the mouse goes right again.
+            if (dx > 0 && (width() - newPos.x() > mClickedPos.x())) {
+                dx -= width() - newPos.x() - mClickedPos.x();
+                if (dx < 0) {
+                    dx = 0;
+                }
+            }
+            g.setRight(g.right() + dx);
+        }
+        if (bottom) {
+            // Fix a bug when you try to resize to less than minimum size and
+            // then the mouse goes down again.
+            if (dy > 0 && (height() - newPos.y() > mClickedPos.y())) {
+                dy -= height() - newPos.y() - mClickedPos.y();
+                if (dy < 0) {
+                    dy = 0;
+                }
+            }
+            g.setBottom(g.bottom() + dy);
+        }
+        setGeometry(g);
+
+    } else {
+        QRect r = rect();
+        left = qAbs(newPos.x()- r.left()) <= 5;// &&
+            //newPos.y() > mTitleBar->height();
+        right = qAbs(newPos.x() - r.right()) <= 5;// &&
+            //newPos.y() > mTitleBar->height();
+        bottom = qAbs(newPos.y() - r.bottom()) <= 5;
+        bool hor = left | right;
+
+        if (hor && bottom) {
+            if (left)
+                setCursor(Qt::SizeBDiagCursor);
+            else
+                setCursor(Qt::SizeFDiagCursor);
+        } else if (hor) {
+            setCursor(Qt::SizeHorCursor);
+        } else if (bottom) {
+            setCursor(Qt::SizeVerCursor);
+        } else {
+            setCursor(Qt::ArrowCursor);
+        }
+    }
 }
 
 void MainWindow::loadProfile()

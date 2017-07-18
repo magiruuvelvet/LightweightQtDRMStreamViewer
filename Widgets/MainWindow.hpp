@@ -22,8 +22,11 @@ public:
     ~MainWindow();
 
 protected:
+    bool eventFilter(QObject *obj, QEvent *event);
     void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
+    void mouseMove(QPoint newPos, QPoint oldPos);
 
 private slots:
     void loadProfile();
@@ -40,6 +43,11 @@ private:
     BrowserWindow *browser;
 
     QPoint m_clickPos;
+    QPoint mClickedPos;
+    bool mMousePressed = false;
+    bool left;
+    bool right;
+    bool bottom;
 };
 
 #endif // MAINWINDOW_HPP

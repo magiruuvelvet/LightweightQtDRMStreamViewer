@@ -15,8 +15,8 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->resize(desktopSize.width() / 1.2, desktopSize.height() / 1.2);
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
-    this->installEventFilter(this);
     this->setMouseTracking(true);
+    this->installEventFilter(this);
 
     this->m_layout = new QVBoxLayout();
     this->m_layout->setContentsMargins(0, 0, 0, 0);
@@ -62,7 +62,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->webView->settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
 
     // load scripts for injection
-    this->loadEmbeddedScript(this->mJs_hideScrollBars, "hide-scrollbars");
+    this->loadEmbeddedScript(this->mJs_hideScrollBars, "hide-scrollbars", true);
 
     // a much better way to inject scripts
     // make use of this when implementing a proper customizable js injector
@@ -91,18 +91,35 @@ void BrowserWindow::createTitleBar()
     this->m_layout->insertWidget(0, this->m_titleBar);
 }
 
-void BrowserWindow::loadEmbeddedScript(QString &target, const QString &filename)
+void BrowserWindow::loadEmbeddedScript(QString &target, const QString &filename, bool compressed)
 {
-    QFile file(":/" + filename + ".js");
-    if (file.open(QFile::ReadOnly | QFile::Text))
+    if (compressed)
     {
-        target = file.readAll();
-        file.close();
-        qDebug() << "Loaded embedded script" << file.fileName();
+        QFile file(":/" + filename + ".js.qgz");
+        if (file.open(QFile::ReadOnly))
+        {
+            target = qUncompress(file.readAll());
+            file.close();
+            qDebug() << "Loaded compressed embedded script" << file.fileName();
+        }
+        else
+        {
+            qDebug() << "Error loading compressed embedded script" << file.fileName();
+        }
     }
     else
     {
-        qDebug() << "Error loading embedded script" << file.fileName();
+        QFile file(":/" + filename + ".js");
+        if (file.open(QFile::ReadOnly | QFile::Text))
+        {
+            target = file.readAll();
+            file.close();
+            qDebug() << "Loaded embedded script" << file.fileName();
+        }
+        else
+        {
+            qDebug() << "Error loading embedded script" << file.fileName();
+        }
     }
 }
 
