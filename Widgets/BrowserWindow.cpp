@@ -12,7 +12,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::BypassGraphicsProxyWidget |
                          Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     QRect desktopSize = QApplication::desktop()->screenGeometry();
-    this->resize(desktopSize.width() / 1.2, desktopSize.height() / 1.2);
+    this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
     this->setMouseTracking(true);
@@ -190,12 +190,14 @@ void BrowserWindow::setWindowIcon(const QIcon &icon)
 
 void BrowserWindow::setTitleBarVisibility(bool visible)
 {
+    QRect desktopSize = QApplication::desktop()->screenGeometry();
     this->m_titleBarVisibility = visible;
 
     if (this->m_titleBarVisibility)
     {
         if (!this->m_titleBar)
         {
+            this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
             this->createTitleBar();
         }
 
@@ -203,6 +205,8 @@ void BrowserWindow::setTitleBarVisibility(bool visible)
     }
     else
     {
+        this->resize(desktopSize.width() / 1.2, desktopSize.height() / 1.2);
+
         delete this->m_titleBar;
         this->m_titleBar = nullptr;
     }
