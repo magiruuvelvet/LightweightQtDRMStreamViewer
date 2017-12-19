@@ -39,6 +39,9 @@ public:
 
     void reset();
 
+signals:
+    void urlChanged(const QUrl &url);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 //    void enterEvent(QEvent*);
@@ -54,6 +57,7 @@ public slots:
 private slots:
     void acceptFullScreen(QWebEngineFullScreenRequest);
     void toggleCursorVisibility();
+    void toggleAddressBarVisibility();
     void showCursor();
     void hideCursor();
 
@@ -63,6 +67,8 @@ private:
     void createTitleBar();
     TitleBar *m_titleBar = nullptr;
     bool m_titleBarVisibility = false;
+
+    QLineEdit *emergencyAddressBar;
 
     QString m_baseTitle;
     bool m_permanentTitle = false;

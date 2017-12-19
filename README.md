@@ -15,7 +15,7 @@ I'm releasing this here on GitHub in case anyone else is looking for web browser
 
 ### Requirements
 
-- Qt 5.9 ( sorry if you are using an older version of Qt :( )
+- Qt 5.9+ ( sorry if you are using an older version of Qt :( )
 - Qt Web Engine built with proprietary codeces!! (important)
 - Adobe **PepperFlash** and the [**Widevine Content Decryptor**](https://www.widevine.com/) (both are included in Google Chrome, download and extract the following files - no need to install the whole browser)
   - `/opt/google/chrome/PepperFlash` (the whole folder)

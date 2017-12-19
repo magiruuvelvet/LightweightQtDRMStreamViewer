@@ -25,6 +25,19 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
     this->createTitleBar();
 
+    this->emergencyAddressBar = new QLineEdit();
+    this->emergencyAddressBar->hide();
+    QObject::connect(this->emergencyAddressBar, &QLineEdit::editingFinished, this, [&]{
+        this->setUrl(QUrl(this->emergencyAddressBar->text()));
+    });
+
+    QObject::connect(this, &BrowserWindow::urlChanged, this, [&](const QUrl &url){
+        this->emergencyAddressBar->setText(url.toString());
+    });
+
+    this->m_layout->addWidget(this->emergencyAddressBar);
+    new QShortcut(QKeySequence(Qt::Key_F1), this, SLOT(toggleAddressBarVisibility()));
+
     this->webView = new QWebEngineView();
     this->webView->setContextMenuPolicy(Qt::NoContextMenu);
     this->m_layout->addWidget(this->webView);
@@ -242,6 +255,7 @@ void BrowserWindow::setBaseTitle(const QString &title, bool permanent)
 void BrowserWindow::setUrl(const QUrl &url)
 {
     this->webView->setUrl(url);
+    emit urlChanged(url);
 }
 
 void BrowserWindow::setProfile(const QString &id)
@@ -311,6 +325,11 @@ void BrowserWindow::acceptFullScreen(QWebEngineFullScreenRequest req)
 
     // actually toggle fullscreen mode
     this->toggleFullScreen();
+}
+
+void BrowserWindow::toggleAddressBarVisibility()
+{
+    this->emergencyAddressBar->isVisible() ? this->emergencyAddressBar->hide() : this->emergencyAddressBar->show();
 }
 
 void BrowserWindow::toggleCursorVisibility()
