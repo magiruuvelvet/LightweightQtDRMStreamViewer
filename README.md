@@ -75,7 +75,7 @@ url:https://www.netflix.com
    The base URL the browser window should load. Set the root URL of the streaming service there.
 
  - `urlInterceptor` (optimal, enabled by default):
-   Hijacks (redirects) specific links by regular expression and loads external sources. Currently only the Netflix player is hijacked to enable 1080p playback. If Netflix stops working for you add `urlInterceptor:false` to the Netflix provider config file. **EXPERIMENTAL** feature, may not work!
+   Hijacks (redirects) specific links by regular expression and loads external sources. Currently only the Netflix player is hijacked to [enable 1080p playback](https://github.com/magiruuvelvet/netflix-1080p). If Netflix stops working for you add `urlInterceptor:false` to the Netflix provider config file. **EXPERIMENTAL** feature, may not work!
 
  - `titlebar` (optimal, default is `false`):
    Set to `true` to show a client-side title bar for the browser window. The title bar can be used to move the window when your window manager doesn't support movement of frameless windows.

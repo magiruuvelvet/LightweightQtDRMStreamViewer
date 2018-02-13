@@ -20,13 +20,13 @@ void UrlRequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
     // URLs to hijack:
     //  -> "*://assets.nflxext.com/*/ffe/player/html/*",
     //  -> "*://www.assets.nflxext.com/*/ffe/player/html/*"
-    // https://github.com/magiruuvelvet/netflix-1080p/raw/master/cadmium-playercore-5.0008.572.011.js
+    // https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js
     static const QRegExp netflix1080p_pattern(".*\:\/\/assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*|"
                                               ".*\:\/\/www\.assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*");
 
     if (netflix1080p_pattern.exactMatch(info.requestUrl().toString()))
     {
         qDebug() << "Netflix Player detected! Injecting Netflix 1080p Unlocker...";
-        info.redirect(QUrl("https://github.com/magiruuvelvet/netflix-1080p/raw/master/cadmium-playercore-5.0008.572.011.js"));
+        info.redirect(QUrl("https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js"));
     }
 }
