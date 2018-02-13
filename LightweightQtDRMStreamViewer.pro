@@ -16,7 +16,8 @@ SOURCES += \
     Gui/TitleBar.cpp \
     Widgets/MainWindow.cpp \
     Widgets/BrowserWindow.cpp \
-    Core/ConfigManager.cpp
+    Core/ConfigManager.cpp \
+    Util/UrlRequestInterceptor.cpp
 
 HEADERS += \
     Core/StreamingProviderStore.hpp \
@@ -24,7 +25,8 @@ HEADERS += \
     Gui/TitleBar.hpp \
     Widgets/MainWindow.hpp \
     Widgets/BrowserWindow.hpp \
-    Core/ConfigManager.hpp
+    Core/ConfigManager.hpp \
+    Util/UrlRequestInterceptor.hpp
 
 RESOURCES += \
     Resources/Resources.qrc

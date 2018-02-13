@@ -271,6 +271,7 @@ void MainWindow::loadProfile()
     this->browser->setWindowTitle("Loading...");
     this->browser->setWindowIcon(pr.icon);
     this->browser->setProfile(pr.id);
+    this->browser->setUrlInterceptorEnabled(pr.urlInterceptor);
     this->browser->setUrl(pr.url);
 
     Config()->fullScreenMode() ? this->browser->showFullScreen() : this->browser->showNormal();

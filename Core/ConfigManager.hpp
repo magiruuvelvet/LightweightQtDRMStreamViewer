@@ -26,6 +26,10 @@ public:
     const bool &fullScreenMode() const { return this->m_fullScreenMode; }
     bool &fullScreenMode() { return this->m_fullScreenMode; }
 
+    // Use URL Interceptor to hijack URLs
+    const bool &urlInterceptorEnabled() const { return this->m_urlInterceptorEnabled; }
+    bool &urlInterceptorEnabled() { return this->m_urlInterceptorEnabled; }
+
 private:
     ConfigManager();
 
@@ -35,6 +39,7 @@ private:
 
     QString m_startupProfile;
     bool m_fullScreenMode = false;
+    bool m_urlInterceptorEnabled = true;
 };
 
 inline ConfigManager *Config()

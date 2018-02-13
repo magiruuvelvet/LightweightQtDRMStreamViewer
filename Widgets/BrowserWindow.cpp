@@ -258,6 +258,22 @@ void BrowserWindow::setUrl(const QUrl &url)
     emit urlChanged(url);
 }
 
+void BrowserWindow::setUrlInterceptorEnabled(bool b)
+{
+    this->m_interceptorEnabled = b;
+    if (b)
+    {
+        qDebug() << "URL Interceptor enabled!";
+        this->m_interceptor = new UrlRequestInterceptor();
+        this->webView->page()->profile()->setRequestInterceptor(this->m_interceptor);
+    }
+    else
+    {
+        qDebug() << "URL Interceptor disabled!";
+        this->webView->page()->profile()->setRequestInterceptor(nullptr);
+    }
+}
+
 void BrowserWindow::setProfile(const QString &id)
 {
     this->m_engineProfilePath = Config()->webEngineProfiles() + '/' + id;

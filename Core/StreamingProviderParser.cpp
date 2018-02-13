@@ -82,6 +82,7 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         i.startsWith("name:") ? provider.name = i.mid(5).simplified() : QString();
         i.startsWith("icon:") ? provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + i.mid(5).simplified()) : QIcon();
         i.startsWith("url:")  ? provider.url  = QUrl(i.mid(4).simplified()) : QUrl();
+        i.startsWith("urlInterceptor:") ? (provider.urlInterceptor = i.mid(15).simplified() == "true" ? true : false) : true;
 
         i.startsWith("titlebar:") ? provider.titleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
         i.startsWith("titlebar-color:") ? provider.titleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);

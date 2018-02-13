@@ -17,6 +17,8 @@
 
 #include "Gui/TitleBar.hpp"
 
+#include "Util/UrlRequestInterceptor.hpp"
+
 class BrowserWindow : public QWidget
 {
     Q_OBJECT
@@ -35,6 +37,7 @@ public:
     void setTitleBarColor(const QColor &color, const QColor &textColor);
     void setBaseTitle(const QString &title, bool permanent = false);
     void setUrl(const QUrl &url);
+    void setUrlInterceptorEnabled(bool);
     void setProfile(const QString &id);
 
     void reset();
@@ -78,6 +81,8 @@ private:
     QWebEngineView *webView;
     QWebEngineCookieStore *m_cookieStore;
     QVector<QNetworkCookie> m_cookies;
+    UrlRequestInterceptor *m_interceptor;
+    bool m_interceptorEnabled = true;
 
     void loadEmbeddedScript(QString &target, const QString &filename, bool compressed = false);
     QString mJs_hideScrollBars;

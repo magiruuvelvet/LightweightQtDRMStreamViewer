@@ -17,6 +17,7 @@ public:
     QString    name;
     QIcon      icon;
     QUrl       url = QUrl(QLatin1String("about:blank"));
+    bool       urlInterceptor = true;
 
     QString    titleBarPermanentTitle;
     QColor     titleBarColor;
