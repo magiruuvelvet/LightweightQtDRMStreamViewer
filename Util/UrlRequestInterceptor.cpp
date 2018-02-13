@@ -21,8 +21,8 @@ void UrlRequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
     //  -> "*://assets.nflxext.com/*/ffe/player/html/*",
     //  -> "*://www.assets.nflxext.com/*/ffe/player/html/*"
     // https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js
-    static const QRegExp netflix1080p_pattern(".*\:\/\/assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*|"
-                                              ".*\:\/\/www\.assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*");
+    static const QRegExp netflix1080p_pattern(R"(.*\:\/\/assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*|)"
+                                              R"(.*\:\/\/www\.assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*)");
 
     if (netflix1080p_pattern.exactMatch(info.requestUrl().toString()))
     {
