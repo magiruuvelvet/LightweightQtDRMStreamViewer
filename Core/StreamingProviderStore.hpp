@@ -24,6 +24,8 @@ public:
     QColor     titleBarTextColor;
     bool       titleBarVisible = false;
     bool       titleBarHasPermanentTitle = false;
+
+    QList<QString> scripts;
 };
 
 class StreamingProviderStore

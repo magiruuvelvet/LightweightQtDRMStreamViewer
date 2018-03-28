@@ -93,6 +93,9 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
             provider.titleBarHasPermanentTitle = true;
             provider.titleBarPermanentTitle = i.mid(14).simplified();
         }
+
+        if (i.startsWith("script:"))
+            provider.scripts.append(i.mid(7).simplified());
     }
 
     if (provider.name.isEmpty())

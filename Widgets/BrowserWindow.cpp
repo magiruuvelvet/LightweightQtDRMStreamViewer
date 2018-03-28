@@ -80,12 +80,12 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     // a much better way to inject scripts
     // make use of this when implementing a proper customizable js injector
     // the scrollbar remover script is the only one for now
-    QWebEngineScriptCollection *scripts = this->webView->page()->profile()->scripts();
+    this->scripts = this->webView->page()->profile()->scripts();
     QWebEngineScript js_hideScrollBars;
     js_hideScrollBars.setName("hide-scrollbars");
     js_hideScrollBars.setInjectionPoint(QWebEngineScript::DocumentReady);
     js_hideScrollBars.setSourceCode(this->mJs_hideScrollBars);
-    scripts->insert(js_hideScrollBars);
+    this->scripts->insert(js_hideScrollBars);
 }
 
 void BrowserWindow::createTitleBar()
@@ -102,6 +102,29 @@ void BrowserWindow::createTitleBar()
     this->m_titleBar->setPalette(titleBarScheme);
     this->m_titleBar->setVisible(false);
     this->m_layout->insertWidget(0, this->m_titleBar);
+}
+
+QWebEngineScript *BrowserWindow::loadScript(const QString &filename)
+{
+    QFile file(Config()->providerStoreDir() + '/' + filename);
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QString target = file.readAll();
+        file.close();
+
+        QWebEngineScript *script = new QWebEngineScript();
+        script->setName(filename);
+        script->setInjectionPoint(QWebEngineScript::DocumentReady);
+        script->setSourceCode(target);
+
+        qDebug() << "Loaded script" << file.fileName();
+        return script;
+    }
+    else
+    {
+        qDebug() << "Error loading script" << file.fileName();
+        return nullptr;
+    }
 }
 
 void BrowserWindow::loadEmbeddedScript(QString &target, const QString &filename, bool compressed)
@@ -266,16 +289,31 @@ void BrowserWindow::setUrlInterceptorEnabled(bool b)
         qDebug() << "URL Interceptor enabled!";
         this->m_interceptor = new UrlRequestInterceptor();
         this->webView->page()->profile()->setRequestInterceptor(this->m_interceptor);
+
+        this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+        //this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
+        //this->webView->settings()->setAttribute(QWebEngineSettings::XSSAuditingEnabled, true);
+        this->webView->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
     }
     else
     {
         qDebug() << "URL Interceptor disabled!";
         this->webView->page()->profile()->setRequestInterceptor(nullptr);
+
+        this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, false);
+        //this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, false);
+        //this->webView->settings()->setAttribute(QWebEngineSettings::XSSAuditingEnabled, false);
+        this->webView->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, false);
     }
 }
 
 void BrowserWindow::setProfile(const QString &id)
 {
+//    for(auto&& script : this->m_scripts)
+//    {
+//        this->scripts->remove();
+//    }
+
     this->m_engineProfilePath = Config()->webEngineProfiles() + '/' + id;
 
     this->m_cookieStoreId = id;
@@ -284,6 +322,19 @@ void BrowserWindow::setProfile(const QString &id)
     this->webView->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::AllowPersistentCookies);
     this->m_cookieStore = this->webView->page()->profile()->cookieStore();
     this->m_cookieStore->loadAllCookies();
+}
+
+void BrowserWindow::setScripts(const QList<QString> &scripts)
+{
+    this->m_scripts = scripts;
+
+    qDebug() << "Available scripts for this profile:" << this->m_scripts;
+    for (auto&& script : this->m_scripts)
+    {
+        qDebug() << "Loading script:" << script;
+        QWebEngineScript *scr = this->loadScript(script);
+        scr ? this->scripts->insert(*scr) : void();
+    }
 }
 
 void BrowserWindow::reset()

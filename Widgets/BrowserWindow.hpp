@@ -39,6 +39,7 @@ public:
     void setUrl(const QUrl &url);
     void setUrlInterceptorEnabled(bool);
     void setProfile(const QString &id);
+    void setScripts(const QList<QString> &scripts);
 
     void reset();
 
@@ -84,8 +85,12 @@ private:
     UrlRequestInterceptor *m_interceptor;
     bool m_interceptorEnabled = true;
 
+    QWebEngineScript *loadScript(const QString &filename);
     void loadEmbeddedScript(QString &target, const QString &filename, bool compressed = false);
     QString mJs_hideScrollBars;
+
+    QWebEngineScriptCollection *scripts;
+    QList<QString> m_scripts;
 };
 
 #endif // BROWSERWINDOW_HPP

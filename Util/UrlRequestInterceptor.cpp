@@ -27,6 +27,8 @@ void UrlRequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
     if (netflix1080p_pattern.exactMatch(info.requestUrl().toString()))
     {
         qDebug() << "Netflix Player detected! Injecting Netflix 1080p Unlocker...";
-        info.redirect(QUrl("https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js"));
+        //info.redirect(QUrl("https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js"));
+        /// raw.githubusercontent.com returns the wrong MIME type, therefore the script refuses to be executed by the engine
+        info.redirect(QUrl("https://rawgit.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.544.011-1080p.js"));
     }
 }
