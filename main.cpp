@@ -119,6 +119,8 @@ int main(int argc, char **argv)
         w.setWindowTitle("Loading...");
         w.setWindowIcon(pr.icon);
         w.setProfile(pr.id);
+        w.setScripts(pr.scripts);
+        w.setUrlInterceptorEnabled(pr.urlInterceptor);
         w.setUrl(pr.url);
 
         qDebug() << "Everything done. Enjoy your shows/movies :D";
