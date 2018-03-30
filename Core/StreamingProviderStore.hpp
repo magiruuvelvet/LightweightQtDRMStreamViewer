@@ -7,11 +7,14 @@
 #include <QColor>
 #include <QIcon>
 
-class Provider
+struct UrlInterceptorLink
 {
-public:
-    Provider() {}
+    QRegExp pattern;
+    QUrl target;
+};
 
+struct Provider
+{
     QString    id;
 
     QString    name;
@@ -25,6 +28,7 @@ public:
     bool       titleBarVisible = false;
     bool       titleBarHasPermanentTitle = false;
 
+    QList<UrlInterceptorLink> urlInterceptorLinks;
     QList<QString> scripts;
 };
 

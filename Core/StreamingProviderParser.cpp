@@ -94,8 +94,36 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
             provider.titleBarPermanentTitle = i.mid(14).simplified();
         }
 
+        if (i.startsWith("urlInterceptorPattern:"))
+        {
+            const auto pattern = i.mid(22).simplified();
+            provider.urlInterceptorLinks.append(UrlInterceptorLink{QRegExp(pattern), QUrl()});
+            qDebug() << provider_name << "Found URL Interceptor Pattern:" << pattern;
+        }
+        if (i.startsWith("urlInterceptorTarget:"))
+        {
+            const auto target = i.mid(21).simplified();
+            if (provider.urlInterceptorLinks.size() != 0 &&
+                !provider.urlInterceptorLinks.last().pattern.isEmpty() &&
+                provider.urlInterceptorLinks.last().target.isEmpty())
+            {
+                provider.urlInterceptorLinks.last().target = QUrl(target);
+                qDebug() << provider_name << "Added new target for pattern:" << target;
+            }
+            else
+            {
+                qDebug() << provider_name << "Missing pattern or target for last pattern!";
+            }
+        }
+
         if (i.startsWith("script:"))
-            provider.scripts.append(i.mid(7).simplified());
+        {
+            const auto script = i.mid(7).simplified();
+            if (!provider.scripts.contains(script))
+                provider.scripts.append(script);
+            else
+                qDebug() << provider_name << "Warning: Duplicate 'script' skipped ->" << script;
+        }
     }
 
     if (provider.name.isEmpty())
@@ -123,6 +151,19 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         qDebug() << provider_name << "Field 'titlebar-text-color' is not a valid color. See the Qt doc on how to set this field correctly."
                                   << "Falling back to the default color which is #ffffff.";
         provider.titleBarTextColor = QColor(255, 255, 255, 255);
+    }
+
+    if (!provider.urlInterceptorLinks.isEmpty())
+    {
+        for (auto&& url : provider.urlInterceptorLinks)
+        {
+            qDebug() << url.pattern.isEmpty() << url.target.isEmpty();
+            if (url.pattern.isEmpty() || url.target.isEmpty())
+            {
+                qDebug() << provider_name << "URL Interceptor list is invalid. Please fix the issue.";
+                hasErrors = true;
+            }
+        }
     }
 
     if (hasErrors)
