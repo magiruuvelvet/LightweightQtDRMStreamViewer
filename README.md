@@ -15,8 +15,9 @@ I'm releasing this here on GitHub in case anyone else is looking for web browser
 
 ### Requirements
 
-- Qt 5.9+ ( sorry if you are using an older version of Qt :( )
-- Qt Web Engine built with proprietary codeces!! (important)
+- Qt 5.9+
+- Qt Web Engine built with proprietary codeces!! (important) <br>
+  [`WEBENGINE_CONFIG+=use_proprietary_codecs`](https://blog.qt.io/blog/2016/06/03/netflix-qt-webengine-5-7/)
 - Adobe **PepperFlash** and the [**Widevine Content Decryptor**](https://www.widevine.com/) (both are included in Google Chrome, download and extract the following files - no need to install the whole browser)
   - `/opt/google/chrome/PepperFlash` (the whole folder)
   - `/opt/google/chrome/libwidevinecdm.so`
@@ -44,7 +45,7 @@ The main interface is just made of a client-side title bar, a really tiny close 
 *Note: Services needs to be added manually. See below how.*
 
 
-## How to use this useful app?
+## Usage
 
 #### Adding Services to the list
 
@@ -75,7 +76,10 @@ url:https://www.netflix.com
    The base URL the browser window should load. Set the root URL of the streaming service there.
 
  - `urlInterceptor` (optimal, enabled by default):
-   Hijacks (redirects) specific links by regular expression and loads external sources. Currently only the Netflix player is hijacked to [enable 1080p playback](https://github.com/magiruuvelvet/netflix-1080p). If Netflix stops working for you add `urlInterceptor:false` to the Netflix provider config file. **EXPERIMENTAL** feature, may not work!
+   Hijacks (redirects) specific links by regular expression and loads external sources. Currently only the Netflix player is hijacked to [enable 1080p playback](https://github.com/magiruuvelvet/netflix-1080p). If Netflix stops working for you add `urlInterceptor:false` to the Netflix provider config file.
+
+ - `script` (optimal, *stackable*):
+   A JavaScript file to inject into all pages of the current profile. This option can be stacked, which means added multiple times in a row. The app maintains a list internally and loads the scripts in the order of appearance.
 
  - `titlebar` (optimal, default is `false`):
    Set to `true` to show a client-side title bar for the browser window. The title bar can be used to move the window when your window manager doesn't support movement of frameless windows.
@@ -108,7 +112,7 @@ For my part I added this command line arguments mainly to skip the UI to create 
 
 - `Ctrl+F` toggle fullscreen mode
 - `Ctrl+Q` close browser window / or exit application when the main ui was skipped
-- `F5` reload page
+- `F5` reload page (sometimes needed on Netflix when the player crashes)
 - `Ctrl+F5` clear cache and reload page (force reload)
 
 - `Ctrl+H` (*temporary hack*) toggles the mouse cursor visibility (for buggy players \*cough*\ Maxdome \*cough*\)
@@ -124,7 +128,7 @@ This is planned past the **v1.0** release!
 
 ## Browser Profiles and Caches
 
-Every provider has its very own browser profile and caches. They are located in the `WebEngineProfiles` subfolder in the configuration directory.
+Every provider has its very own browser profile and caches. They are located in the `WebEngineProfiles` subfolder in the configuration directory. Additionally Qt also stores data into the generic data path of your OS under `LightweightQtDRMStreamViewer/QtWebEngine`. On XDG platforms this is `~/.local/share` and on Windows its the `AppData` directory.
 
 Login credentials are remembered if you tick that "Remember me" checkbox. No need to login every single time :)
 
