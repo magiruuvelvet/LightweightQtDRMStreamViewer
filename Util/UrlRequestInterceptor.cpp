@@ -8,27 +8,24 @@ UrlRequestInterceptor::UrlRequestInterceptor(QObject *parent)
 {
 }
 
+UrlRequestInterceptor::UrlRequestInterceptor(const QList<UrlInterceptorLink> &urlInterceptorLinks,
+                                             QObject *parent)
+    : QWebEngineUrlRequestInterceptor(parent)
+{
+    this->urlInterceptorLinks = urlInterceptorLinks;
+}
+
 void UrlRequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
 {
-//    if (info.requestUrl().toString().contains("magiruuvelvet.gdn")) {
-//        qDebug() << "hijacked url";
-//        info.redirect(QUrl("http://localhost"));
-//    }
-
-    // Netflix-1080p
-    //   ( https://github.com/truedread/netflix-1080p )
-    // URLs to hijack:
-    //  -> "*://assets.nflxext.com/*/ffe/player/html/*",
-    //  -> "*://www.assets.nflxext.com/*/ffe/player/html/*"
-    // https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js
-    static const QRegExp netflix1080p_pattern(R"(.*\:\/\/assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*|)"
-                                              R"(.*\:\/\/www\.assets\.nflxext\.com\/.*\/ffe\/player\/html\/.*)");
-
-    if (netflix1080p_pattern.exactMatch(info.requestUrl().toString()))
+    for (auto&& url : this->urlInterceptorLinks)
     {
-        qDebug() << "Netflix Player detected! Injecting Netflix 1080p Unlocker...";
-        //info.redirect(QUrl("https://raw.githubusercontent.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.572.011.js"));
-        /// raw.githubusercontent.com returns the wrong MIME type, therefore the script refuses to be executed by the engine
-        info.redirect(QUrl("https://rawgit.com/magiruuvelvet/netflix-1080p/master/cadmium-playercore-5.0008.544.011-1080p.js"));
+        // too spammy, just show matches
+        //qDebug() << "[URL Interceptor] Trying: " << url.pattern;
+        if (url.pattern.exactMatch(info.requestUrl().toString()))
+        {
+            qDebug() << "[URL Interceptor] Match! -> " << url.target;
+            info.redirect(url.target);
+            return;
+        }
     }
 }

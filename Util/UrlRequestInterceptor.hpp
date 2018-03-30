@@ -2,6 +2,7 @@
 #define URLREQUESTINTERCEPTOR_HPP
 
 #include <QWebEngineUrlRequestInterceptor>
+#include <Core/StreamingProviderStore.hpp>
 
 class UrlRequestInterceptor : public QWebEngineUrlRequestInterceptor
 {
@@ -9,7 +10,11 @@ class UrlRequestInterceptor : public QWebEngineUrlRequestInterceptor
 
 public:
     UrlRequestInterceptor(QObject *parent = nullptr);
+    UrlRequestInterceptor(const QList<UrlInterceptorLink> &urlInterceptorLinks, QObject *parnet = nullptr);
     void interceptRequest(QWebEngineUrlRequestInfo &info) override;
+
+private:
+    QList<UrlInterceptorLink> urlInterceptorLinks;
 };
 
 #endif // URLREQUESTINTERCEPTOR_HPP
