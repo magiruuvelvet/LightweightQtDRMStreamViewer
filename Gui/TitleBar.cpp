@@ -58,7 +58,7 @@ void TitleBar::mouseMoveEvent(QMouseEvent *event)
                                                 event->globalY() - m_nMouseClick_Y_Coordinate);
 }
 
-void TitleBar::mouseDoubleClickEvent(QMouseEvent *event)
+void TitleBar::mouseDoubleClickEvent(QMouseEvent *)
 {
     if (this->parentWidget()->isFullScreen())
         return;
