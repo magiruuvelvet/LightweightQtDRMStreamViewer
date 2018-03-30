@@ -6,8 +6,6 @@
 #include <QWebEngineCookieStore>
 #include <QNetworkCookie>
 
-#include <QWidget>
-#include <QLayout>
 #include <QString>
 #include <QVector>
 #include <QList>
@@ -15,17 +13,21 @@
 
 #include <QShortcut>
 
-#include "Gui/TitleBar.hpp"
+#include <Gui/BaseWindow.hpp>
+#include <Util/UrlRequestInterceptor.hpp>
+#include <Core/StreamingProviderStore.hpp>
 
-#include "Util/UrlRequestInterceptor.hpp"
-
-class BrowserWindow : public QWidget
+class BrowserWindow : public BaseWindow
 {
     Q_OBJECT
+    friend void StreamingProviderStore::loadProfile(BrowserWindow*,const Provider&);
 
-public:
+private:
     explicit BrowserWindow(QWidget *parent = nullptr);
+public:
     ~BrowserWindow();
+
+    static BrowserWindow *createBrowserWindow(const Provider &profile);
 
     void show();
     void showNormal();
@@ -37,20 +39,18 @@ public:
     void setTitleBarColor(const QColor &color, const QColor &textColor);
     void setBaseTitle(const QString &title, bool permanent = false);
     void setUrl(const QUrl &url);
-    void setUrlInterceptorEnabled(bool);
+    void setUrlInterceptorEnabled(bool, const QList<UrlInterceptorLink> &urlInterceptorLinks = QList<UrlInterceptorLink>());
     void setProfile(const QString &id);
     void setScripts(const QList<QString> &scripts);
 
-    void reset();
-
 signals:
+    void opened();
+    void closed();
     void urlChanged(const QUrl &url);
 
 protected:
-    bool eventFilter(QObject *obj, QEvent *event);
-//    void enterEvent(QEvent*);
-//    void mouseMoveEvent(QMouseEvent*);
-//    void leaveEvent(QEvent*);
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 public slots:
     void toggleFullScreen();
@@ -60,18 +60,10 @@ public slots:
 
 private slots:
     void acceptFullScreen(QWebEngineFullScreenRequest);
-    void toggleCursorVisibility();
     void toggleAddressBarVisibility();
-    void showCursor();
-    void hideCursor();
 
 private:
     QVBoxLayout *m_layout;
-
-    void createTitleBar();
-    TitleBar *m_titleBar = nullptr;
-    bool m_titleBarVisibility = false;
-
     QLineEdit *emergencyAddressBar;
 
     QString m_baseTitle;
@@ -79,10 +71,14 @@ private:
     QString m_cookieStoreId;
     QString m_engineProfilePath;
 
+    bool m_titleBarVisibility;
+    bool m_titleBarVisibilityToggle;
+
     QWebEngineView *webView;
     QWebEngineCookieStore *m_cookieStore;
     QVector<QNetworkCookie> m_cookies;
-    UrlRequestInterceptor *m_interceptor;
+
+    UrlRequestInterceptor *m_interceptor = nullptr;
     bool m_interceptorEnabled = true;
 
     QWebEngineScript *loadScript(const QString &filename);

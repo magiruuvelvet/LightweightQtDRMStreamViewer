@@ -7,15 +7,14 @@
 #include <Core/StreamingProviderStore.hpp>
 
 BrowserWindow::BrowserWindow(QWidget *parent)
-    : QWidget(parent)
+    : BaseWindow(parent)
 {
-    this->setWindowFlags(Qt::FramelessWindowHint | Qt::BypassGraphicsProxyWidget |
+    this->setWindowFlags(this->windowFlags() |
                          Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     QRect desktopSize = QApplication::desktop()->screenGeometry();
     this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
-    this->setMouseTracking(true);
     this->installEventFilter(this);
 
     this->m_layout = new QVBoxLayout();
@@ -23,7 +22,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->m_layout->setMargin(0);
     this->m_layout->setSizeConstraint(QLayout::SetMaximumSize);
 
-    this->createTitleBar();
+    this->setContainerLayoutContentsMargins(0,0,0,0);
 
     this->emergencyAddressBar = new QLineEdit();
     this->emergencyAddressBar->hide();
@@ -41,7 +40,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->webView = new QWebEngineView();
     this->webView->setContextMenuPolicy(Qt::NoContextMenu);
     this->m_layout->addWidget(this->webView);
-    this->setLayout(this->m_layout);
+    this->containerWidget()->setLayout(this->m_layout);
 
     QObject::connect(this->webView, &QWebEngineView::titleChanged, this, &BrowserWindow::setWindowTitle);
     QObject::connect(this->webView, &QWebEngineView::loadProgress, this, &BrowserWindow::onLoadProgress);
@@ -52,11 +51,6 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
     new QShortcut(QKeySequence(Qt::Key_F5), this->webView, SLOT(reload()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F5), this, SLOT(forceReload()));
-
-    // temporary workaround until i figured out how to implement a player-like behavior
-    // note: the Maxdome player is buggy and slow, it also has major cursor visibility toggle issues,
-    //       that's why i want to implement such a feature client-side in this app
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this, SLOT(toggleCursorVisibility()));
 
     // Inject app name and version into the default Qt Web Engine user agent
     // the default looks like this:
@@ -86,22 +80,6 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     js_hideScrollBars.setInjectionPoint(QWebEngineScript::DocumentReady);
     js_hideScrollBars.setSourceCode(this->mJs_hideScrollBars);
     this->scripts->insert(js_hideScrollBars);
-}
-
-void BrowserWindow::createTitleBar()
-{
-    this->m_titleBar = new TitleBar(this);
-    this->m_titleBar->setFixedHeight(25);
-    this->m_titleBar->setBackgroundRole(QPalette::Background);
-
-    QPalette titleBarScheme;
-    titleBarScheme.setColor(QPalette::All, QPalette::Background, QColor( 50,  50,  50, 255));
-    titleBarScheme.setColor(QPalette::All, QPalette::Text,       QColor(255, 255, 255, 255));
-    titleBarScheme.setColor(QPalette::All, QPalette::WindowText, QColor(255, 255, 255, 255));
-
-    this->m_titleBar->setPalette(titleBarScheme);
-    this->m_titleBar->setVisible(false);
-    this->m_layout->insertWidget(0, this->m_titleBar);
 }
 
 QWebEngineScript *BrowserWindow::loadScript(const QString &filename)
@@ -167,26 +145,37 @@ BrowserWindow::~BrowserWindow()
     this->m_cookies.clear();
 
     this->mJs_hideScrollBars.clear();
+
+//    delete scripts;
+//    delete m_interceptor;
+//    delete emergencyAddressBar;
+
+//    delete m_cookieStore;
+//    delete webView;
+//    delete m_layout;
+}
+
+BrowserWindow *BrowserWindow::createBrowserWindow(const Provider &profile)
+{
+    BrowserWindow *w = new BrowserWindow();
+    StreamingProviderStore::loadProfile(w, profile);
+    return w;
 }
 
 void BrowserWindow::show()
 {
     QWidget::show();
-
-    if (this->m_titleBar)
-    {
-        this->m_titleBar->setVisible(this->m_titleBarVisibility);
-    }
+    this->titleBar()->setVisible(this->m_titleBarVisibility);
 }
 
 void BrowserWindow::showNormal()
 {
     QWidget::showNormal();
 
-    if (this->m_titleBar)
+    if (this->m_titleBarVisibility)
     {
-        this->m_titleBarVisibility = true;
-        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+        this->m_titleBarVisibilityToggle = true;
+        this->titleBar()->setVisible(this->m_titleBarVisibilityToggle);
     }
 }
 
@@ -194,10 +183,10 @@ void BrowserWindow::showFullScreen()
 {
     QWidget::showFullScreen();
 
-    if (this->m_titleBar)
+    if (this->m_titleBarVisibility)
     {
-        this->m_titleBarVisibility = false;
-        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+        this->m_titleBarVisibilityToggle = false;
+        this->titleBar()->setVisible(this->m_titleBarVisibilityToggle);
     }
 }
 
@@ -206,7 +195,7 @@ void BrowserWindow::setWindowTitle(const QString &title)
     if (!this->m_permanentTitle)
     {
         QWidget::setWindowTitle(title + QString::fromUtf8(" ─ ") + this->m_baseTitle);
-        if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
+        this->titleBar()->setTitle(QWidget::windowTitle());
     }
 }
 
@@ -215,50 +204,40 @@ void BrowserWindow::setWindowIcon(const QIcon &icon)
     if (icon.isNull())
     {
         QWidget::setWindowIcon(qApp->windowIcon());
-        if (this->m_titleBar) this->m_titleBar->setIcon(qApp->windowIcon().pixmap(23, 23, QIcon::Normal, QIcon::On));
+        this->titleBar()->setIcon(qApp->windowIcon().pixmap(23, 23, QIcon::Normal, QIcon::On));
     }
     else
     {
         QWidget::setWindowIcon(icon);
-        if (this->m_titleBar) this->m_titleBar->setIcon(icon.pixmap(23, 23, QIcon::Normal, QIcon::On));
+        this->titleBar()->setIcon(icon.pixmap(23, 23, QIcon::Normal, QIcon::On));
     }
 }
 
 void BrowserWindow::setTitleBarVisibility(bool visible)
 {
-    QRect desktopSize = QApplication::desktop()->screenGeometry();
+    const QRect desktopSize = QApplication::desktop()->screenGeometry();
     this->m_titleBarVisibility = visible;
 
     if (this->m_titleBarVisibility)
     {
-        if (!this->m_titleBar)
-        {
-            this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
-            this->createTitleBar();
-        }
-
-        this->m_titleBar->setVisible(this->m_titleBarVisibility);
+        this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
+        this->titleBar()->setVisible(true);
     }
     else
     {
         this->resize(desktopSize.width() / 1.2, desktopSize.height() / 1.2);
-
-        delete this->m_titleBar;
-        this->m_titleBar = nullptr;
+        this->titleBar()->setVisible(false);
     }
 }
 
 void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColor)
 {
-    if (this->m_titleBar)
-    {
-        QPalette titleBarScheme = this->m_titleBar->palette();
-        titleBarScheme.setColor(QPalette::All, QPalette::Background, color);
-        titleBarScheme.setColor(QPalette::All, QPalette::Text,       textColor);
-        titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
-        this->m_titleBar->setPalette(titleBarScheme);
-        this->setPalette(titleBarScheme);
-    }
+    QPalette titleBarScheme = this->titleBar()->palette();
+    titleBarScheme.setColor(QPalette::All, QPalette::Background, color);
+    titleBarScheme.setColor(QPalette::All, QPalette::Text,       textColor);
+    titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
+    this->titleBar()->setPalette(titleBarScheme);
+    this->setPalette(titleBarScheme);
 }
 
 void BrowserWindow::setBaseTitle(const QString &title, bool permanent)
@@ -267,7 +246,7 @@ void BrowserWindow::setBaseTitle(const QString &title, bool permanent)
     {
         this->m_permanentTitle = true;
         QWidget::setWindowTitle(title);
-        if (this->m_titleBar) this->m_titleBar->setTitle(QWidget::windowTitle());
+        this->titleBar()->setTitle(QWidget::windowTitle());
     }
     else
     {
@@ -281,39 +260,31 @@ void BrowserWindow::setUrl(const QUrl &url)
     emit urlChanged(url);
 }
 
-void BrowserWindow::setUrlInterceptorEnabled(bool b)
+void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorLink> &urlInterceptorLinks)
 {
     this->m_interceptorEnabled = b;
     if (b)
     {
         qDebug() << "URL Interceptor enabled!";
-        this->m_interceptor = new UrlRequestInterceptor();
+        this->m_interceptor = new UrlRequestInterceptor(urlInterceptorLinks);
         this->webView->page()->profile()->setRequestInterceptor(this->m_interceptor);
 
         this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
-        //this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
-        //this->webView->settings()->setAttribute(QWebEngineSettings::XSSAuditingEnabled, true);
         this->webView->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
     }
     else
     {
         qDebug() << "URL Interceptor disabled!";
+        this->m_interceptor = nullptr;
         this->webView->page()->profile()->setRequestInterceptor(nullptr);
 
         this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, false);
-        //this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, false);
-        //this->webView->settings()->setAttribute(QWebEngineSettings::XSSAuditingEnabled, false);
         this->webView->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, false);
     }
 }
 
 void BrowserWindow::setProfile(const QString &id)
 {
-//    for(auto&& script : this->m_scripts)
-//    {
-//        this->scripts->remove();
-//    }
-
     this->m_engineProfilePath = Config()->webEngineProfiles() + '/' + id;
 
     this->m_cookieStoreId = id;
@@ -337,32 +308,16 @@ void BrowserWindow::setScripts(const QList<QString> &scripts)
     }
 }
 
-void BrowserWindow::reset()
+void BrowserWindow::showEvent(QShowEvent *event)
 {
-    this->m_engineProfilePath = Config()->webEngineProfiles() + '/' + "Default";
-
-    this->m_baseTitle.clear();
-    QWidget::setWindowTitle(QLatin1String("BrowserWindow"));
-    this->webView->setUrl(QUrl("about:blank"));
-    this->webView->stop();
-
-    this->m_cookieStoreId.clear();
-    this->webView->page()->profile()->setCachePath(this->m_engineProfilePath);
-    this->webView->page()->profile()->setPersistentStoragePath(this->m_engineProfilePath + '/' + "Storage");
-    this->webView->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::NoPersistentCookies);
-    this->m_cookieStore = this->webView->page()->profile()->cookieStore();
-
-    this->close();
+    emit opened();
+    event->accept();
 }
 
-bool BrowserWindow::eventFilter(QObject *, QEvent *event)
+void BrowserWindow::closeEvent(QCloseEvent *event)
 {
-    if (event->type() == QEvent::MouseMove)
-    {
-         this->mouseMoveEvent(static_cast<QMouseEvent*>(event));
-    }
-
-    return false;
+    emit closed();
+    event->accept();
 }
 
 void BrowserWindow::toggleFullScreen()
@@ -397,23 +352,4 @@ void BrowserWindow::acceptFullScreen(QWebEngineFullScreenRequest req)
 void BrowserWindow::toggleAddressBarVisibility()
 {
     this->emergencyAddressBar->isVisible() ? this->emergencyAddressBar->hide() : this->emergencyAddressBar->show();
-}
-
-void BrowserWindow::toggleCursorVisibility()
-{
-    // buggy as fuck and doesn't work most of the time
-    static bool hidden = false; // assume cursor is visible
-    this->unsetCursor();
-    hidden ? this->showCursor() : this->hideCursor();
-    hidden = !hidden;
-}
-
-void BrowserWindow::showCursor()
-{
-    this->setCursor(QCursor(Qt::ArrowCursor));
-}
-
-void BrowserWindow::hideCursor()
-{
-    this->setCursor(QCursor(Qt::BlankCursor));
 }
