@@ -36,6 +36,10 @@ Widevine must be obtained using Google Chrome, grep it from their Website. Qt is
 
 Just install `pepper-flash` and `qt5-webengine-widevine`<sup>[AUR](https://aur.archlinux.org/packages/qt5-webengine-widevine/)</sup> to get started.
 
+##### Hint about possible random crashes (if you encounter one)
+
+See [this comment for details](https://github.com/magiruuvelvet/LightweightQtDRMStreamViewer/issues/3#issuecomment-377531975). Adding `--disable-seccomp-filter-sandbox` to the app command line is a workaround to this issue. Only enable this if you actually suffer from random crashes.
+
 ## Main Interface
 
 ![Main Interface](.github/main_ui.png "Main Interface")
