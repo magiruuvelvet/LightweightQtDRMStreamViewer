@@ -75,8 +75,14 @@ url:https://www.netflix.com
  - `url` (required):
    The base URL the browser window should load. Set the root URL of the streaming service there.
 
- - `urlInterceptor` (optimal, enabled by default):
-   Hijacks (redirects) specific links by regular expression and loads external sources. Currently only the Netflix player is hijacked to [enable 1080p playback](https://github.com/magiruuvelvet/netflix-1080p). If Netflix stops working for you add `urlInterceptor:false` to the Netflix provider config file.
+ - `urlInterceptor` (optimal, `true/false`, enabled by default):
+   Hijacks (redirects) specific links by regular expression and loads external sources. This is the master switch to enable/disable all given patterns. See the next 2 options on how to set up new patterns and targets. The Netflix sample config file provides a good example on how to use this feature. It injects a 1080p unlocker script to enjoy your shows in Full HD.
+
+ - `urlInterceptorPattern` (optimal, requires a following `urlInterceptorTarget` afterwards, *stackable*):
+   Sets a regular expression to hijack specific URLs and redirect them to something else. You can add as many patterns as you want. Regular expressions must be in a [`QRegExp`](https://doc.qt.io/qt-5/qregexp.html#details) compatible format. The new Perl compatible format is not supported!
+
+ - `urlInterceptorTarget` (optimal, requires a `urlInterceptorPattern` beforehand, *stackable*):
+   Sets a valid target URL (usually http) to what a matched pattern should redirect. You can add as many target URLs as you want. There is no "error" detection so make sure the target links are valid.
 
  - `script` (optimal, *stackable*):
    A JavaScript file to inject into all pages of the current profile. This option can be stacked, which means added multiple times in a row. The app maintains a list internally and loads the scripts in the order of appearance.
