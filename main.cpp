@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.10.2");
+    a.setApplicationVersion("0.12.1");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     if (a.arguments().contains("-c"))
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     {
         qDebug() << "Loading provider" << Config()->startupProfile();
 
-        Provider pr = StreamingProviderStore::instance()->provider(Config()->startupProfile());
+        const Provider pr = StreamingProviderStore::instance()->provider(Config()->startupProfile());
         if (pr.id.isEmpty())
         {
             qDebug() << Config()->startupProfile() << "No such provider! Exiting...";
@@ -108,23 +108,14 @@ int main(int argc, char **argv)
         }
 
         qDebug() << "Loading browser window...";
-        BrowserWindow w;
-        w.reset();
-
-        pr.titleBarHasPermanentTitle ?
-            w.setBaseTitle(pr.titleBarPermanentTitle, true) :
-            w.setBaseTitle(pr.name);
-        w.setTitleBarVisibility(pr.titleBarVisible);
-        w.setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
-        w.setWindowTitle("Loading...");
-        w.setWindowIcon(pr.icon);
-        w.setProfile(pr.id);
-        w.setScripts(pr.scripts);
-        w.setUrlInterceptorEnabled(pr.urlInterceptor);
-        w.setUrl(pr.url);
+        BrowserWindow *w = BrowserWindow::createBrowserWindow(pr);
+        QObject::connect(w, &BrowserWindow::closed, &a, [&]{
+            // FIXME: delete engine instance here
+            // memory leak if you keep the app open and open/close profiles regularly
+        });
 
         qDebug() << "Everything done. Enjoy your shows/movies :D";
-        Config()->fullScreenMode() ? w.showFullScreen() : w.show();
+        Config()->fullScreenMode() ? w->showFullScreen() : w->show();
 
         return a.exec();
     }
