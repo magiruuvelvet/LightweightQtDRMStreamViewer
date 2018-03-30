@@ -157,7 +157,6 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
     {
         for (auto&& url : provider.urlInterceptorLinks)
         {
-            qDebug() << url.pattern.isEmpty() << url.target.isEmpty();
             if (url.pattern.isEmpty() || url.target.isEmpty())
             {
                 qDebug() << provider_name << "URL Interceptor list is invalid. Please fix the issue.";

@@ -7,6 +7,8 @@
 #include <QColor>
 #include <QIcon>
 
+class BrowserWindow;
+
 struct UrlInterceptorLink
 {
     QRegExp pattern;
@@ -46,6 +48,8 @@ public:
     const Provider &providerAt(int index) const
     { return this->m_providers.at(index); }
     const Provider &provider(const QString &id) const;
+
+    static void loadProfile(BrowserWindow *w, const Provider &provider);
 
 private:
     StreamingProviderStore();
