@@ -44,6 +44,7 @@ TitleBar::~TitleBar()
     delete m_icon;
 
     delete m_closeBtn;
+    this->buttons.clear();
 }
 
 void TitleBar::mousePressEvent(QMouseEvent *event)
@@ -77,4 +78,22 @@ void TitleBar::setTitle(const QString &title)
 void TitleBar::setIcon(const QPixmap &icon)
 {
     this->m_icon->setPixmap(icon.scaled(23, 23, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+void TitleBar::addButton(const QString &text, const std::function<void()> &receiver)
+{
+    QPushButton *btn = new QPushButton(text);
+    btn->setFlat(true);
+    btn->setFixedSize(15, 15);
+    btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btn->setFocusPolicy(Qt::NoFocus);
+    btn->setStyleSheet(
+                "QPushButton{outline: none; border: none; padding: 0px; color: #ffffff;}"
+                "QPushButton:focus{outline: none; border: 1px solid #f3f3f3; padding: 0px;}"
+                "QPushButton:hover{outline: none; border: 1px solid #ffffff; padding: 0px; background-color: #555555;}"
+                "QPushButton:pressed{outline: none; border: 1px solid #ffffff; padding: 0px; background-color: #484848;}");
+    QObject::connect(btn, &QPushButton::clicked, this, receiver);
+
+    this->m_layout->insertWidget(this->m_layout->count() - 1, btn);
+    this->buttons.append(btn);
 }

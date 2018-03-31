@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QPixmap>
 
+#include <functional>
+
 class TitleBar : public QWidget
 {
     Q_OBJECT
@@ -19,6 +21,8 @@ public:
 
     void setTitle(const QString &title);
     void setIcon(const QPixmap &icon);
+
+    void addButton(const QString &text, const std::function<void()> &receiver);
 
 private:
     void mousePressEvent(QMouseEvent *event);
@@ -32,6 +36,7 @@ private:
     QLabel *m_icon;
 
     QPushButton *m_closeBtn;
+    QList<QPushButton*> buttons;
 };
 
 #endif // TITLEBAR_HPP
