@@ -21,26 +21,32 @@ struct UrlInterceptorLink
 struct Script
 {
     QString filename;
-    QWebEngineScript::InjectionPoint injectionPoint;
-    /*
-      Deferred,
-      DocumentReady,       <--- default
-      DocumentCreation
-    */
+    enum InjectionPoint {
+        Deferred,
+        DocumentReady,
+        DocumentCreation,
+        Automatic // @run-at from userscript; default
+    } injectionPoint;
 };
 
 #include <QDebug>
+inline QDebug operator<< (QDebug d, const Script::InjectionPoint &injection_pt)
+{
+    d << ([&]{
+        switch (injection_pt)
+        {
+            case Script::Deferred: return "defer";
+            case Script::DocumentReady: return "ready";
+            case Script::DocumentCreation: return "create";
+            case Script::Automatic: return "auto";
+        }
+    })();
+    return d;
+}
 inline QDebug operator<< (QDebug d, const Script &script) {
     d << '['
       << script.filename.toUtf8().constData() << ','
-      << ([&]{
-             switch (script.injectionPoint)
-             {
-                 case QWebEngineScript::Deferred: return "defer";
-                 case QWebEngineScript::DocumentReady: return "ready";
-                 case QWebEngineScript::DocumentCreation: return "create";
-             }
-         })()
+      << script.injectionPoint
       << ']';
     return d;
 }

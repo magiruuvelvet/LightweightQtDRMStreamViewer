@@ -142,11 +142,12 @@ This app supports the injection of UserScripts into web pages. The format is `fi
 
 #### Injection Points
 
-This is an optimal value. The default injection point is `ready` when this option is omitted.
+This is an optimal value. The default injection point is `auto` when this option is omitted.
 
  - `create`: The script will be executed as soon as the document is created. This is not suitable for any DOM operation.
  - `ready`: The script will run as soon as the DOM is ready. This is equivalent to the DOMContentLoaded event firing in JavaScript.
  - `defer`: The script will run when the page load finishes, or 500ms after the document is ready, whichever comes first.
+ - `auto`: Let the user script decide when to run. `@run-at` option in Greasemonkey scripts ─ compatible with Qt.
 
 
 ## Browser Profiles and Caches

@@ -84,7 +84,7 @@ private:
     UrlRequestInterceptor *m_interceptor = nullptr;
     bool m_interceptorEnabled = true;
 
-    QWebEngineScript *loadScript(const QString &filename, QWebEngineScript::InjectionPoint injection_pt = QWebEngineScript::DocumentReady);
+    QWebEngineScript *loadScript(const QString &filename, Script::InjectionPoint injection_pt = Script::Automatic);
     void loadEmbeddedScript(QString &target, const QString &filename, bool compressed = false);
     QString mJs_hideScrollBars;
 

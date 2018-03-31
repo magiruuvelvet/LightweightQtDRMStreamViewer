@@ -81,7 +81,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->scripts->insert(js_hideScrollBars);
 }
 
-QWebEngineScript *BrowserWindow::loadScript(const QString &filename, QWebEngineScript::InjectionPoint injection_pt)
+QWebEngineScript *BrowserWindow::loadScript(const QString &filename, Script::InjectionPoint injection_pt)
 {
     // check if script name is a relative or absolute path
     // on relative, its relative to the provider store directory
@@ -98,7 +98,13 @@ QWebEngineScript *BrowserWindow::loadScript(const QString &filename, QWebEngineS
 
         QWebEngineScript *script = new QWebEngineScript();
         script->setName(filename);
-        script->setInjectionPoint(injection_pt);
+        switch (injection_pt)
+        {
+            case Script::Deferred:          script->setInjectionPoint(QWebEngineScript::Deferred); break;
+            case Script::DocumentReady:     script->setInjectionPoint(QWebEngineScript::DocumentReady); break;
+            case Script::DocumentCreation:  script->setInjectionPoint(QWebEngineScript::DocumentCreation); break;
+            case Script::Automatic:         break;
+        }
         script->setSourceCode(target);
 
         qDebug() << "Loaded script" << file.fileName();
