@@ -25,6 +25,7 @@ struct Provider
     QIcon      icon;
     QUrl       url = QUrl(QLatin1String("about:blank"));
     bool       urlInterceptor = true;
+    QString    useragent;
 
     QString    titleBarPermanentTitle;
     QColor     titleBarColor;

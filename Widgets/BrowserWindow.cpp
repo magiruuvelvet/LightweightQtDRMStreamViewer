@@ -6,6 +6,8 @@
 #include <Core/ConfigManager.hpp>
 #include <Core/StreamingProviderStore.hpp>
 
+#include <Util/UserAgent.hpp>
+
 BrowserWindow::BrowserWindow(QWidget *parent)
     : BaseWindow(parent)
 {
@@ -53,11 +55,8 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F5), this, SLOT(forceReload()));
 
     // Inject app name and version into the default Qt Web Engine user agent
-    // the default looks like this:
-    //     Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.9.1 Chrome/56.0.2924.122 Safari/537.36
-    QString UserAgent = this->webView->page()->profile()->httpUserAgent();
-    UserAgent.replace("QtWebEngine", qApp->applicationName() + '/' + qApp->applicationVersion() + " QtWebEngine");
-    this->webView->page()->profile()->setHttpUserAgent(UserAgent);
+    this->webView->page()->profile()->setHttpUserAgent(
+        UserAgent::GetUserAgent(this->webView->page()->profile()->httpUserAgent()));
 
     // allow PepperFlash to toggle fullscreen (Netflix, Amazon Video, etc.)
     this->webView->settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
@@ -315,6 +314,11 @@ void BrowserWindow::setScripts(const QList<QString> &scripts)
         QWebEngineScript *scr = this->loadScript(script);
         scr ? this->scripts->insert(*scr) : void();
     }
+}
+
+void BrowserWindow::setUserAgent(const QString &ua)
+{
+    this->webView->page()->profile()->setHttpUserAgent(ua);
 }
 
 void BrowserWindow::showEvent(QShowEvent *event)

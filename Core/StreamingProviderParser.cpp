@@ -110,6 +110,8 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
         i.startsWith("url:")  ? provider.url  = QUrl(i.mid(4).simplified()) : QUrl();
         i.startsWith("urlInterceptor:") ? (provider.urlInterceptor = i.mid(15).simplified() == "true" ? true : false) : true;
 
+        i.startsWith("user-agent:") ? provider.useragent = i.mid(11).simplified() : QString();
+
         i.startsWith("titlebar:") ? provider.titleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
         i.startsWith("titlebar-color:") ? provider.titleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);
         i.startsWith("titlebar-text-color:") ? provider.titleBarTextColor = QColor(i.mid(20).simplified()) : QColor(255, 255, 255, 255);

@@ -42,6 +42,7 @@ public:
     void setUrlInterceptorEnabled(bool, const QList<UrlInterceptorLink> &urlInterceptorLinks = QList<UrlInterceptorLink>());
     void setProfile(const QString &id);
     void setScripts(const QList<QString> &scripts);
+    void setUserAgent(const QString &ua);
 
 signals:
     void opened();

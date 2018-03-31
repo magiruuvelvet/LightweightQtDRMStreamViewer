@@ -95,6 +95,9 @@ url:https://www.netflix.com
  - `script` (optimal, *stackable*):
    A JavaScript file to inject into all pages of the current profile. This option can be stacked, which means added multiple times in a row. The app maintains a list internally and loads the scripts in the order of appearance.
 
+ - `user-agent` (optimal):
+   Overrides the default Qt Web Engine user-agent and the ARM detection user-agent. Set your custom HTTP user-agent there. If the string is empty it falls back to auto detect.
+
  - `titlebar` (optimal, default is `false`):
    Set to `true` to show a client-side title bar for the browser window. The title bar can be used to move the window when your window manager doesn't support movement of frameless windows.
 

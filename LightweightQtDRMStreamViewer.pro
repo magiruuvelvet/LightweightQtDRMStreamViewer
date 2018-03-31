@@ -13,24 +13,26 @@ SOURCES += \
     main.cpp \
     Core/StreamingProviderStore.cpp \
     Core/StreamingProviderParser.cpp \
+    Core/ConfigManager.cpp \
+    Gui/BaseWindow.cpp \
     Gui/TitleBar.cpp \
     Gui/FlowLayout.cpp \
     Widgets/MainWindow.cpp \
     Widgets/BrowserWindow.cpp \
-    Core/ConfigManager.cpp \
     Util/UrlRequestInterceptor.cpp \
-    Gui/BaseWindow.cpp
+    Util/UserAgent.cpp
 
 HEADERS += \
     Core/StreamingProviderStore.hpp \
     Core/StreamingProviderParser.hpp \
+    Core/ConfigManager.hpp \
+    Gui/BaseWindow.hpp \
     Gui/TitleBar.hpp \
     Gui/FlowLayout.hpp \
     Widgets/MainWindow.hpp \
     Widgets/BrowserWindow.hpp \
-    Core/ConfigManager.hpp \
     Util/UrlRequestInterceptor.hpp \
-    Gui/BaseWindow.hpp
+    Util/UserAgent.hpp
 
 RESOURCES += \
     Resources/Resources.qrc

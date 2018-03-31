@@ -73,6 +73,9 @@ void StreamingProviderStore::loadProfile(BrowserWindow *w, const Provider &pr)
 
     w->providerPath = pr.path;
 
+    if (!pr.useragent.isEmpty())
+        w->setUserAgent(pr.useragent);
+
     pr.titleBarHasPermanentTitle ?
         w->setBaseTitle(pr.titleBarPermanentTitle, true) :
         w->setBaseTitle(pr.name);
