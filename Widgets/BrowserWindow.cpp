@@ -81,7 +81,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->scripts->insert(js_hideScrollBars);
 }
 
-QWebEngineScript *BrowserWindow::loadScript(const QString &filename)
+QWebEngineScript *BrowserWindow::loadScript(const QString &filename, QWebEngineScript::InjectionPoint injection_pt)
 {
     // check if script name is a relative or absolute path
     // on relative, its relative to the provider store directory
@@ -98,7 +98,7 @@ QWebEngineScript *BrowserWindow::loadScript(const QString &filename)
 
         QWebEngineScript *script = new QWebEngineScript();
         script->setName(filename);
-        script->setInjectionPoint(QWebEngineScript::DocumentReady);
+        script->setInjectionPoint(injection_pt);
         script->setSourceCode(target);
 
         qDebug() << "Loaded script" << file.fileName();
@@ -303,15 +303,15 @@ void BrowserWindow::setProfile(const QString &id)
     this->m_cookieStore->loadAllCookies();
 }
 
-void BrowserWindow::setScripts(const QList<QString> &scripts)
+void BrowserWindow::setScripts(const QList<Script> &scripts)
 {
     this->m_scripts = scripts;
 
     qDebug() << "Available scripts for this profile:" << this->m_scripts;
     for (auto&& script : this->m_scripts)
     {
-        qDebug() << "Loading script:" << script;
-        QWebEngineScript *scr = this->loadScript(script);
+        qDebug() << "Loading script:" << script.filename;
+        QWebEngineScript *scr = this->loadScript(script.filename, script.injectionPoint);
         scr ? this->scripts->insert(*scr) : void();
     }
 }

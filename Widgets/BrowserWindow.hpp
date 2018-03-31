@@ -41,7 +41,7 @@ public:
     void setUrl(const QUrl &url);
     void setUrlInterceptorEnabled(bool, const QList<UrlInterceptorLink> &urlInterceptorLinks = QList<UrlInterceptorLink>());
     void setProfile(const QString &id);
-    void setScripts(const QList<QString> &scripts);
+    void setScripts(const QList<Script> &scripts);
     void setUserAgent(const QString &ua);
 
 signals:
@@ -84,12 +84,12 @@ private:
     UrlRequestInterceptor *m_interceptor = nullptr;
     bool m_interceptorEnabled = true;
 
-    QWebEngineScript *loadScript(const QString &filename);
+    QWebEngineScript *loadScript(const QString &filename, QWebEngineScript::InjectionPoint injection_pt = QWebEngineScript::DocumentReady);
     void loadEmbeddedScript(QString &target, const QString &filename, bool compressed = false);
     QString mJs_hideScrollBars;
 
     QWebEngineScriptCollection *scripts;
-    QList<QString> m_scripts;
+    QList<Script> m_scripts;
 };
 
 #endif // BROWSERWINDOW_HPP

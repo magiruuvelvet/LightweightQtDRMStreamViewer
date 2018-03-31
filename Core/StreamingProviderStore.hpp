@@ -8,6 +8,8 @@
 #include <QColor>
 #include <QIcon>
 
+#include <QWebEngineScript>
+
 class BrowserWindow;
 
 struct UrlInterceptorLink
@@ -15,6 +17,23 @@ struct UrlInterceptorLink
     QRegExp pattern;
     QUrl target;
 };
+
+struct Script
+{
+    QString filename;
+    QWebEngineScript::InjectionPoint injectionPoint;
+    /*
+      Deferred,
+      DocumentReady,       <--- default
+      DocumentCreation
+    */
+};
+
+#include <QDebug>
+inline QDebug operator<< (QDebug d, const Script &script) {
+    d << script.filename.constData() << "," << script.injectionPoint;
+    return d;
+}
 
 struct Provider
 {
@@ -34,7 +53,7 @@ struct Provider
     bool       titleBarHasPermanentTitle = false;
 
     QList<UrlInterceptorLink> urlInterceptorLinks;
-    QList<QString> scripts;
+    QList<Script> scripts;
 };
 
 class StreamingProviderStore

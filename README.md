@@ -92,8 +92,8 @@ url:https://www.netflix.com
  - `urlInterceptorTarget` (optimal, requires a `urlInterceptorPattern` beforehand, *stackable*):
    Sets a valid target URL (usually http) to what a matched pattern should redirect. You can add as many target URLs as you want. There is no "error" detection so make sure the target links are valid.
 
- - `script` (optimal, *stackable*):
-   A JavaScript file to inject into all pages of the current profile. This option can be stacked, which means added multiple times in a row. The app maintains a list internally and loads the scripts in the order of appearance.
+ - `script` (optimal, format=`filename,injection_point(optimal)`, *stackable*):
+   A JavaScript file to inject into all pages of the current profile. This option can be stacked, which means added multiple times in a row. The app maintains a list internally and loads the scripts in the order of appearance. See **Script Injection** below for more usage details.
 
  - `user-agent` (optimal):
    Overrides the default Qt Web Engine user-agent and the ARM detection user-agent. Set your custom HTTP user-agent there. If the string is empty it falls back to auto detect.
@@ -138,9 +138,15 @@ The application is completely frameless, while the main UI should be movable, th
 
 ## Script Injection
 
-I started to implement a JavaScript injection method to customize the user interface of the streaming websites. Currently there is only one hard-coded script which hides the scroll bars because I don't like them, they are disturbing. Once I got something better setup, scripts can be placed in the configuration directory and are executed in alphabetically order after the site finished loading.
+This app supports the injection of UserScripts into web pages. The format is `filename,injection_point(optimal)`, which means you may not have a comma sign (`,`) in filenames. Filenames can be relative to the current provider file or absolute.
 
-This is planned past the **v1.0** release!
+#### Injection Points
+
+This is an optimal value. The default injection point is `ready` when this option is omitted.
+
+ - `create`: The script will be executed as soon as the document is created. This is not suitable for any DOM operation.
+ - `ready`: The script will run as soon as the DOM is ready. This is equivalent to the DOMContentLoaded event firing in JavaScript.
+ - `defer`: The script will run when the page load finishes, or 500ms after the document is ready, whichever comes first.
 
 
 ## Browser Profiles and Caches
