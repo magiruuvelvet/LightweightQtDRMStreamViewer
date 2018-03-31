@@ -80,7 +80,20 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
     for (auto&& i : props)
     {
         i.startsWith("name:") ? provider.name = i.mid(5).simplified() : QString();
-        i.startsWith("icon:") ? provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + i.mid(5).simplified()) : QIcon();
+        //i.startsWith("icon:") ? provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + i.mid(5).simplified()) : QIcon();
+        if (i.startsWith("icon:"))
+        {
+            const auto icon = i.mid(5).simplified();
+
+            if (!icon.isEmpty())
+            {
+                if (QFileInfo(icon).isAbsolute())
+                    provider.icon = QIcon(icon);
+                else
+                    provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + icon);
+            }
+        }
+
         i.startsWith("url:")  ? provider.url  = QUrl(i.mid(4).simplified()) : QUrl();
         i.startsWith("urlInterceptor:") ? (provider.urlInterceptor = i.mid(15).simplified() == "true" ? true : false) : true;
 

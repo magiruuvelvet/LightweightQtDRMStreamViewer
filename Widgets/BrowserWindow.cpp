@@ -84,7 +84,14 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
 QWebEngineScript *BrowserWindow::loadScript(const QString &filename)
 {
-    QFile file(Config()->providerStoreDir() + '/' + filename);
+    // check if script name is a relative or absolute path
+    // on relative, its relative to the provider store directory
+    QFile file;
+    if (QFileInfo(filename).isAbsolute())
+        file.setFileName(filename);
+    else
+        file.setFileName(Config()->providerStoreDir() + '/' + filename);
+
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
         QString target = file.readAll();
