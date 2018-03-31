@@ -31,7 +31,17 @@ struct Script
 
 #include <QDebug>
 inline QDebug operator<< (QDebug d, const Script &script) {
-    d << script.filename.toUtf8().constData() << "," << script.injectionPoint;
+    d << '['
+      << script.filename.toUtf8().constData() << ','
+      << ([&]{
+             switch (script.injectionPoint)
+             {
+                 case QWebEngineScript::Deferred: return "defer";
+                 case QWebEngineScript::DocumentReady: return "ready";
+                 case QWebEngineScript::DocumentCreation: return "create";
+             }
+         })()
+      << ']';
     return d;
 }
 
