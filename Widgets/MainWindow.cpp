@@ -49,6 +49,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setContentsMargins(0, 0, 0, 0);
 
+    // configuration button
+    this->titleBar()->addButton("⚙", []{
+        qDebug() << "Configuration Button pressed";
+    });
+
     for (auto&& i : StreamingProviderStore::instance()->providers())
     {
         this->_providerBtns.append(new QPushButton(i.name));
