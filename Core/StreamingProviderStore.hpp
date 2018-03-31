@@ -31,7 +31,7 @@ struct Script
 
 #include <QDebug>
 inline QDebug operator<< (QDebug d, const Script &script) {
-    d << script.filename.constData() << "," << script.injectionPoint;
+    d << script.filename.toUtf8().constData() << "," << script.injectionPoint;
     return d;
 }
 
