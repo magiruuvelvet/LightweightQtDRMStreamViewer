@@ -31,14 +31,27 @@ ConfigManager::ConfigManager()
 
     this->m_dir = appConfigLocation;
     this->m_webEngineProfiles = appConfigLocation + '/' + "WebEngineProfiles";
-    this->m_providerStoreDir = baseConfigLocation + '/' + providerLocation;
+    this->m_providerStoreDirs.append(baseConfigLocation + '/' + providerLocation);
+
+#ifdef Q_OS_UNIX
+    // *NIX: add system paths (usually /usr/share)
+    const auto paths = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+    for (auto&& path : paths)
+        if (path.startsWith("/usr"))
+            this->m_providerStoreDirs.insert(0, path + '/' + "providers");
+#endif
+
+#ifdef Q_OS_WIN32
+    // Windows: add exe directory
+    this->m_providerStoreDirs.insert(0, QApplication::applicationDirPath() + '/' + "providers");
+#endif
 }
 
 ConfigManager::~ConfigManager()
 {
     this->m_dir.clear();
     this->m_webEngineProfiles.clear();
-    this->m_providerStoreDir.clear();
+    this->m_providerStoreDirs.clear();
     this->m_startupProfile.clear();
     delete this;
 }
@@ -53,7 +66,12 @@ const QString &ConfigManager::webEngineProfiles() const
     return this->m_webEngineProfiles;
 }
 
-const QString &ConfigManager::providerStoreDir() const
+const QString &ConfigManager::localProviderStoreDir() const
 {
-    return this->m_providerStoreDir;
+    return this->m_providerStoreDirs.last();
+}
+
+const QStringList &ConfigManager::providerStoreDirs() const
+{
+    return this->m_providerStoreDirs;
 }

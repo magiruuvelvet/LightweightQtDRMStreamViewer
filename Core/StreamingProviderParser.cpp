@@ -20,6 +20,7 @@ const char *StreamingProviderParser::search_pattern = "*.p";
 
 StreamingProviderParser::StreamingProviderParser()
 {
+    this->makeValidPaths();
 }
 
 StreamingProviderParser::~StreamingProviderParser()
@@ -29,29 +30,39 @@ StreamingProviderParser::~StreamingProviderParser()
 
 void StreamingProviderParser::findAll()
 {
-    if (StreamingProviderStore::instance()->providerStorePath().isEmpty())
-        return;
-
-    QDirIterator providers(StreamingProviderStore::instance()->providerStorePath(),
-                           QStringList{StreamingProviderParser::search_pattern},
-                           QDir::Files | QDir::Readable | QDir::NoDotAndDotDot,
-                           QDirIterator::FollowSymlinks | QDirIterator::Subdirectories);
-    while (providers.hasNext())
+    for (auto&& path : this->m_validPaths)
     {
-        (void) providers.next();
-        this->m_providers.append(providers.fileInfo().baseName());
-    }
+        QStringList currentPaths;
 
-    this->m_providers.sort();
+        QDirIterator providers(path,
+                               QStringList{StreamingProviderParser::search_pattern},
+                               QDir::Files | QDir::Readable | QDir::NoDotAndDotDot,
+                               QDirIterator::FollowSymlinks | QDirIterator::Subdirectories);
+        while (providers.hasNext())
+        {
+            (void) providers.next();
+
+            const auto provider_file = providers.fileInfo().absoluteFilePath();
+            currentPaths.append(provider_file);
+        }
+
+        currentPaths.sort();
+        this->m_providers.append(currentPaths);
+    }
 }
 
-bool StreamingProviderParser::parse(const QString &provider_name) const
+StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString &provider_name) const
 {
-    if (StreamingProviderStore::instance()->providerStorePath().isEmpty() ||
-        !this->m_providers.contains(provider_name))
-        return false;
+    const auto provider_file = this->findHighestPriorityProvider(provider_name);
+    if (provider_file.isEmpty())
+        return FILE_ERROR;
 
-    QFile file(StreamingProviderStore::instance()->providerStorePath() + '/' + provider_name + StreamingProviderParser::extension);
+    if (StreamingProviderStore::instance()->contains(QFileInfo(provider_name).baseName()))
+        return ALREADY_IN_LIST;
+
+    const auto provider_path = QFileInfo(provider_file).path();
+
+    QFile file(provider_file);
     QString data;
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -60,27 +71,28 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
     }
     else
     {
-        qDebug() << provider_name << "Unable to open file for reading!";
-        return false;
+        qDebug() << provider_file << "Unable to open file for reading!";
+        return FILE_ERROR;
     }
 
     if (data.isEmpty())
     {
-        qDebug() << provider_name << "File is empty!";
-        return false;
+        qDebug() << provider_file << "File is empty!";
+        return FILE_EMPTY;
     }
 
     QStringList props = data.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
     data.clear();
 
     Provider provider;
-    provider.id = provider_name;
+    provider.id = QFileInfo(provider_file).baseName();
+    provider.path = provider_path;
+    qDebug() << "<<<" << provider.id << provider.path;
     bool hasErrors = false;
 
     for (auto&& i : props)
     {
         i.startsWith("name:") ? provider.name = i.mid(5).simplified() : QString();
-        //i.startsWith("icon:") ? provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + i.mid(5).simplified()) : QIcon();
         if (i.startsWith("icon:"))
         {
             const auto icon = i.mid(5).simplified();
@@ -90,7 +102,8 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
                 if (QFileInfo(icon).isAbsolute())
                     provider.icon = QIcon(icon);
                 else
-                    provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + icon);
+                    //provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + icon);
+                    provider.icon = QIcon(provider_path + '/' + icon);
             }
         }
 
@@ -111,7 +124,7 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         {
             const auto pattern = i.mid(22).simplified();
             provider.urlInterceptorLinks.append(UrlInterceptorLink{QRegExp(pattern), QUrl()});
-            qDebug() << provider_name << "Found URL Interceptor Pattern:" << pattern;
+            qDebug() << provider_file << "Found URL Interceptor Pattern:" << pattern;
         }
         if (i.startsWith("urlInterceptorTarget:"))
         {
@@ -121,11 +134,11 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
                 provider.urlInterceptorLinks.last().target.isEmpty())
             {
                 provider.urlInterceptorLinks.last().target = QUrl(target);
-                qDebug() << provider_name << "Added new target for pattern:" << target;
+                qDebug() << provider_file << "Added new target for pattern:" << target;
             }
             else
             {
-                qDebug() << provider_name << "Missing pattern or target for last pattern!";
+                qDebug() << provider_file << "Missing pattern or target for last pattern!";
             }
         }
 
@@ -135,33 +148,33 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
             if (!provider.scripts.contains(script))
                 provider.scripts.append(script);
             else
-                qDebug() << provider_name << "Warning: Duplicate 'script' skipped ->" << script;
+                qDebug() << provider_file << "Warning: Duplicate 'script' skipped ->" << script;
         }
     }
 
     if (provider.name.isEmpty())
     {
-        qDebug() << provider_name << "Field 'name' must not be empty.";
+        qDebug() << provider_file << "Field 'name' must not be empty.";
         hasErrors = true;
     }
     if (provider.icon.isNull())
     {
-        qDebug() << provider_name << "Field 'icon' is empty. Falling back to text name.";
+        qDebug() << provider_file << "Field 'icon' is empty. Falling back to text name.";
     }
     if (provider.url.isEmpty())
     {
-        qDebug() << provider_name << "Field 'url' must not be empty.";
+        qDebug() << provider_file << "Field 'url' must not be empty.";
         hasErrors = true;
     }
     if (provider.titleBarVisible && !provider.titleBarColor.isValid())
     {
-        qDebug() << provider_name << "Field 'titlebar-color' is not a valid color. See the Qt doc on how to set this field correctly."
+        qDebug() << provider_file << "Field 'titlebar-color' is not a valid color. See the Qt doc on how to set this field correctly."
                                   << "Falling back to the default color which is #323232.";
         provider.titleBarColor = QColor(50, 50, 50, 255);
     }
     if (provider.titleBarVisible && !provider.titleBarTextColor.isValid())
     {
-        qDebug() << provider_name << "Field 'titlebar-text-color' is not a valid color. See the Qt doc on how to set this field correctly."
+        qDebug() << provider_file << "Field 'titlebar-text-color' is not a valid color. See the Qt doc on how to set this field correctly."
                                   << "Falling back to the default color which is #ffffff.";
         provider.titleBarTextColor = QColor(255, 255, 255, 255);
     }
@@ -172,7 +185,7 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
         {
             if (url.pattern.isEmpty() || url.target.isEmpty())
             {
-                qDebug() << provider_name << "URL Interceptor list is invalid. Please fix the issue.";
+                qDebug() << provider_file << "URL Interceptor list is invalid. Please fix the issue.";
                 hasErrors = true;
             }
         }
@@ -180,11 +193,32 @@ bool StreamingProviderParser::parse(const QString &provider_name) const
 
     if (hasErrors)
     {
-        qDebug() << provider_name << "contains errors and was skipped!";
-        return false;
+        qDebug() << provider_file << "contains errors and was skipped!";
+        return SYNTAX_ERROR;
     }
 
     StreamingProviderStore::instance()->addProvider(provider);
 
-    return true;
+    return SUCCESS;
+}
+
+void StreamingProviderParser::makeValidPaths()
+{
+    for (auto&& path : Config()->providerStoreDirs())
+    {
+        QFileInfo finfo(path);
+        if (finfo.exists() && finfo.isReadable())
+        {
+            this->m_validPaths.append(path);
+        }
+    }
+}
+
+const QString StreamingProviderParser::findHighestPriorityProvider(const QString &provider_name) const
+{
+    QString provider;
+    for (auto&& path : this->m_providers)
+        if (path.endsWith(QFileInfo(provider_name).baseName() + StreamingProviderParser::extension))
+            provider = path;
+    return provider;
 }

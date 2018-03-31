@@ -66,6 +66,8 @@ private:
     QVBoxLayout *m_layout;
     QLineEdit *emergencyAddressBar;
 
+    QString providerPath;
+
     QString m_baseTitle;
     bool m_permanentTitle = false;
     QString m_cookieStoreId;

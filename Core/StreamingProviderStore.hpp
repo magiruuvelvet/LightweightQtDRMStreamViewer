@@ -2,6 +2,7 @@
 #define STREAMINGPROVIDERSTORE_HPP
 
 #include <QString>
+#include <QStringList>
 #include <QUrl>
 #include <QList>
 #include <QColor>
@@ -18,6 +19,7 @@ struct UrlInterceptorLink
 struct Provider
 {
     QString    id;
+    QString    path;
 
     QString    name;
     QIcon      icon;
@@ -40,7 +42,8 @@ public:
     static StreamingProviderStore *instance();
     ~StreamingProviderStore();
 
-    const QString &providerStorePath() const;
+    const QString &localProviderStorePath() const;
+    const QStringList &providerStorePaths() const;
 
     void addProvider(const Provider &provider);
     const QList<Provider> &providers() const
@@ -49,12 +52,15 @@ public:
     { return this->m_providers.at(index); }
     const Provider &provider(const QString &id) const;
 
+    bool contains(const QString &id) const;
+    void sort();
+
     static void loadProfile(BrowserWindow *w, const Provider &provider);
 
 private:
     StreamingProviderStore();
     QList<Provider> m_providers;
-    QString m_providerStorePath;
+    QStringList m_providerStorePaths;
 
     Provider m_null;
 };

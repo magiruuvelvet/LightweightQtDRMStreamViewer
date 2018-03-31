@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.12.1");
+    a.setApplicationVersion("0.13.1");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     if (a.arguments().contains("-c"))
@@ -68,14 +68,29 @@ int main(int argc, char **argv)
 
     for (auto&& i : parser.providers())
     {
-        if (parser.parse(i))
+        // parse provider file
+        StreamingProviderParser::StatusCode status = parser.parse(i);
+
+        switch (status)
         {
-            qDebug() << "Added" << i << "to the list of streaming providers.";
+            case StreamingProviderParser::SUCCESS:
+                qDebug() << "Added" << i << "to the list of streaming providers.";
+                break;
+            case StreamingProviderParser::FILE_ERROR:
+                qDebug() << "File" << i << "is faulty and was skipped!";
+                break;
+            case StreamingProviderParser::SYNTAX_ERROR:
+                qDebug() << "The file for provider" << i << "has issues. Please check the template. File skipped!";
+                break;
+            case StreamingProviderParser::FILE_EMPTY:
+                qDebug() << "File" << i << "is empty and was skipped!";
+                break;
+            case StreamingProviderParser::ALREADY_IN_LIST:
+                qDebug() << "Provider" << QFileInfo(i).baseName() << "is already in the list from a higher priority target! Skipped.";
+                break;
         }
-        else
-        {
-            qDebug() << "The file for provider" << i << "has issues. Please check the template. File skipped!";
-        }
+
+        StreamingProviderStore::instance()->sort();
     }
 
     qDebug() << "Initializing Qt Web Engine...";

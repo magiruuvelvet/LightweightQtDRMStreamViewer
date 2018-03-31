@@ -2,6 +2,7 @@
 #define CONFIGMANAGER_HPP
 
 #include <QString>
+#include <QStringList>
 
 class ConfigManager
 {
@@ -16,7 +17,8 @@ public:
     const QString &webEngineProfiles() const;
 
     // Get provider store location
-    const QString &providerStoreDir() const;
+    const QString &localProviderStoreDir() const;
+    const QStringList &providerStoreDirs() const;
 
     // Startup profile to use, if empty display the main UI
     const QString &startupProfile() const { return this->m_startupProfile; }
@@ -34,8 +36,8 @@ private:
     ConfigManager();
 
     QString m_dir,
-            m_webEngineProfiles,
-            m_providerStoreDir;
+            m_webEngineProfiles;
+    QStringList m_providerStoreDirs;
 
     QString m_startupProfile;
     bool m_fullScreenMode = false;

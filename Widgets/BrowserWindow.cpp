@@ -90,7 +90,7 @@ QWebEngineScript *BrowserWindow::loadScript(const QString &filename)
     if (QFileInfo(filename).isAbsolute())
         file.setFileName(filename);
     else
-        file.setFileName(Config()->providerStoreDir() + '/' + filename);
+        file.setFileName(this->providerPath + '/' + filename);
 
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -150,6 +150,8 @@ BrowserWindow::~BrowserWindow()
     this->m_cookieStoreId.clear();
     this->m_engineProfilePath.clear();
     this->m_cookies.clear();
+
+    this->providerPath.clear();
 
     this->mJs_hideScrollBars.clear();
 
