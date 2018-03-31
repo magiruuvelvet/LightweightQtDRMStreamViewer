@@ -66,6 +66,7 @@ int main(int argc, char **argv)
         qDebug() << "Found providers:" << parser.providers();
     }
 
+    qDebug() << "\n-------------------------\n";
     for (auto&& i : parser.providers())
     {
         // parse provider file
@@ -91,6 +92,8 @@ int main(int argc, char **argv)
         }
 
         StreamingProviderStore::instance()->sort();
+
+        qDebug() << "\n-------------------------\n";
     }
 
     qDebug() << "Initializing Qt Web Engine...";
