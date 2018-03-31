@@ -57,6 +57,10 @@ Run the app for at least once (optimally from a terminal). It will create its co
 
 Default is `~/.config/LightweightQtDRMStreamViewer` (on Linux) and `%LOCALAPPDATA%/LightweightQtDRMStreamViewer` (on Windows).
 
+A global system configuration is also supported.
+ - `/usr/share/LightweightQtDRMStreamViewer` on \*NIX
+ - exe location on Windows
+
 Once in the config directory there should be a `providers` subfolder in there (create if it doesn't exist). Inside that directory the app is looking for streaming services to generate the list in the user interface.
 
 All files with the `.p` extension are parsed in alphabetically order. Prepand numbers to the filenames like `01-provider1.p, 02-provider2.p, 0n-providerN.p` to sort the list in the user interface to your liking.
