@@ -54,12 +54,7 @@ int main(int argc, char **argv)
     parser.findAll();
     if (parser.providers().isEmpty())
     {
-        const char *msg = "WARNING: No providers found! There is nothing to do, exiting now...";
-        qDebug() << QObject::tr(msg);
-        QMessageBox::critical(nullptr, a.applicationDisplayName(),
-                              QObject::tr(msg),
-                              QMessageBox::Ok, QMessageBox::Ok);
-        return 1;
+        qDebug() << "Warning: No providers found.";
     }
     else
     {
