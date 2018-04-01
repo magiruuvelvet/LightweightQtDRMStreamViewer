@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QRect>
 
 class ConfigManager
 {
@@ -32,6 +33,10 @@ public:
     const bool &urlInterceptorEnabled() const { return this->m_urlInterceptorEnabled; }
     bool &urlInterceptorEnabled() { return this->m_urlInterceptorEnabled; }
 
+    // Gui: MainWindow position and size
+    void setMainWindowGeometry(const QRect &rect);
+    const QRect &mainWindowGeometry() const;
+
 private:
     ConfigManager();
 
@@ -42,6 +47,13 @@ private:
     QString m_startupProfile;
     bool m_fullScreenMode = false;
     bool m_urlInterceptorEnabled = true;
+
+    QRect m_mainWindowGeometry = QRect(0, 0, 0, 0);
+
+private:
+    QString m_uiConfigFile;
+    bool readUiConfig();
+    bool writeUiConfig();
 };
 
 inline ConfigManager *Config()

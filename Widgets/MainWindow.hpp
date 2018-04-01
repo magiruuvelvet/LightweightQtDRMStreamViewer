@@ -17,6 +17,9 @@ public:
 private slots:
     void launchBrowserWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 private:
     QWidget *_rootWidget;
     QVBoxLayout *_lV_main;

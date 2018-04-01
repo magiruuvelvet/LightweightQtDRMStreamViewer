@@ -24,6 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
     this->move(desktopSize.width() / 2 - this->size().width() / 2,
                desktopSize.height() / 2 - this->size().height() / 2);
 
+    // Load saved geometry if greater than 0 (default on first startup)
+    const auto geom = Config()->mainWindowGeometry();
+    if (geom.x() >= 0 && geom.y() >= 0 &&
+        geom.width() > 0 && geom.height() > 0)
+    {
+        this->setGeometry(geom);
+    }
+
     this->installEventFilter(this);
 
     QPalette toolTipPalette = QToolTip::palette();
@@ -106,4 +114,10 @@ void MainWindow::launchBrowserWindow()
     });
 
     Config()->fullScreenMode() ? w->showFullScreen() : w->showNormal();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    Config()->setMainWindowGeometry(this->geometry());
+    event->accept();
 }

@@ -4,6 +4,10 @@
 #include <QStandardPaths>
 #include <QDir>
 
+#include <QFile>
+#include <QDataStream>
+#include <cstring>
+
 #include <QDebug>
 
 ConfigManager *ConfigManager::instance()
@@ -45,6 +49,61 @@ ConfigManager::ConfigManager()
     // Windows: add exe directory
     this->m_providerStoreDirs.insert(0, QApplication::applicationDirPath() + '/' + "providers");
 #endif
+
+    this->m_uiConfigFile = appConfigLocation + '/' + "ui_config.bin";
+    this->readUiConfig();
+}
+
+bool ConfigManager::readUiConfig()
+{
+    QFile ui_config(this->m_uiConfigFile);
+    if (ui_config.exists())
+    {
+        if (ui_config.open(QFile::ReadOnly))
+        {
+            QDataStream stream(&ui_config);
+            char *header;
+            stream >> header;
+            if (std::strcmp(header, "Lui_config\0") == 0)
+            {
+                stream >> this->m_mainWindowGeometry;
+
+                qDebug() << "`ui_config.bin` loaded!";
+                ui_config.close();
+                return true;
+            }
+            else
+            {
+                qDebug() << "Error parsing `ui_config.bin`. Falling back to built-in defaults...";
+                ui_config.close();
+                this->writeUiConfig();
+            }
+        }
+    }
+    else
+    {
+        this->writeUiConfig();
+    }
+
+    return false;
+}
+
+bool ConfigManager::writeUiConfig()
+{
+    QFile ui_config(this->m_uiConfigFile);
+    if (ui_config.open(QFile::WriteOnly))
+    {
+        QDataStream stream(&ui_config);
+        stream << "Lui_config\0";
+        stream << this->m_mainWindowGeometry;
+
+        qDebug() << "`ui_config.bin` written!";
+        ui_config.close();
+        return true;
+    }
+
+    qDebug() << "Error writing `ui_config.bin`!";
+    return false;
 }
 
 ConfigManager::~ConfigManager()
@@ -74,4 +133,15 @@ const QString &ConfigManager::localProviderStoreDir() const
 const QStringList &ConfigManager::providerStoreDirs() const
 {
     return this->m_providerStoreDirs;
+}
+
+void ConfigManager::setMainWindowGeometry(const QRect &rect)
+{
+    this->m_mainWindowGeometry = rect;
+    this->writeUiConfig();
+}
+
+const QRect &ConfigManager::mainWindowGeometry() const
+{
+    return this->m_mainWindowGeometry;
 }
