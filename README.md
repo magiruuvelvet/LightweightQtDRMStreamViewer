@@ -156,6 +156,10 @@ This is an optimal value. The default injection point is `auto` when this option
  - `defer`: The script will run when the page load finishes, or 500ms after the document is ready, whichever comes first.
  - `auto`: Let the user script decide when to run. `@run-at` option in Greasemonkey scripts ─ compatible with Qt.
 
+#### Important Notice
+
+Make sure your script filename ends with `.user.js` when working with UserScripts. Apparently this makes a difference when the Qt Web Engine parses JavaScript files.
+
 
 ## Browser Profiles and Caches
 
