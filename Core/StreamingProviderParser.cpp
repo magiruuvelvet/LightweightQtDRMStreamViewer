@@ -92,6 +92,9 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
 
     for (auto&& i : props)
     {
+        if (i.startsWith('#'))
+            continue;
+
         i.startsWith("name:") ? provider.name = i.mid(5).simplified() : QString();
         if (i.startsWith("icon:"))
         {

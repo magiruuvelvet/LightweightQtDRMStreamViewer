@@ -72,6 +72,8 @@ icon:netflix.svgz
 url:https://www.netflix.com
 ```
 
+Lines starting with a hash (`#`) are ignored.
+
 ##### Options
 
  - `name` (required):
