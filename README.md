@@ -131,10 +131,9 @@ For my part I added this command line arguments mainly to skip the UI to create 
 
 - `Ctrl+F` toggle fullscreen mode
 - `Ctrl+Q` close browser window / or exit application when the main ui was skipped
+- `F1` toggles the address bar visibility (can also be used to change the URL; use with caution)
 - `F5` reload page (sometimes needed on Netflix when the player crashes)
 - `Ctrl+F5` clear cache and reload page (force reload)
-
-- `Ctrl+H` (*temporary hack*) toggles the mouse cursor visibility (for buggy players \*cough*\ Maxdome \*cough*\)
 
 The application is completely frameless, while the main UI should be movable, the browser window is not. If you use window managers like KDE/KWin, Compiz or any tiling window manager this is no problem at all. On Windows you may want to take a look at the `titlebar` option (see above).
 
