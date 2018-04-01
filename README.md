@@ -136,6 +136,13 @@ For my part I added this command line arguments mainly to skip the UI to create 
 
 The application is completely frameless, while the main UI should be movable, the browser window is not. If you use window managers like KDE/KWin, Compiz or any tiling window manager this is no problem at all. On Windows you may want to take a look at the `titlebar` option (see above).
 
+## Hacks
+
+A useful list of hacks you can make use of.
+
+ - [Netflix 1080p Unlocker](https://github.com/magiruuvelvet/netflix-1080p)
+
+
 ## Script Injection
 
 This app supports the injection of UserScripts into web pages. The format is `filename,injection_point(optimal)`, which means you may not have a comma sign (`,`) in filenames. Filenames can be relative to the current provider file or absolute.
