@@ -88,3 +88,23 @@ void StreamingProviderStore::loadProfile(BrowserWindow *w, const Provider &pr)
     w->setUrlInterceptorEnabled(pr.urlInterceptor, pr.urlInterceptorLinks);
     w->setUrl(pr.url);
 }
+
+void StreamingProviderStore::resetProfile(BrowserWindow *w)
+{
+    if (!w)
+        return;
+
+    Provider def;
+
+    w->providerPath = Config()->localProviderStoreDir();
+    w->restoreUserAgent();
+    w->setBaseTitle(qApp->applicationDisplayName());
+    w->setTitleBarVisibility(def.titleBarVisible);
+    w->setTitleBarColor(def.titleBarColor, def.titleBarTextColor);
+    w->setWindowTitle("[empty]");
+    w->setWindowIcon(def.icon);
+    w->setProfile("Default");
+    w->removeScripts();
+    w->setUrlInterceptorEnabled(def.urlInterceptor);
+    w->setUrl(def.url);
+}

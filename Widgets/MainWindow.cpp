@@ -111,12 +111,9 @@ void MainWindow::launchBrowserWindow()
     QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
     const Provider pr = StreamingProviderStore::instance()->provider(button->objectName());
 
-    BrowserWindow *w = BrowserWindow::createBrowserWindow(pr);
-//    QObject::connect(w, &BrowserWindow::closed, this, [&]{
-//        // FIXME: delete engine instance here
-//        // memory leak if you keep the app open and open/close profiles regularly
-//    });
-    QObject::connect(w, &BrowserWindow::closed, w, &BrowserWindow::setUrlAboutBlank);
+    BrowserWindow *w = BrowserWindow::getInstance();
+    w->resetProfile();
+    w->setProfile(pr);
 
     Config()->fullScreenMode() ? w->showFullScreen() : w->showNormal();
 }

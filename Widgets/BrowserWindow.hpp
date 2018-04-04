@@ -20,14 +20,18 @@
 class BrowserWindow : public BaseWindow
 {
     Q_OBJECT
-    friend void StreamingProviderStore::loadProfile(BrowserWindow*,const Provider&);
+    friend void StreamingProviderStore::loadProfile(BrowserWindow*, const Provider&);
+    friend void StreamingProviderStore::resetProfile(BrowserWindow*);
 
 private:
     explicit BrowserWindow(QWidget *parent = nullptr);
 public:
+    static BrowserWindow *getInstance();
     ~BrowserWindow();
 
-    static BrowserWindow *createBrowserWindow(const Provider &profile);
+    //static BrowserWindow *createBrowserWindow(const Provider &profile);
+    void setProfile(const Provider &profile);
+    void resetProfile();
 
     void show();
     void showNormal();
@@ -42,7 +46,9 @@ public:
     void setUrlInterceptorEnabled(bool, const QList<UrlInterceptorLink> &urlInterceptorLinks = QList<UrlInterceptorLink>());
     void setProfile(const QString &id);
     void setScripts(const QList<Script> &scripts);
+    void removeScripts();
     void setUserAgent(const QString &ua);
+    void restoreUserAgent();
 
 signals:
     void opened();
@@ -76,6 +82,8 @@ private:
     QString m_cookieStoreId;
     QString m_engineProfilePath;
 
+    QString m_originalUserAgent;
+
     bool m_titleBarVisibility;
     bool m_titleBarVisibilityToggle;
 
@@ -86,12 +94,12 @@ private:
     UrlRequestInterceptor *m_interceptor = nullptr;
     bool m_interceptorEnabled = true;
 
-    QWebEngineScript *loadScript(const QString &filename, Script::InjectionPoint injection_pt = Script::Automatic);
+    QWebEngineScript loadScript(const QString &filename, Script::InjectionPoint injection_pt = Script::Automatic);
     void loadEmbeddedScript(QString &target, const QString &filename, bool compressed = false);
     QString mJs_hideScrollBars;
 
     QWebEngineScriptCollection *scripts;
-    QList<Script> m_scripts;
+    QList<QWebEngineScript> m_scripts;
 };
 
 #endif // BROWSERWINDOW_HPP

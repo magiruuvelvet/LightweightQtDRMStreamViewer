@@ -54,9 +54,11 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     new QShortcut(QKeySequence(Qt::Key_F5), this->webView, SLOT(reload()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F5), this, SLOT(forceReload()));
 
+    // Backup current user-agent
+    this->m_originalUserAgent = this->webView->page()->profile()->httpUserAgent();
+
     // Inject app name and version into the default Qt Web Engine user agent
-    this->webView->page()->profile()->setHttpUserAgent(
-        UserAgent::GetUserAgent(this->webView->page()->profile()->httpUserAgent()));
+    this->restoreUserAgent();
 
     // allow PepperFlash to toggle fullscreen (Netflix, Amazon Video, etc.)
     this->webView->settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
@@ -81,7 +83,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->scripts->insert(js_hideScrollBars);
 }
 
-QWebEngineScript *BrowserWindow::loadScript(const QString &filename, Script::InjectionPoint injection_pt)
+QWebEngineScript BrowserWindow::loadScript(const QString &filename, Script::InjectionPoint injection_pt)
 {
     // check if script name is a relative or absolute path
     // on relative, its relative to the provider store directory
@@ -96,16 +98,16 @@ QWebEngineScript *BrowserWindow::loadScript(const QString &filename, Script::Inj
         QString target = file.readAll();
         file.close();
 
-        QWebEngineScript *script = new QWebEngineScript();
-        script->setName(filename);
+        QWebEngineScript script;
+        script.setName(filename);
         switch (injection_pt)
         {
-            case Script::Deferred:          script->setInjectionPoint(QWebEngineScript::Deferred); break;
-            case Script::DocumentReady:     script->setInjectionPoint(QWebEngineScript::DocumentReady); break;
-            case Script::DocumentCreation:  script->setInjectionPoint(QWebEngineScript::DocumentCreation); break;
+            case Script::Deferred:          script.setInjectionPoint(QWebEngineScript::Deferred); break;
+            case Script::DocumentReady:     script.setInjectionPoint(QWebEngineScript::DocumentReady); break;
+            case Script::DocumentCreation:  script.setInjectionPoint(QWebEngineScript::DocumentCreation); break;
             case Script::Automatic:         break;
         }
-        script->setSourceCode(target);
+        script.setSourceCode(target);
 
         qDebug() << "Loaded script" << file.fileName();
         return script;
@@ -113,7 +115,7 @@ QWebEngineScript *BrowserWindow::loadScript(const QString &filename, Script::Inj
     else
     {
         qDebug() << "Error loading script" << file.fileName();
-        return nullptr;
+        return QWebEngineScript(); // return null script
     }
 }
 
@@ -149,6 +151,18 @@ void BrowserWindow::loadEmbeddedScript(QString &target, const QString &filename,
     }
 }
 
+BrowserWindow *BrowserWindow::getInstance()
+{
+    static BrowserWindow *instance = ([]{
+        BrowserWindow *i = new BrowserWindow();
+        i->setWindowModality(Qt::ApplicationModal);
+        StreamingProviderStore::resetProfile(i);
+        return i;
+    })();
+
+    return instance;
+}
+
 BrowserWindow::~BrowserWindow()
 {
     // delete browser window properties
@@ -159,8 +173,9 @@ BrowserWindow::~BrowserWindow()
 
     // delete injected scripts
     this->mJs_hideScrollBars.clear();
+    this->m_scripts.clear();
     this->scripts->clear();
-    delete scripts;
+    //delete scripts;
 
     // delete url interceptor
     delete m_interceptor;
@@ -170,7 +185,7 @@ BrowserWindow::~BrowserWindow()
 
     // delete browser cookie store
     this->m_cookies.clear();
-    delete m_cookieStore;
+    //delete m_cookieStore;
 
     // destory the web view
     delete webView;
@@ -181,11 +196,15 @@ BrowserWindow::~BrowserWindow()
     qDebug() << "BrowserWindow destroyed";
 }
 
-BrowserWindow *BrowserWindow::createBrowserWindow(const Provider &profile)
+void BrowserWindow::setProfile(const Provider &profile)
 {
-    BrowserWindow *w = new BrowserWindow();
-    StreamingProviderStore::loadProfile(w, profile);
-    return w;
+    StreamingProviderStore::loadProfile(this, profile);
+}
+
+void BrowserWindow::resetProfile()
+{
+    this->webView->stop();
+    StreamingProviderStore::resetProfile(this);
 }
 
 void BrowserWindow::show()
@@ -268,9 +287,11 @@ void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColo
 
 void BrowserWindow::setBaseTitle(const QString &title, bool permanent)
 {
+    this->m_permanentTitle = permanent;
+
     if (permanent)
     {
-        this->m_permanentTitle = true;
+        this->m_baseTitle.clear();
         QWidget::setWindowTitle(title);
         this->titleBar()->setTitle(QWidget::windowTitle());
     }
@@ -288,6 +309,9 @@ void BrowserWindow::setUrl(const QUrl &url)
 
 void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorLink> &urlInterceptorLinks)
 {
+    if (this->m_interceptor)
+        delete this->m_interceptor;
+
     this->m_interceptorEnabled = b;
     if (b)
     {
@@ -323,20 +347,38 @@ void BrowserWindow::setProfile(const QString &id)
 
 void BrowserWindow::setScripts(const QList<Script> &scripts)
 {
-    this->m_scripts = scripts;
+    // remove existing scripts first
+    this->removeScripts();
 
-    qDebug() << "Available scripts for this profile:" << this->m_scripts;
-    for (auto&& script : this->m_scripts)
+    qDebug() << "Available scripts for this profile:" << scripts;
+    for (auto&& script : scripts)
     {
         qDebug() << "Loading script:" << script.filename;
-        QWebEngineScript *scr = this->loadScript(script.filename, script.injectionPoint);
-        scr ? this->scripts->insert(*scr) : void();
+        QWebEngineScript scr = this->loadScript(script.filename, script.injectionPoint);
+        if (!scr.isNull())
+        {
+            this->m_scripts.append(scr);
+            this->scripts->insert(scr);
+        }
     }
+}
+
+void BrowserWindow::removeScripts()
+{
+    for (auto&& script : this->m_scripts)
+        this->scripts->remove(script);
+    this->m_scripts.clear();
 }
 
 void BrowserWindow::setUserAgent(const QString &ua)
 {
     this->webView->page()->profile()->setHttpUserAgent(ua);
+}
+
+void BrowserWindow::restoreUserAgent()
+{
+    this->webView->page()->profile()->setHttpUserAgent(
+        UserAgent::GetUserAgent(this->webView->page()->profile()->httpUserAgent()));
 }
 
 void BrowserWindow::showEvent(QShowEvent *event)
@@ -347,6 +389,7 @@ void BrowserWindow::showEvent(QShowEvent *event)
 
 void BrowserWindow::closeEvent(QCloseEvent *event)
 {
+    this->resetProfile();
     event->accept();
     emit closed();
 }

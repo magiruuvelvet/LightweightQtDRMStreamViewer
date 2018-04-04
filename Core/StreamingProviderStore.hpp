@@ -92,6 +92,7 @@ public:
     void sort();
 
     static void loadProfile(BrowserWindow *w, const Provider &provider);
+    static void resetProfile(BrowserWindow *w);
 
 private:
     StreamingProviderStore();
