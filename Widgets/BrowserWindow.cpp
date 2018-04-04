@@ -378,7 +378,7 @@ void BrowserWindow::setUserAgent(const QString &ua)
 void BrowserWindow::restoreUserAgent()
 {
     this->webView->page()->profile()->setHttpUserAgent(
-        UserAgent::GetUserAgent(this->webView->page()->profile()->httpUserAgent()));
+        UserAgent::GetUserAgent(this->m_originalUserAgent));
 }
 
 void BrowserWindow::showEvent(QShowEvent *event)
