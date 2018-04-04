@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QColor>
 
 class StreamingProviderParser
 {
@@ -29,6 +30,9 @@ private:
 
     static const char *extension;
     static const char *search_pattern;
+
+    static bool getBoolean(const QString &value);
+    static QColor getColor(const QString &value, const QColor &fallback = QColor(0, 0, 0, 0));
 
     void makeValidPaths();
     QStringList m_validPaths;

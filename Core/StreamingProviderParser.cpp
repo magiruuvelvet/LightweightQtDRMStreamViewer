@@ -92,11 +92,16 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
 
     for (auto&& i : props)
     {
+        // comment line
         if (i.startsWith('#'))
             continue;
 
-        i.startsWith("name:") ? provider.name = i.mid(5).simplified() : QString();
-        if (i.startsWith("icon:"))
+        // provider name
+        else if (i.startsWith("name:", Qt::CaseInsensitive))
+            provider.name = i.mid(5).simplified();
+
+        // provider icon
+        else if (i.startsWith("icon:", Qt::CaseInsensitive))
         {
             const auto icon = i.mid(5).simplified();
 
@@ -105,33 +110,49 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
                 if (QFileInfo(icon).isAbsolute())
                     provider.icon = QIcon(icon);
                 else
-                    //provider.icon = QIcon(StreamingProviderStore::instance()->providerStorePath() + '/' + icon);
                     provider.icon = QIcon(provider_path + '/' + icon);
             }
         }
 
-        i.startsWith("url:")  ? provider.url  = QUrl(i.mid(4).simplified()) : QUrl();
-        i.startsWith("urlInterceptor:") ? (provider.urlInterceptor = i.mid(15).simplified() == "true" ? true : false) : true;
+        // provider url
+        else if (i.startsWith("url:", Qt::CaseInsensitive))
+            provider.url  = QUrl(i.mid(4).simplified());
 
-        i.startsWith("user-agent:") ? provider.useragent = i.mid(11).simplified() : QString();
+        // use url interceptor?
+        else if (i.startsWith("urlInterceptor:", Qt::CaseInsensitive))
+            provider.urlInterceptor = getBoolean(i.mid(15).simplified());
 
-        i.startsWith("titlebar:") ? provider.titleBarVisible = (i.mid(9).simplified() == QLatin1String("true") ? true : false) : false;
-        i.startsWith("titlebar-color:") ? provider.titleBarColor = QColor(i.mid(15).simplified()) : QColor(50, 50, 50, 255);
-        i.startsWith("titlebar-text-color:") ? provider.titleBarTextColor = QColor(i.mid(20).simplified()) : QColor(255, 255, 255, 255);
+        // http user-agent
+        else if (i.startsWith("user-agent:", Qt::CaseInsensitive))
+            provider.useragent = i.mid(11).simplified();
 
-        if (i.startsWith("titlebar-text:"))
+        // should render titlebar?
+        else if (i.startsWith("titlebar:", Qt::CaseInsensitive))
+            provider.titleBarVisible = getBoolean(i.mid(9).simplified());
+
+        // titlebar color
+        else if (i.startsWith("titlebar-color:", Qt::CaseInsensitive))
+            provider.titleBarColor = getColor(i.mid(15).simplified(), provider.titleBarColor);
+
+        // titlebar text color
+        else if (i.startsWith("titlebar-text-color:", Qt::CaseInsensitive))
+            provider.titleBarTextColor = getColor(i.mid(20).simplified(), provider.titleBarTextColor);
+
+        // permanent titlebar text
+        else if (i.startsWith("titlebar-text:", Qt::CaseInsensitive))
         {
             provider.titleBarHasPermanentTitle = true;
             provider.titleBarPermanentTitle = i.mid(14).simplified();
         }
 
-        if (i.startsWith("urlInterceptorPattern:"))
+        // url interceptor pattern and target url
+        else if (i.startsWith("urlInterceptorPattern:", Qt::CaseInsensitive))
         {
             const auto pattern = i.mid(22).simplified();
             provider.urlInterceptorLinks.append(UrlInterceptorLink{QRegExp(pattern), QUrl()});
             qDebug() << provider_file << "Found URL Interceptor Pattern:" << pattern;
         }
-        if (i.startsWith("urlInterceptorTarget:"))
+        else if (i.startsWith("urlInterceptorTarget:", Qt::CaseInsensitive))
         {
             const auto target = i.mid(21).simplified();
             if (provider.urlInterceptorLinks.size() != 0 &&
@@ -147,7 +168,8 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
             }
         }
 
-        if (i.startsWith("script:"))
+        // script / userscript
+        else if (i.startsWith("script:", Qt::CaseInsensitive))
         {
             const auto script = i.mid(7).simplified();
             const auto scr = script.split(',', QString::SkipEmptyParts);
@@ -200,7 +222,13 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
             else
                 qDebug() << provider_file << "Warning: Duplicate 'script' skipped ->" << script;
         }
-    }
+
+        // unknown option
+        else
+        {
+            qDebug() << "Warning: unknown option" << i.simplified() << "skipped.";
+        }
+    } // end for loop
 
     if (provider.name.isEmpty())
     {
@@ -215,18 +243,6 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
     {
         qDebug() << provider_file << "Field 'url' must not be empty.";
         hasErrors = true;
-    }
-    if (provider.titleBarVisible && !provider.titleBarColor.isValid())
-    {
-        qDebug() << provider_file << "Field 'titlebar-color' is not a valid color. See the Qt doc on how to set this field correctly."
-                                  << "Falling back to the default color which is #323232.";
-        provider.titleBarColor = QColor(50, 50, 50, 255);
-    }
-    if (provider.titleBarVisible && !provider.titleBarTextColor.isValid())
-    {
-        qDebug() << provider_file << "Field 'titlebar-text-color' is not a valid color. See the Qt doc on how to set this field correctly."
-                                  << "Falling back to the default color which is #ffffff.";
-        provider.titleBarTextColor = QColor(255, 255, 255, 255);
     }
 
     if (!provider.urlInterceptorLinks.isEmpty())
@@ -250,6 +266,42 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
     StreamingProviderStore::instance()->addProvider(provider);
 
     return SUCCESS;
+}
+
+bool StreamingProviderParser::getBoolean(const QString &value)
+{
+    // default to false
+    bool status = false;
+
+    // trim value string
+    const auto val = value.simplified();
+
+    // compare value to true and 1
+    if (QString::compare(val, "true", Qt::CaseInsensitive) == 0 ||
+        QString::compare(val, "1") == 0)
+        status = true;
+    else
+        status = false;
+
+    return status;
+}
+
+QColor StreamingProviderParser::getColor(const QString &value, const QColor &fallback)
+{
+    // trim value string
+    const auto val = value.simplified();
+
+    // try to parse value
+    const auto color = QColor(val);
+
+    // invalid color
+    if (!color.isValid())
+    {
+        qDebug() << val << "is not a valid color. See the Qt doc on how to set this field correctly.";
+        return fallback;
+    }
+
+    return color;
 }
 
 void StreamingProviderParser::makeValidPaths()

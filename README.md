@@ -85,7 +85,7 @@ Lines starting with a hash (`#`) are ignored.
  - `url` (required):
    The base URL the browser window should load. Set the root URL of the streaming service there.
 
- - `urlInterceptor` (optimal, `true/false`, enabled by default):
+ - `urlInterceptor` (optimal, `true/false`, disabled by default):
    Hijacks (redirects) specific links by regular expression and loads external sources. This is the master switch to enable/disable all given patterns. See the next 2 options on how to set up new patterns and targets. The Netflix sample config file provides a good example on how to use this feature. It injects a 1080p unlocker script to enjoy your shows in Full HD.
 
  - `urlInterceptorPattern` (optimal, requires a following `urlInterceptorTarget` afterwards, *stackable*):

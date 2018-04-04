@@ -59,12 +59,12 @@ struct Provider
     QString    name;
     QIcon      icon;
     QUrl       url = QUrl(QLatin1String("about:blank"));
-    bool       urlInterceptor = true;
+    bool       urlInterceptor = false;
     QString    useragent;
 
     QString    titleBarPermanentTitle;
-    QColor     titleBarColor;
-    QColor     titleBarTextColor;
+    QColor     titleBarColor = QColor(50, 50, 50, 255);
+    QColor     titleBarTextColor = QColor(255, 255, 255, 255);
     bool       titleBarVisible = false;
     bool       titleBarHasPermanentTitle = false;
 
