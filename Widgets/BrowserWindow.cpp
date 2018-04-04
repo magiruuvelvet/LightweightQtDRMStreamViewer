@@ -151,22 +151,34 @@ void BrowserWindow::loadEmbeddedScript(QString &target, const QString &filename,
 
 BrowserWindow::~BrowserWindow()
 {
+    // delete browser window properties
     this->m_baseTitle.clear();
     this->m_cookieStoreId.clear();
     this->m_engineProfilePath.clear();
-    this->m_cookies.clear();
-
     this->providerPath.clear();
 
+    // delete injected scripts
     this->mJs_hideScrollBars.clear();
+    this->scripts->clear();
+    delete scripts;
 
-//    delete scripts;
-//    delete m_interceptor;
-//    delete emergencyAddressBar;
+    // delete url interceptor
+    delete m_interceptor;
 
-//    delete m_cookieStore;
-//    delete webView;
-//    delete m_layout;
+    // delete address bar
+    delete emergencyAddressBar;
+
+    // delete browser cookie store
+    this->m_cookies.clear();
+    delete m_cookieStore;
+
+    // destory the web view
+    delete webView;
+
+    // delete layout
+    delete m_layout;
+
+    qDebug() << "BrowserWindow destroyed";
 }
 
 BrowserWindow *BrowserWindow::createBrowserWindow(const Provider &profile)
@@ -335,8 +347,8 @@ void BrowserWindow::showEvent(QShowEvent *event)
 
 void BrowserWindow::closeEvent(QCloseEvent *event)
 {
-    emit closed();
     event->accept();
+    emit closed();
 }
 
 void BrowserWindow::toggleFullScreen()
@@ -357,6 +369,11 @@ void BrowserWindow::onLoadProgress(int progress)
 void BrowserWindow::onLoadFinished(bool ok)
 {
     // soon™
+}
+
+void BrowserWindow::setUrlAboutBlank()
+{
+    this->setUrl(QUrl("about:blank"));
 }
 
 void BrowserWindow::acceptFullScreen(QWebEngineFullScreenRequest req)

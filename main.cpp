@@ -122,10 +122,11 @@ int main(int argc, char **argv)
 
         qDebug() << "Loading browser window...";
         BrowserWindow *w = BrowserWindow::createBrowserWindow(pr);
-        QObject::connect(w, &BrowserWindow::closed, &a, [&]{
-            // FIXME: delete engine instance here
-            // memory leak if you keep the app open and open/close profiles regularly
-        });
+//        QObject::connect(w, &BrowserWindow::closed, &a, [&]{
+//            // FIXME: delete engine instance here
+//            // memory leak if you keep the app open and open/close profiles regularly
+//        });
+        QObject::connect(w, &BrowserWindow::closed, w, &BrowserWindow::setUrlAboutBlank);
 
         qDebug() << "Everything done. Enjoy your shows/movies :D";
         Config()->fullScreenMode() ? w->showFullScreen() : w->show();

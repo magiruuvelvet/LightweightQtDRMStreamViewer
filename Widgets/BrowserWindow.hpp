@@ -59,6 +59,8 @@ public slots:
     void onLoadProgress(int);
     void onLoadFinished(bool);
 
+    void setUrlAboutBlank();
+
 private slots:
     void acceptFullScreen(QWebEngineFullScreenRequest);
     void toggleAddressBarVisibility();

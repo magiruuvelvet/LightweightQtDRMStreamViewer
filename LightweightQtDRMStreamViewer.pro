@@ -19,6 +19,7 @@ SOURCES += \
     Gui/FlowLayout.cpp \
     Widgets/MainWindow.cpp \
     Widgets/BrowserWindow.cpp \
+    Widgets/ConfigWindow.cpp \
     Util/UrlRequestInterceptor.cpp \
     Util/UserAgent.cpp
 
@@ -30,6 +31,7 @@ HEADERS += \
     Gui/TitleBar.hpp \
     Gui/FlowLayout.hpp \
     Widgets/MainWindow.hpp \
+    Widgets/ConfigWindow.hpp \
     Widgets/BrowserWindow.hpp \
     Util/UrlRequestInterceptor.hpp \
     Util/UserAgent.hpp

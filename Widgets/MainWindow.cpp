@@ -8,6 +8,7 @@
 #include <QToolTip>
 
 #include "BrowserWindow.hpp"
+#include "ConfigWindow.hpp"
 
 #include <QDebug>
 
@@ -59,7 +60,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // configuration button
     this->titleBar()->addButton("⚙", []{
-        qDebug() << "Configuration Button pressed";
+        ConfigWindow *w = new ConfigWindow();
+        w->setWindowModality(Qt::ApplicationModal);
+        QObject::connect(w, &ConfigWindow::closed, w, &ConfigWindow::deleteLater);
+        w->show();
     });
 
     for (auto&& i : StreamingProviderStore::instance()->providers())
@@ -108,10 +112,11 @@ void MainWindow::launchBrowserWindow()
     const Provider pr = StreamingProviderStore::instance()->provider(button->objectName());
 
     BrowserWindow *w = BrowserWindow::createBrowserWindow(pr);
-    QObject::connect(w, &BrowserWindow::closed, this, [&]{
-        // FIXME: delete engine instance here
-        // memory leak if you keep the app open and open/close profiles regularly
-    });
+//    QObject::connect(w, &BrowserWindow::closed, this, [&]{
+//        // FIXME: delete engine instance here
+//        // memory leak if you keep the app open and open/close profiles regularly
+//    });
+    QObject::connect(w, &BrowserWindow::closed, w, &BrowserWindow::setUrlAboutBlank);
 
     Config()->fullScreenMode() ? w->showFullScreen() : w->showNormal();
 }
