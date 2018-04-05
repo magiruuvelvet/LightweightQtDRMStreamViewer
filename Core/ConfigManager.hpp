@@ -37,6 +37,10 @@ public:
     void setMainWindowGeometry(const QRect &rect);
     const QRect &mainWindowGeometry() const;
 
+    // Gui: ConfigWindow position and size
+    void setConfigWindowGeometry(const QRect &rect);
+    const QRect &configWindowGeometry() const;
+
 private:
     ConfigManager();
 
@@ -49,6 +53,7 @@ private:
     bool m_urlInterceptorEnabled = true;
 
     QRect m_mainWindowGeometry = QRect(0, 0, 0, 0);
+    QRect m_configWindowGeometry = QRect(0, 0, 0, 0);
 
 private:
     QString m_uiConfigFile;

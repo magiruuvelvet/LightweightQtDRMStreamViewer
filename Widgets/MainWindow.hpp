@@ -21,7 +21,6 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    QWidget *_rootWidget;
     QVBoxLayout *_lV_main;
 
     FlowLayout *_lF_providerButtonList;

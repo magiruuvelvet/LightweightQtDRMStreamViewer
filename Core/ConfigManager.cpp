@@ -67,6 +67,7 @@ bool ConfigManager::readUiConfig()
             if (std::strcmp(header, "Lui_config\0") == 0)
             {
                 stream >> this->m_mainWindowGeometry;
+                stream >> this->m_configWindowGeometry;
 
                 qDebug() << "`ui_config.bin` loaded!";
                 ui_config.close();
@@ -96,6 +97,7 @@ bool ConfigManager::writeUiConfig()
         QDataStream stream(&ui_config);
         stream << "Lui_config\0";
         stream << this->m_mainWindowGeometry;
+        stream << this->m_configWindowGeometry;
 
         qDebug() << "`ui_config.bin` written!";
         ui_config.close();
@@ -144,4 +146,15 @@ void ConfigManager::setMainWindowGeometry(const QRect &rect)
 const QRect &ConfigManager::mainWindowGeometry() const
 {
     return this->m_mainWindowGeometry;
+}
+
+void ConfigManager::setConfigWindowGeometry(const QRect &rect)
+{
+    this->m_configWindowGeometry = rect;
+    this->writeUiConfig();
+}
+
+const QRect &ConfigManager::configWindowGeometry() const
+{
+    return this->m_configWindowGeometry;
 }

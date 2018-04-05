@@ -16,6 +16,9 @@ signals:
 
 protected:
     void closeEvent(QCloseEvent *event);
+
+private:
+    QVBoxLayout *_lV_main;
 };
 
 #endif // CONFIGWINDOW_HPP
