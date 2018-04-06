@@ -17,6 +17,7 @@ SOURCES += \
     Gui/BaseWindow.cpp \
     Gui/TitleBar.cpp \
     Gui/FlowLayout.cpp \
+    Gui/ProviderButton.cpp \
     Widgets/MainWindow.cpp \
     Widgets/BrowserWindow.cpp \
     Widgets/ConfigWindow.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     Gui/BaseWindow.hpp \
     Gui/TitleBar.hpp \
     Gui/FlowLayout.hpp \
+    Gui/ProviderButton.hpp \
     Widgets/MainWindow.hpp \
     Widgets/ConfigWindow.hpp \
     Widgets/BrowserWindow.hpp \

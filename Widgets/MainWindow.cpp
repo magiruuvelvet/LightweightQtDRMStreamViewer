@@ -3,6 +3,8 @@
 #include <Core/ConfigManager.hpp>
 #include <Core/StreamingProviderStore.hpp>
 
+#include <Gui/ProviderButton.hpp>
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QToolTip>
@@ -68,30 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     for (auto&& i : StreamingProviderStore::instance()->providers())
     {
-        this->_providerBtns.append(new QPushButton(i.name));
-        this->_providerBtns.last()->setObjectName(i.id);
-        this->_providerBtns.last()->setGeometry(-1, -1, 80, 80);
-        this->_providerBtns.last()->setFixedWidth(95);
-        this->_providerBtns.last()->setFixedHeight(95);
-        this->_providerBtns.last()->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-        this->_providerBtns.last()->setFlat(true);
-        this->_providerBtns.last()->setFocusPolicy(Qt::TabFocus);
-        this->_providerBtns.last()->setStyleSheet(
-                    "QPushButton{outline: none; border: none; padding: 5px; color: #ffffff;}"
-                    "QPushButton:focus{outline: none; border: 1px solid #f3f3f3; padding: 5px;}"
-                    "QPushButton:hover{outline: none; border: 1px solid #ffffff; padding: 5px; background-color: #555555;}"
-                    "QPushButton:pressed{outline: none; border: 1px solid #ffffff; padding: 5px; background-color: #484848;}");
-
-        if (!i.icon.isNull())
-        {
-            this->_providerBtns.last()->setIcon(i.icon);
-            this->_providerBtns.last()->setIconSize(QSize(80, 80));
-            this->_providerBtns.last()->setText(QString());
-            this->_providerBtns.last()->setToolTip(i.name);
-        }
-
+        this->_providerBtns.append(ProviderButton::create(i));
         this->_lF_providerButtonList->addWidget(this->_providerBtns.last());
-
         QObject::connect(this->_providerBtns.last(), &QPushButton::clicked, this, &MainWindow::launchBrowserWindow);
     }
 

@@ -48,6 +48,8 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
 
 
+
+
     this->_lV_main->addSpacerItem(new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     this->containerWidget()->setLayout(this->_lV_main);
