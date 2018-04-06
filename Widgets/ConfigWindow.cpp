@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QToolTip>
+#include <QHeaderView>
 
 #include <QDebug>
 
@@ -49,13 +50,19 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->_lV_main->setDirection(QBoxLayout::TopToBottom);
 
     // provider list
-    this->m_listView = new QListView();
-    this->m_listView->setViewMode(QListView::ListMode);
-    this->m_listView->setModel(new ProviderListModel());
-    this->_lV_main->addWidget(this->m_listView);
+    this->m_tblView = new QTableView();
+    this->m_tblView->setModel(new ProviderListModel());
+    this->m_tblView->horizontalHeader()->hide();
+    this->m_tblView->verticalHeader()->hide();
+    this->_lV_main->addWidget(this->m_tblView);
 
-    this->m_listView->setStyleSheet("* {color: white; background-color: #434343;}");
+    this->m_tblView->setStyleSheet("* {color: white; background-color: #434343;}");
+    this->m_tblView->setEditTriggers(QTableView::NoEditTriggers);
+    this->m_tblView->setSelectionBehavior(QTableView::SelectRows);
+    this->m_tblView->setSelectionMode(QTableView::SingleSelection);
 
+    this->m_tblView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    this->m_tblView->setColumnWidth(0, 25);
 
 
     this->_lV_main->addSpacerItem(new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -67,7 +74,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
 ConfigWindow::~ConfigWindow()
 {
-    delete m_listView;
+    delete m_tblView;
 }
 
 void ConfigWindow::closeEvent(QCloseEvent *event)

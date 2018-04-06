@@ -28,7 +28,7 @@ QPushButton *ProviderButton::create(const Provider &provider)
 }
 
 ProviderListModel::ProviderListModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : QAbstractTableModel(parent)
 {
 }
 
@@ -45,27 +45,28 @@ int ProviderListModel::columnCount(const QModelIndex &) const
 {
     // col 1: icon
     // col 2: name
-    ///return 2;
-    return 1;
+    return 2;
 }
 
 QVariant ProviderListModel::data(const QModelIndex &index, int role) const
 {
-//    const auto row = index.row();
-//    const auto col = index.column();
+    const auto row = index.row();
+    const auto col = index.column();
 
-//    switch (role)
-//    {
-//        case Qt::DisplayRole:
-//            switch (col)
-//            {
-//                case 0: return StreamingProviderStore::instance()->providerAt(row).icon;
-//                case 1: return StreamingProviderStore::instance()->providerAt(row).name;
-//            }
-//            break;
-//    }
-//    return QVariant();
-    if (role == Qt::DisplayRole)
-        return StreamingProviderStore::instance()->providerAt(index.row()).name;
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            switch (col)
+            {
+                case 1: return StreamingProviderStore::instance()->providerAt(row).name;
+            }
+            break;
+        case Qt::DecorationRole:
+            switch (col)
+            {
+                case 0: return StreamingProviderStore::instance()->providerAt(row).icon;
+            }
+            break;
+    }
     return QVariant();
 }

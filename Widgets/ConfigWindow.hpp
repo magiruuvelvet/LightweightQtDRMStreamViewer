@@ -3,7 +3,7 @@
 
 #include <Gui/BaseWindow.hpp>
 
-#include <QListView>
+#include <QTableView>
 
 class ConfigWindow : public BaseWindow
 {
@@ -22,7 +22,7 @@ protected:
 private:
     QVBoxLayout *_lV_main;
 
-    QListView *m_listView;
+    QTableView *m_tblView;
 };
 
 #endif // CONFIGWINDOW_HPP

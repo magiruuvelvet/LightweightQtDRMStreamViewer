@@ -1,7 +1,7 @@
 #ifndef PROVIDERBUTTON_HPP
 #define PROVIDERBUTTON_HPP
 
-#include <QAbstractItemModel>
+#include <QAbstractTableModel>
 #include <QPushButton>
 
 #include <Core/StreamingProviderStore.hpp>
@@ -11,11 +11,8 @@ namespace ProviderButton
     QPushButton *create(const Provider &provider);
 };
 
-class ProviderListModel : public QAbstractItemModel //QAbstractTableModel
+class ProviderListModel : public QAbstractTableModel
 {
-    // note: show icon + name instead?
-    //  currently only shows name
-
     Q_OBJECT
 
 public:
@@ -25,16 +22,8 @@ public:
     inline void reload()
     {
         this->beginResetModel();
+        // external data update
         this->endResetModel();
-    }
-
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override
-    {
-        return this->createIndex(row, column, parent.internalId());
-    }
-    QModelIndex parent(const QModelIndex &child) const override
-    {
-        return QModelIndex();
     }
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
