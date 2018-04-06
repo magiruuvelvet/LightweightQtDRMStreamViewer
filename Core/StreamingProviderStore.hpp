@@ -89,6 +89,7 @@ public:
     const Provider &provider(const QString &id) const;
 
     bool contains(const QString &id) const;
+    inline int count() const { return this->m_providers.size(); }
     void sort();
 
     static void loadProfile(BrowserWindow *w, const Provider &provider);

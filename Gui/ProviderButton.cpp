@@ -26,3 +26,46 @@ QPushButton *ProviderButton::create(const Provider &provider)
 
     return btn;
 }
+
+ProviderListModel::ProviderListModel(QObject *parent)
+    : QAbstractItemModel(parent)
+{
+}
+
+ProviderListModel::~ProviderListModel()
+{
+}
+
+int ProviderListModel::rowCount(const QModelIndex &) const
+{
+    return StreamingProviderStore::instance()->count();
+}
+
+int ProviderListModel::columnCount(const QModelIndex &) const
+{
+    // col 1: icon
+    // col 2: name
+    ///return 2;
+    return 1;
+}
+
+QVariant ProviderListModel::data(const QModelIndex &index, int role) const
+{
+//    const auto row = index.row();
+//    const auto col = index.column();
+
+//    switch (role)
+//    {
+//        case Qt::DisplayRole:
+//            switch (col)
+//            {
+//                case 0: return StreamingProviderStore::instance()->providerAt(row).icon;
+//                case 1: return StreamingProviderStore::instance()->providerAt(row).name;
+//            }
+//            break;
+//    }
+//    return QVariant();
+    if (role == Qt::DisplayRole)
+        return StreamingProviderStore::instance()->providerAt(index.row()).name;
+    return QVariant();
+}

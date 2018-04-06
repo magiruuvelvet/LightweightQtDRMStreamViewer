@@ -3,6 +3,8 @@
 
 #include <Gui/BaseWindow.hpp>
 
+#include <QListView>
+
 class ConfigWindow : public BaseWindow
 {
     Q_OBJECT
@@ -19,6 +21,8 @@ protected:
 
 private:
     QVBoxLayout *_lV_main;
+
+    QListView *m_listView;
 };
 
 #endif // CONFIGWINDOW_HPP

@@ -3,6 +3,8 @@
 #include <Core/ConfigManager.hpp>
 #include <Core/StreamingProviderStore.hpp>
 
+#include <Gui/ProviderButton.hpp>
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QToolTip>
@@ -17,7 +19,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->setWindowFlag(Qt::WindowCloseButtonHint, true);
     this->setWindowFlag(Qt::WindowMinimizeButtonHint, false);
 
-    this->resize(450, 600);
+    this->resize(430, 540);
 
     // Center window on screen
     QRect desktopSize = QApplication::desktop()->screenGeometry();
@@ -46,7 +48,13 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->_lV_main->setContentsMargins(5, 8, 5, 5);
     this->_lV_main->setDirection(QBoxLayout::TopToBottom);
 
+    // provider list
+    this->m_listView = new QListView();
+    this->m_listView->setViewMode(QListView::ListMode);
+    this->m_listView->setModel(new ProviderListModel());
+    this->_lV_main->addWidget(this->m_listView);
 
+    this->m_listView->setStyleSheet("* {color: white; background-color: #434343;}");
 
 
 
@@ -59,6 +67,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
 ConfigWindow::~ConfigWindow()
 {
+    delete m_listView;
 }
 
 void ConfigWindow::closeEvent(QCloseEvent *event)
