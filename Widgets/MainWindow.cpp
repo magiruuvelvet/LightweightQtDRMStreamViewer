@@ -61,10 +61,14 @@ MainWindow::MainWindow(QWidget *parent)
     this->setContentsMargins(0, 0, 0, 0);
 
     // configuration button
-    this->titleBar()->addButton("⚙", []{
+    this->titleBar()->addButton("⚙", [&]{
         ConfigWindow *w = new ConfigWindow();
         w->setWindowModality(Qt::ApplicationModal);
         QObject::connect(w, &ConfigWindow::closed, w, &ConfigWindow::deleteLater);
+        QObject::connect(w, &ConfigWindow::closed, this, [&]{
+            this->setWindowOpacity(1.0);
+        });
+        this->setWindowOpacity(0.75);
         w->show();
     });
 
