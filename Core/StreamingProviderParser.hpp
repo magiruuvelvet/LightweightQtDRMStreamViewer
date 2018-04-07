@@ -7,6 +7,8 @@
 
 class StreamingProviderParser
 {
+    friend class StreamingProviderWriter;
+
 public:
     StreamingProviderParser();
     ~StreamingProviderParser();

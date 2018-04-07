@@ -13,6 +13,7 @@ SOURCES += \
     main.cpp \
     Core/StreamingProviderStore.cpp \
     Core/StreamingProviderParser.cpp \
+    Core/StreamingProviderWriter.cpp \
     Core/ConfigManager.cpp \
     Gui/BaseWindow.cpp \
     Gui/TitleBar.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 HEADERS += \
     Core/StreamingProviderStore.hpp \
     Core/StreamingProviderParser.hpp \
+    Core/StreamingProviderWriter.hpp \
     Core/ConfigManager.hpp \
     Gui/BaseWindow.hpp \
     Gui/TitleBar.hpp \

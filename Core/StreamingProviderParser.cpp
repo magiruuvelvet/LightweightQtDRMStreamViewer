@@ -107,10 +107,11 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
 
             if (!icon.isEmpty())
             {
+                provider.icon.value = icon;
                 if (QFileInfo(icon).isAbsolute())
-                    provider.icon = QIcon(icon);
+                    provider.icon.icon = QIcon(icon);
                 else
-                    provider.icon = QIcon(provider_path + '/' + icon);
+                    provider.icon.icon = QIcon(provider_path + '/' + icon);
             }
         }
 
@@ -235,7 +236,7 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
         qDebug() << provider_file << "Field 'name' must not be empty.";
         hasErrors = true;
     }
-    if (provider.icon.isNull())
+    if (provider.icon.icon.isNull())
     {
         qDebug() << provider_file << "Field 'icon' is empty. Falling back to text name.";
     }

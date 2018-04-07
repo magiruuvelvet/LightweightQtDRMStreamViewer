@@ -57,7 +57,11 @@ struct Provider
     QString    path;
 
     QString    name;
-    QIcon      icon;
+    //QIcon      icon;
+    struct {
+        QIcon icon;
+        QString value;
+    } icon;
     QUrl       url = QUrl(QLatin1String("about:blank"));
     bool       urlInterceptor = false;
     QString    useragent;
@@ -87,6 +91,7 @@ public:
     const Provider &providerAt(int index) const
     { return this->m_providers.at(index); }
     const Provider &provider(const QString &id) const;
+    Provider *provider_ptr(const QString &id);
 
     bool contains(const QString &id) const;
     inline int count() const { return this->m_providers.size(); }

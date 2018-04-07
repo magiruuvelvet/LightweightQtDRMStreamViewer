@@ -16,9 +16,9 @@ QPushButton *ProviderButton::create(const Provider &provider)
         "QPushButton:hover{outline: none; border: 1px solid #ffffff; padding: 5px; background-color: #555555;}"
         "QPushButton:pressed{outline: none; border: 1px solid #ffffff; padding: 5px; background-color: #484848;}");
 
-    if (!provider.icon.isNull())
+    if (!provider.icon.icon.isNull())
     {
-        btn->setIcon(provider.icon);
+        btn->setIcon(provider.icon.icon);
         btn->setIconSize(QSize(80, 80));
         btn->setText(QString());
         btn->setToolTip(provider.name);
@@ -64,7 +64,7 @@ QVariant ProviderListModel::data(const QModelIndex &index, int role) const
         case Qt::DecorationRole:
             switch (col)
             {
-                case 0: return StreamingProviderStore::instance()->providerAt(row).icon;
+                case 0: return StreamingProviderStore::instance()->providerAt(row).icon.icon;
             }
             break;
     }

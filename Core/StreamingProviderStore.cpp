@@ -50,6 +50,19 @@ const Provider &StreamingProviderStore::provider(const QString &id) const
     return this->m_null;
 }
 
+Provider *StreamingProviderStore::provider_ptr(const QString &id)
+{
+    for (auto&& i : this->m_providers)
+    {
+        if (i.id == id)
+        {
+            return &i;
+        }
+    }
+
+    return nullptr;
+}
+
 bool StreamingProviderStore::contains(const QString &id) const
 {
     for (auto&& provider : this->m_providers)
@@ -82,7 +95,7 @@ void StreamingProviderStore::loadProfile(BrowserWindow *w, const Provider &pr)
     w->setTitleBarVisibility(pr.titleBarVisible);
     w->setTitleBarColor(pr.titleBarColor, pr.titleBarTextColor);
     w->setWindowTitle("Loading...");
-    w->setWindowIcon(pr.icon);
+    w->setWindowIcon(pr.icon.icon);
     w->setProfile(pr.id);
     w->setScripts(pr.scripts);
     w->setUrlInterceptorEnabled(pr.urlInterceptor, pr.urlInterceptorLinks);
@@ -102,7 +115,7 @@ void StreamingProviderStore::resetProfile(BrowserWindow *w)
     w->setTitleBarVisibility(def.titleBarVisible);
     w->setTitleBarColor(def.titleBarColor, def.titleBarTextColor);
     w->setWindowTitle("[empty]");
-    w->setWindowIcon(def.icon);
+    w->setWindowIcon(def.icon.icon);
     w->setProfile("Default");
     w->removeScripts();
     w->setUrlInterceptorEnabled(def.urlInterceptor);
