@@ -72,30 +72,37 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
                     replace_value(prop, provider.titleBarTextColor.name(QColor::HexRgb));
             }
 
-//            quint32 pos = 0;
-//            bool replaced = false;
-//            for (auto&& prop : props)
-//            {
-//                for (auto&& interceptor : provider.urlInterceptorLinks)
-//                {
-//                    if (prop.startsWith("urlInterceptorPattern:", Qt::CaseInsensitive))
-//                    {
-//                        replace_value(prop, interceptor.pattern.pattern());
-//                        replaced = true;
-//                    }
-//                }
-//                pos++;
-//            }
-//-----------------------
-//            for (auto&& interceptor : provider.urlInterceptorLinks)
-//            {
-//                if (prop.startsWith("urlInterceptorPattern:", Qt::CaseInsensitive))
-//                    replace_value(prop, interceptor.pattern.pattern());
-//                else if (prop.startsWith("urlInterceptorTarget:", Qt::CaseInsensitive))
-//                    replace_value(prop, interceptor.target.toString());
-//            }
-//-----------------------
-            // for scripts
+            // find all positions of stackable options
+            static const auto find_pos_of_all = [&](const QString &startsWith)
+            {
+                QList<int> pos;
+                for (auto i = 0; i < props.size(); i++)
+                    if (props.at(i).startsWith(startsWith, Qt::CaseInsensitive))
+                        pos.append(i);
+                return pos;
+            };
+
+            // find all url interceptor options
+            auto patternPositions = find_pos_of_all("urlInterceptorPattern:");
+            auto targetPositions = find_pos_of_all("urlInterceptorTarget:");
+
+            // update url interceptors
+            int internalCounter_Interceptors = 0;
+            for (auto i = 0; i < patternPositions.size(); i++)
+            {
+                replace_value(props[patternPositions.at(i)], provider.urlInterceptorLinks.at(internalCounter_Interceptors).pattern.pattern());
+                replace_value(props[targetPositions.at(i)], provider.urlInterceptorLinks.at(internalCounter_Interceptors).target.toString());
+                internalCounter_Interceptors++;
+            }
+
+            // update scripts
+            auto scriptPositions = find_pos_of_all("script:");
+            int internalCounter_Scripts = 0;
+            for (auto i = 0; i < scriptPositions.size(); i++)
+            {
+                replace_value(props[scriptPositions.at(i)], provider.scripts.at(internalCounter_Scripts).filename);
+                internalCounter_Scripts++;
+            }
 
             ///
             /// add new properties
