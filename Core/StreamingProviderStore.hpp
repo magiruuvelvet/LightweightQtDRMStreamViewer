@@ -27,6 +27,20 @@ struct Script
         DocumentCreation,
         Automatic // @run-at from userscript; default
     } injectionPoint;
+
+    // convert helper
+    //  > filename,injectionPoint[auto]
+    operator const QString() const {
+        QString ret = this->filename;
+        switch (this->injectionPoint)
+        {
+            case Script::Automatic: break;
+            case Script::Deferred: ret.append(",defer"); break;
+            case Script::DocumentReady: ret.append(",ready"); break;
+            case Script::DocumentCreation: ret.append(",create"); break;
+        }
+        return ret;
+    }
 };
 
 #include <QDebug>

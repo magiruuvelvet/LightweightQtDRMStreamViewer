@@ -100,7 +100,7 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
             int internalCounter_Scripts = 0;
             for (auto i = 0; i < scriptPositions.size(); i++)
             {
-                replace_value(props[scriptPositions.at(i)], provider.scripts.at(internalCounter_Scripts).filename);
+                replace_value(props[scriptPositions.at(i)], provider.scripts.at(internalCounter_Scripts));
                 internalCounter_Scripts++;
             }
 
@@ -129,7 +129,7 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
                 props.append("urlInterceptorTarget:" + provider.urlInterceptorLinks.at(i).target.toString());
             }
             for (auto i = internalCounter_Scripts; i < provider.scripts.size(); i++)
-                props.append("script:" + provider.scripts.at(i).filename);
+                props.append("script:" + provider.scripts.at(i));
             if (!contains_option("user-agent:") && !provider.useragent.isEmpty())
                 props.append("user-agent:" + provider.useragent);
             if (!contains_option("titlebar:") && provider.titleBarVisible)
@@ -177,17 +177,7 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
                 s << "urlInterceptorTarget:" << interceptor.target.toString() << '\n';
             }
             for (auto&& script : provider.scripts)
-            {
-                s << "script:" << script.filename;
-                switch (script.injectionPoint)
-                {
-                    case Script::Automatic: break;
-                    case Script::Deferred: s << ",defer"; break;
-                    case Script::DocumentReady: s << ",ready"; break;
-                    case Script::DocumentCreation: s << ",create"; break;
-                }
-                s << '\n';
-            }
+                s << "script:" << script << '\n';
             if (!provider.useragent.isEmpty())
                 s << "user-agent:" << provider.useragent << '\n';
             if (provider.titleBarVisible)

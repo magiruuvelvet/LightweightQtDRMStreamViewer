@@ -135,7 +135,7 @@ void ProviderEditWidget::_update()
 
     this->_scripts->clear();
     for (auto&& i : provider.scripts)
-        this->_scripts->append(i.filename);
+        this->_scripts->append(i);
 
     this->_useragent->setText(provider.useragent);
 
