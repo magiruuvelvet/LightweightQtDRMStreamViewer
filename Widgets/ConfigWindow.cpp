@@ -20,7 +20,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->setWindowFlag(Qt::WindowCloseButtonHint, true);
     this->setWindowFlag(Qt::WindowMinimizeButtonHint, false);
 
-    this->resize(430, 540);
+    this->resize(430, 730);
 
     // Center window on screen
     QRect desktopSize = QApplication::desktop()->screenGeometry();
@@ -66,6 +66,10 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
     QObject::connect(this->m_tblView, &QTableView::clicked, this, [&](const QModelIndex &idx) {
         this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt(idx.row()));
+    });
+    QObject::connect(this->m_tblView->selectionModel(), &QItemSelectionModel::currentRowChanged,
+                     this, [&](const QModelIndex &current, const QModelIndex &) {
+        this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt(current.row()));
     });
 
     this->m_editWidget = new ProviderEditWidget();

@@ -2,7 +2,11 @@
 #define PROVIDEREDITWIDGET_HPP
 
 #include <QWidget>
+#include <QLabel>
+#include <QGridLayout>
 #include <QLineEdit>
+#include <QTextEdit>
+#include <QCheckBox>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 
@@ -21,6 +25,24 @@ public slots:
 
 private:
     Provider provider;
+
+    QGridLayout *_layout;
+
+    QLineEdit *_name;
+    QLineEdit *_icon;
+    QLineEdit *_url;
+    QCheckBox *_urlInterceptor;
+    QTableWidget *_urlInterceptorLinks;
+        QList<QTableWidgetItem*> _urlInterceptorLinkItems;
+    QTextEdit *_scripts;
+        QLabel *_scriptsLabel;
+    QLineEdit *_useragent;
+    QCheckBox *_titleBar;
+    QCheckBox *_permanentTitleBarText;
+    QLineEdit *_titleBarText;
+    QLineEdit *_titleBarColor;
+    QLineEdit *_titleBarTextColor;
+        QLabel *_titleBarColors;
 
     void _update();
 };
