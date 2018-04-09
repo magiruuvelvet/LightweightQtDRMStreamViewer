@@ -18,51 +18,62 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         return l;
     };
 
-    static const auto create_lineedit = [](const QString &placeholder) {
+    static const auto create_lineedit = [](const QString &placeholder, const QString &objectName) {
         QLineEdit *le = new QLineEdit();
+        le->setObjectName(objectName);
         le->setPlaceholderText(placeholder);
         le->setToolTip(placeholder);
         le->setStyleSheet(stylesheet);
         return le;
     };
 
-    static const auto create_checkbbox = [](const QString &text) {
+    static const auto create_checkbbox = [](const QString &text, const QString &objectName) {
         QCheckBox *cb = new QCheckBox(text);
+        cb->setObjectName(objectName);
         cb->setStyleSheet("* {color: white;} /*QCheckBox::indicator {background:#444444;}*/");
         return cb;
     };
 
-    static const auto create_tablewidget = [](int rows, int columns) {
+    static const auto create_tablewidget = [](int rows, int columns,
+                                              const QStringList &rowNames,
+                                              const QStringList &columNames,
+                                              bool hideRows = false, bool hideColums = false) {
         QTableWidget *tw = new QTableWidget(rows, columns);
         tw->setStyleSheet(stylesheet);
-        tw->verticalHeader()->hide();
-        // FIXME: improve this, see also bottom in _update()
-        tw->setHorizontalHeaderLabels({"Pattern", "Target URL"});
+        if (hideRows)
+            tw->verticalHeader()->hide();
+        if (hideColums)
+            tw->horizontalHeader()->hide();
+        tw->setUserData(0, new TableWidgetUserData(rowNames));
+        tw->setUserData(1, new TableWidgetUserData(columNames));
+        tw->setVerticalHeaderLabels(static_cast<TableWidgetUserData*>(tw->userData(0))->headerData);
+        tw->setHorizontalHeaderLabels(static_cast<TableWidgetUserData*>(tw->userData(1))->headerData);
         for (auto i = 0; i < columns; i++)
             tw->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
         return tw;
     };
 
-    static const auto create_textedit = []{
+    static const auto create_textedit = [](const QString &objectName) {
         QTextEdit *te = new QTextEdit();
+        te->setObjectName(objectName);
         te->setStyleSheet(stylesheet);
         return te;
     };
 
-    this->_name = create_lineedit("Name");
-    this->_icon = create_lineedit("Icon");
-    this->_url = create_lineedit("URL");
-    this->_urlInterceptor = create_checkbbox("URL Interceptor");
-    this->_urlInterceptorLinks = create_tablewidget(0, 2);
+    this->_name = create_lineedit("Name", "name");
+    this->_icon = create_lineedit("Icon", "icon");
+    this->_url = create_lineedit("URL", "url");
+    this->_urlInterceptor = create_checkbbox("URL Interceptor", "url_interceptor");
+    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, true, false);
     this->_scriptsLabel = create_label("Scripts");
-    this->_scripts = create_textedit();
-    this->_useragent = create_lineedit("User Agent");
-    this->_titleBar = create_checkbbox("Show title bar");
-    this->_permanentTitleBarText = create_checkbbox("Use permanent title bar text");
-    this->_titleBarText = create_lineedit("Permanent title bar text");
+    this->_scripts = create_textedit("scripts");
+    this->_useragent = create_lineedit("User Agent", "useragent");
+    this->_titleBar = create_checkbbox("Show title bar", "show_titlebar");
+    this->_permanentTitleBarText = create_checkbbox("Use permanent title bar text", "use_permanent_title");
+    this->_titleBarText = create_lineedit("Permanent title bar text", "permanent_title");
     this->_titleBarColors = create_label("Title bar colors");
-    this->_titleBarColor = create_lineedit("Title bar color");
-    this->_titleBarTextColor = create_lineedit("Title bar text color");
+    this->_titleBarColor = create_lineedit("Title bar color", "titlebar_color");
+    this->_titleBarTextColor = create_lineedit("Title bar text color", "titlebar_text_color");
 
     this->_layout->addWidget(this->_name,                  0, 0, 1, 2);
     this->_layout->addWidget(this->_icon,                  1, 0, 1, 2);
@@ -115,7 +126,8 @@ void ProviderEditWidget::_update()
 
     this->_urlInterceptorLinks->clear();
     this->_urlInterceptorLinks->setRowCount(0);
-    this->_urlInterceptorLinks->setHorizontalHeaderLabels({"Pattern", "Target URL"});
+    this->_urlInterceptorLinks->setHorizontalHeaderLabels(
+        static_cast<TableWidgetUserData*>(this->_urlInterceptorLinks->userData(1))->headerData);
     this->_urlInterceptorLinkItems.clear();
 
     for (auto&& i : provider.urlInterceptorLinks)

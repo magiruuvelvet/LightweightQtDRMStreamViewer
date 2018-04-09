@@ -47,4 +47,19 @@ private:
     void _update();
 };
 
+class TableWidgetUserData : public QObjectUserData
+{
+public:
+    TableWidgetUserData(const QStringList &headerData)
+    {
+        this->headerData = headerData;
+    }
+    ~TableWidgetUserData() override
+    {
+        this->headerData.clear();
+    }
+
+    QStringList headerData;
+};
+
 #endif // PROVIDEREDITWIDGET_HPP
