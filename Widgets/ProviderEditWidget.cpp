@@ -77,6 +77,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         return te;
     };
 
+    this->_id = create_lineedit("ID (Filename)", "id");
     this->_name = create_lineedit("Name", "name");
     this->_icon = create_lineedit("Icon", "icon");
     this->_url = create_lineedit("URL", "url");
@@ -92,25 +93,28 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     this->_titleBarColor = create_lineedit("Title bar color", "titlebar_color");
     this->_titleBarTextColor = create_lineedit("Title bar text color", "titlebar_text_color");
 
-    this->_layout->addWidget(this->_name,                  0, 0, 1, 2);
-    this->_layout->addWidget(this->_icon,                  1, 0, 1, 2);
-    this->_layout->addWidget(this->_url,                   2, 0, 1, 2);
-    this->_layout->addWidget(this->_urlInterceptor,        3, 0, 1, 2);
-    this->_layout->addWidget(this->_urlInterceptorLinks,   4, 0, 1, 2);
-    this->_layout->addWidget(this->_scriptsLabel,          5, 0, 1, 2);
-    this->_layout->addWidget(this->_scripts,               6, 0, 1, 2);
-    this->_layout->addWidget(this->_useragent,             7, 0, 1, 2);
-    this->_layout->addWidget(this->_titleBar,              8, 0, 1, 1);
-    this->_layout->addWidget(this->_permanentTitleBarText, 8, 1, 1, 1);
-    this->_layout->addWidget(this->_titleBarText,          9, 0, 1, 2);
-    this->_layout->addWidget(this->_titleBarColors,       10, 0, 1, 2);
-    this->_layout->addWidget(this->_titleBarColor,        11, 0, 1, 1);
-    this->_layout->addWidget(this->_titleBarTextColor,    11, 1, 1, 1);
+    this->_layout->addWidget(this->_id,                    0, 0, 1, 2);
+    this->_layout->addWidget(this->_name,                  1, 0, 1, 2);
+    this->_layout->addWidget(this->_icon,                  2, 0, 1, 2);
+    this->_layout->addWidget(this->_url,                   3, 0, 1, 2);
+    this->_layout->addWidget(this->_urlInterceptor,        4, 0, 1, 2);
+    this->_layout->addWidget(this->_urlInterceptorLinks,   5, 0, 1, 2);
+    this->_layout->addWidget(this->_scriptsLabel,          6, 0, 1, 2);
+    this->_layout->addWidget(this->_scripts,               7, 0, 1, 2);
+    this->_layout->addWidget(this->_useragent,             8, 0, 1, 2);
+    this->_layout->addWidget(this->_titleBar,              9, 0, 1, 1);
+    this->_layout->addWidget(this->_permanentTitleBarText, 9, 1, 1, 1);
+    this->_layout->addWidget(this->_titleBarText,         10, 0, 1, 2);
+    this->_layout->addWidget(this->_titleBarColors,       11, 0, 1, 2);
+    this->_layout->addWidget(this->_titleBarColor,        12, 0, 1, 1);
+    this->_layout->addWidget(this->_titleBarTextColor,    12, 1, 1, 1);
     this->setLayout(this->_layout);
 }
 
 ProviderEditWidget::~ProviderEditWidget()
 {
+    _id->disconnect();
+    delete _id;
     _name->disconnect();
     delete _name;
     _icon->disconnect();
@@ -139,12 +143,22 @@ ProviderEditWidget::~ProviderEditWidget()
     delete _titleBarTextColor;
     delete _titleBarColors;
 
+    provider_ptr = nullptr;
+
     qDebug() << "ProviderEditWidget destroyed!";
 }
 
-void ProviderEditWidget::setProvider(const Provider &provider)
+void ProviderEditWidget::setProvider(Provider *provider)
 {
-    this->provider = provider;
+    if (!provider)
+        return;
+
+    // create copy of object for modifications
+    this->provider = *provider;
+
+    // pointer to real object (for saving later)
+    this->provider_ptr = provider;
+
     this->_update();
     first_start = false;
 }
@@ -153,6 +167,7 @@ void ProviderEditWidget::_update()
 {
     is_updating = true;
 
+    this->_id->setText(provider.id);
     this->_name->setText(provider.name);
     this->_icon->setText(provider.icon.value);
     this->_url->setText(provider.url.toString());
@@ -194,13 +209,24 @@ void ProviderEditWidget::_update()
     is_updating = false;
 }
 
+void ProviderEditWidget::_save()
+{
+
+}
+
 void ProviderEditWidget::string_option_changed(const QString &)
 {
     if (!first_start && !is_updating)
     {
         const auto option = this->sender()->objectName();
 
-        if (option == "name")
+        if (option == "id")
+        {
+            if (provider.id != _id->text())
+                provider_renamed = true;
+            provider.id = _id->text();
+        }
+        else if (option == "name")
         { provider.name = _name->text(); }
         else if (option == "icon")
         { StreamingProviderParser::parseIcon(_icon->text(), &provider.icon.value, &provider.icon.icon); }

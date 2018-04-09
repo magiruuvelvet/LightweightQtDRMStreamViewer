@@ -65,11 +65,11 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->m_tblView->setColumnWidth(0, 25);
 
     QObject::connect(this->m_tblView, &QTableView::clicked, this, [&](const QModelIndex &idx) {
-        this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt(idx.row()));
+        this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt_ptr(idx.row()));
     });
     QObject::connect(this->m_tblView->selectionModel(), &QItemSelectionModel::currentRowChanged,
                      this, [&](const QModelIndex &current, const QModelIndex &) {
-        this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt(current.row()));
+        this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt_ptr(current.row()));
     });
 
     this->m_editWidget = new ProviderEditWidget();

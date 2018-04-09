@@ -16,21 +16,26 @@ class ProviderEditWidget : public QWidget
 {
     Q_OBJECT
 
+    friend class ConfigWindow;
+
 public:
     ProviderEditWidget(QWidget *parent = nullptr);
     ~ProviderEditWidget();
 
 public slots:
-    void setProvider(const Provider &provider);
+    void setProvider(Provider *provider);
 
 private:
     Provider provider;
+    Provider *provider_ptr = nullptr;
 
     bool first_start = true;
     bool is_updating = false;
+    bool provider_renamed = false;
 
     QGridLayout *_layout;
 
+    QLineEdit *_id;
     QLineEdit *_name;
     QLineEdit *_icon;
     QLineEdit *_url;
@@ -48,6 +53,7 @@ private:
         QLabel *_titleBarColors;
 
     void _update();
+    void _save();
 
 private slots:
     void string_option_changed(const QString &text);

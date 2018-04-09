@@ -96,6 +96,13 @@ Provider *StreamingProviderStore::provider_ptr(const QString &id)
     return nullptr;
 }
 
+Provider *StreamingProviderStore::providerAt_ptr(int index)
+{
+    if (index > this->m_providers.size())
+        return nullptr;
+    return &this->m_providers[index];
+}
+
 bool StreamingProviderStore::contains(const QString &id) const
 {
     for (auto&& provider : this->m_providers)
