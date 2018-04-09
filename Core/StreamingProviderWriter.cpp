@@ -107,6 +107,39 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
             ///
             /// add new properties
             ///
+            static const auto contains_option = [&](const QString &option)
+            {
+                for (auto&& prop : props)
+                    if (prop.startsWith(option, Qt::CaseInsensitive))
+                        return true;
+                return false;
+            };
+
+            if (!contains_option("name:"))
+                props.append("name:" + provider.name);
+            if (!contains_option("icon:"))
+                props.append("icon:" + provider.icon.value);
+            if (!contains_option("url:"))
+                props.append("url:" + provider.url.toString());
+            if (provider.urlInterceptor && !contains_option("urlInterceptor:"))
+                props.append("urlInterceptor:true");
+            for (auto i = internalCounter_Interceptors; i < provider.urlInterceptorLinks.size(); i++)
+            {
+                props.append("urlInterceptorPattern:" + provider.urlInterceptorLinks.at(i).pattern.pattern());
+                props.append("urlInterceptorTarget:" + provider.urlInterceptorLinks.at(i).target.toString());
+            }
+            for (auto i = internalCounter_Scripts; i < provider.scripts.size(); i++)
+                props.append("script:" + provider.scripts.at(i).filename);
+            if (!contains_option("user-agent:") && !provider.useragent.isEmpty())
+                props.append("user-agent:" + provider.useragent);
+            if (!contains_option("titlebar:") && provider.titleBarVisible)
+                props.append("titlebar:true");
+            if (!contains_option("titlebar-text:") && provider.titleBarHasPermanentTitle)
+                props.append("titlebar-text:" + provider.titleBarPermanentTitle);
+            if (!contains_option("titlebar-color:") && provider.titleBarVisible)
+                props.append("titlebar-color:" + provider.titleBarColor.name(QColor::HexRgb));
+            if (!contains_option("titlebar-text-color:") && provider.titleBarVisible)
+                props.append("titlebar-text-color:" + provider.titleBarTextColor.name(QColor::HexRgb));
 
 
             f.open(QFile::WriteOnly | QFile::Text);
