@@ -2,6 +2,7 @@
 #define CONFIGWINDOW_HPP
 
 #include <Gui/BaseWindow.hpp>
+#include <Widgets/ProviderEditWidget.hpp>
 
 #include <QTableView>
 
@@ -23,6 +24,7 @@ private:
     QVBoxLayout *_lV_main;
 
     QTableView *m_tblView;
+    ProviderEditWidget *m_editWidget;
 };
 
 #endif // CONFIGWINDOW_HPP

@@ -64,6 +64,12 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->m_tblView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     this->m_tblView->setColumnWidth(0, 25);
 
+    QObject::connect(this->m_tblView, &QTableView::clicked, this, [&](const QModelIndex &idx) {
+        this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt(idx.row()));
+    });
+
+    this->m_editWidget = new ProviderEditWidget();
+    this->_lV_main->addWidget(this->m_editWidget);
 
     this->_lV_main->addSpacerItem(new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
@@ -75,6 +81,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 ConfigWindow::~ConfigWindow()
 {
     delete m_tblView;
+    delete m_editWidget;
 }
 
 void ConfigWindow::closeEvent(QCloseEvent *event)

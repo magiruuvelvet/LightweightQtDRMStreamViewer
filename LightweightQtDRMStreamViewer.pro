@@ -22,6 +22,7 @@ SOURCES += \
     Widgets/MainWindow.cpp \
     Widgets/BrowserWindow.cpp \
     Widgets/ConfigWindow.cpp \
+    Widgets/ProviderEditWidget.cpp \
     Util/UrlRequestInterceptor.cpp \
     Util/UserAgent.cpp
 
@@ -37,6 +38,7 @@ HEADERS += \
     Widgets/MainWindow.hpp \
     Widgets/ConfigWindow.hpp \
     Widgets/BrowserWindow.hpp \
+    Widgets/ProviderEditWidget.hpp \
     Util/UrlRequestInterceptor.hpp \
     Util/UserAgent.hpp
 
