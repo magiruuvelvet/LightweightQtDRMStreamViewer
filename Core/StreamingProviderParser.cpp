@@ -183,9 +183,14 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
             };
 
             if (!contains_script(provider.scripts, script))
+            {
                 provider.scripts.append(script);
+                qDebug() << provider_file << "Loaded script" << script.filename << "with mode" << script.injectionPoint;
+            }
             else
+            {
                 qDebug() << provider_file << "Warning: Duplicate 'script' skipped ->" << script;
+            }
         }
 
         // unknown option
