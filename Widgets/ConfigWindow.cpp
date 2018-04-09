@@ -20,7 +20,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->setWindowFlag(Qt::WindowCloseButtonHint, true);
     this->setWindowFlag(Qt::WindowMinimizeButtonHint, false);
 
-    this->resize(430, 730);
+    this->resize(430, 780);
 
     // Center window on screen
     QRect desktopSize = QApplication::desktop()->screenGeometry();
@@ -72,10 +72,17 @@ ConfigWindow::ConfigWindow(QWidget *parent)
         this->m_editWidget->setProvider(StreamingProviderStore::instance()->providerAt_ptr(current.row()));
     });
 
-    this->m_editWidget = new ProviderEditWidget();
+    this->m_editWidget = new ProviderEditWidget(this);
     this->_lV_main->addWidget(this->m_editWidget);
 
     this->_lV_main->addSpacerItem(new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    // save button
+    this->m_saveBtn = new QPushButton("Save");
+    this->m_saveBtn->setFlat(true);
+    this->m_saveBtn->setStyleSheet("* {color: white; background-color: #444444;}");
+    this->_lV_main->addWidget(this->m_saveBtn);
+    QObject::connect(this->m_saveBtn, &QPushButton::clicked, this->m_editWidget, &ProviderEditWidget::_save);
 
     this->containerWidget()->setLayout(this->_lV_main);
 

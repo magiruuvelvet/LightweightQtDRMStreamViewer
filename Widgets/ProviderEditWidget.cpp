@@ -2,7 +2,14 @@
 
 #include <QHeaderView>
 
+#include <QFile>
+#include <QFileInfo>
+
+#include <Gui/ProviderButton.hpp>
 #include <Core/StreamingProviderParser.hpp>
+#include <Core/StreamingProviderWriter.hpp>
+
+#include "ConfigWindow.hpp"
 
 ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     : QWidget(parent)
@@ -211,7 +218,77 @@ void ProviderEditWidget::_update()
 
 void ProviderEditWidget::_save()
 {
+    // saving code works, but is disabled due to a bug in StreamingProviderWriter
+    // removing scripts and url interceptors doesn't work and crashes the program
+    if (true)
+        return;
 
+    qDebug() << "Saving" << this->provider_ptr->id << "...";
+    if (provider_renamed)
+        qDebug() << "Hint: Provider was renamed to" << this->provider.id;
+
+    // check if all required fields are there
+    if (this->provider.id.isEmpty() ||
+        this->provider.name.isEmpty() ||
+        this->provider.url.isEmpty())
+    {
+        qDebug() << "Error: 'id', 'name' and 'icon' are required fields and must not be empty! Canceling save...";
+        return;
+    }
+
+    // routine for config file renaming on id change
+    if (provider_renamed)
+    {
+        // check for id conflict
+        if (StreamingProviderStore::instance()->contains(this->provider.id))
+        {
+            qDebug() << "Error: ID" << this->provider.id << "is already taken! Canceling save...";
+            return;
+        }
+
+        // rename file on disk
+        const auto old_filename = Config()->localProviderStoreDir() + '/' + this->provider_ptr->id + StreamingProviderParser::extension;
+        const auto new_filename = Config()->localProviderStoreDir() + '/' + this->provider.id + StreamingProviderParser::extension;
+
+        QFileInfo old_info(old_filename);
+        if (old_info.exists())
+        {
+            if (QFile(old_filename).rename(new_filename))
+            {
+                qDebug() << "Renamed config file.";
+            }
+            else
+            {
+                qDebug() << "Couldn't rename config file! Check your permissions! Canceling save...";
+                return;
+            }
+        }
+        else
+        {
+            // assume system config override
+        }
+
+        // reset boolean
+        provider_renamed = false;
+    }
+
+    // write back modified provider to its file
+    StreamingProviderWriter::StatusCode status = StreamingProviderWriter::write(this->provider);
+    switch (status)
+    {
+        case StreamingProviderWriter::SUCCESS:
+            // modify provider in memory on success
+            (*this->provider_ptr) = this->provider;
+            //static_cast<ProviderListModel*>(static_cast<ConfigWindow*>(this->parentWidget())->m_tblView->model())->reload();
+            qDebug() << "Successfully saved" << this->provider_ptr->id;
+            break;
+        case StreamingProviderWriter::PERM_ERROR:
+            qDebug() << "A permission error occurred! Please check if you have write permissions.";
+            break;
+        case StreamingProviderWriter::FILE_ERROR:
+            qDebug() << "An unknown I/O error occurred!";
+            break;
+    }
 }
 
 void ProviderEditWidget::string_option_changed(const QString &)
@@ -284,9 +361,9 @@ void ProviderEditWidget::table_option_changed(int row, int column)
         if (option == "url_interceptor_links")
         {
             if (column == 0) // pattern
-                provider.urlInterceptorLinks[row].pattern = QRegExp(_urlInterceptorLinks->itemAt(row, 0)->text());
+                provider.urlInterceptorLinks[row].pattern = QRegExp(_urlInterceptorLinks->item(row, 0)->text());
             else if (column == 1) // url target
-                provider.urlInterceptorLinks[row].target = _urlInterceptorLinks->itemAt(row, 1)->text();
+                provider.urlInterceptorLinks[row].target = QUrl(_urlInterceptorLinks->item(row, 1)->text());
         }
     }
 }

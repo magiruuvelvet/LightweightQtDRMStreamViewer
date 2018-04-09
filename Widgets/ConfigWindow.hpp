@@ -10,6 +10,8 @@ class ConfigWindow : public BaseWindow
 {
     Q_OBJECT
 
+    friend class ProviderEditWidget;
+
 public:
     explicit ConfigWindow(QWidget *parent = nullptr);
     ~ConfigWindow();
@@ -25,6 +27,7 @@ private:
 
     QTableView *m_tblView;
     ProviderEditWidget *m_editWidget;
+    QPushButton *m_saveBtn;
 };
 
 #endif // CONFIGWINDOW_HPP

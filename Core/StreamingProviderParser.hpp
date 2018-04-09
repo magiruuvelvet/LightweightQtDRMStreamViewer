@@ -12,6 +12,7 @@ class QIcon;
 class StreamingProviderParser
 {
     friend class StreamingProviderWriter;
+    friend class ProviderEditWidget;
 
 public:
     StreamingProviderParser();
