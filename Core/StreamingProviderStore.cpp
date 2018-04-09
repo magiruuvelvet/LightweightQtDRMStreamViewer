@@ -3,6 +3,39 @@
 
 #include <Widgets/BrowserWindow.hpp>
 
+Script Script::parse(const QString &script)
+{
+    const auto scr = script.split(',', QString::KeepEmptyParts);
+    if (scr.size() > 1)
+    {
+        const auto injection_pt = scr.at(1);
+        if (QString::compare(injection_pt, "deferred", Qt::CaseInsensitive) == 0 ||
+            QString::compare(injection_pt, "deferr", Qt::CaseInsensitive) == 0 ||
+            QString::compare(injection_pt, "defer", Qt::CaseInsensitive) == 0)
+            return Script{scr.at(0), Script::Deferred};
+        else if (QString::compare(injection_pt, "documentready", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "docready", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "ready", Qt::CaseInsensitive) == 0)
+            return Script{scr.at(0), Script::DocumentReady};
+        else if (QString::compare(injection_pt, "documentcreation", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "doccreation", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "doccreate", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "creation", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "create", Qt::CaseInsensitive) == 0)
+            return Script{scr.at(0), Script::DocumentCreation};
+        else if (QString::compare(injection_pt, "automatic", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(injection_pt, "auto", Qt::CaseInsensitive) == 0 ||
+                 injection_pt.isEmpty())
+            return Script{scr.at(0), Script::Automatic};
+        else
+            return Script{scr.at(0), Script::Automatic};
+    }
+    else
+    {
+        return Script{scr.at(0), Script::Automatic};
+    }
+}
+
 StreamingProviderStore *StreamingProviderStore::instance()
 {
     static StreamingProviderStore *i = new StreamingProviderStore();

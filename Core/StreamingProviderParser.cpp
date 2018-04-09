@@ -172,54 +172,18 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
         // script / userscript
         else if (i.startsWith("script:", Qt::CaseInsensitive))
         {
-            const auto script = i.mid(7).simplified();
-            const auto scr = script.split(',', QString::SkipEmptyParts);
+            const auto _script = i.mid(7).simplified();
+            const auto script = Script::parse(_script);
 
-            static const auto contains_script = [&](const QList<Script> &scripts, const QString &filename) {
+            static const auto contains_script = [&](const QList<Script> &scripts, const Script &script) {
                 for (auto&& scr : scripts)
-                    if (scr.filename == filename)
+                    if (scr.filename == script.filename)
                         return true;
                 return false;
             };
 
-            if (!contains_script(provider.scripts, scr.at(0)))
-            {
-                if (scr.size() > 1)
-                {
-                    const auto injection_pt = scr.at(1);
-                    if (QString::compare(injection_pt, "deferred", Qt::CaseInsensitive) == 0 ||
-                        QString::compare(injection_pt, "deferr", Qt::CaseInsensitive) == 0 ||
-                        QString::compare(injection_pt, "defer", Qt::CaseInsensitive) == 0)
-                        provider.scripts.append(Script{scr.at(0), Script::Deferred});
-                    else if (QString::compare(injection_pt, "documentready", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "docready", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "ready", Qt::CaseInsensitive) == 0)
-                        provider.scripts.append(Script{scr.at(0), Script::DocumentReady});
-                    else if (QString::compare(injection_pt, "documentcreation", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "doccreation", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "doccreate", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "creation", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "create", Qt::CaseInsensitive) == 0)
-                        provider.scripts.append(Script{scr.at(0), Script::DocumentCreation});
-                    else if (QString::compare(injection_pt, "automatic", Qt::CaseInsensitive) == 0 ||
-                             QString::compare(injection_pt, "auto", Qt::CaseInsensitive) == 0 ||
-                             injection_pt.isEmpty())
-                        provider.scripts.append(Script{scr.at(0), Script::Automatic});
-                    else
-                    {
-                        qDebug() << provider_file << "Warning: Unknown script option:" << injection_pt
-                                 << "| Default to Automatic";
-                        provider.scripts.append(Script{scr.at(0), Script::Automatic});
-                    }
-
-                    qDebug() << provider_file << "Loaded script" << scr.at(0) << "with mode" << scr.at(1);
-                }
-                else
-                {
-                    provider.scripts.append(Script{scr.at(0), Script::Automatic});
-                    qDebug() << provider_file << "Loaded script" << scr.at(0) << "with mode" << Script::Automatic;
-                }
-            }
+            if (!contains_script(provider.scripts, script))
+                provider.scripts.append(script);
             else
                 qDebug() << provider_file << "Warning: Duplicate 'script' skipped ->" << script;
         }

@@ -41,6 +41,9 @@ struct Script
         }
         return ret;
     }
+
+    // parse string and convert to Script struct
+    static Script parse(const QString &script);
 };
 
 #include <QDebug>
