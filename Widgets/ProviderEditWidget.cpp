@@ -222,8 +222,7 @@ void ProviderEditWidget::string_option_changed(const QString &)
 
         if (option == "id")
         {
-            if (provider.id != _id->text())
-                provider_renamed = true;
+            provider_renamed = provider.id != _id->text() ? true : false;
             provider.id = _id->text();
         }
         else if (option == "name")
