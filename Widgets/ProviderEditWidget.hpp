@@ -26,6 +26,9 @@ public slots:
 private:
     Provider provider;
 
+    bool first_start = true;
+    bool is_updating = false;
+
     QGridLayout *_layout;
 
     QLineEdit *_name;

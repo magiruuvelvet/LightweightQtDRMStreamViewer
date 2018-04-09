@@ -1,8 +1,6 @@
 #include "StreamingProviderParser.hpp"
 #include "StreamingProviderStore.hpp"
 
-#include "ConfigManager.hpp"
-
 #include <QApplication>
 #include <QStandardPaths>
 #include <QFile>
@@ -107,11 +105,7 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
 
             if (!icon.isEmpty())
             {
-                provider.icon.value = icon;
-                if (QFileInfo(icon).isAbsolute())
-                    provider.icon.icon = QIcon(icon);
-                else
-                    provider.icon.icon = QIcon(provider_path + '/' + icon);
+                StreamingProviderParser::parseIcon(icon, &provider.icon.value, &provider.icon.icon, provider_path);
             }
         }
 
@@ -236,6 +230,18 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
     StreamingProviderStore::instance()->addProvider(provider);
 
     return SUCCESS;
+}
+
+void StreamingProviderParser::parseIcon(const QString &input, QString *value, QIcon *icon, const QString &relativePathPrefix)
+{
+    if (!value || !icon)
+        return;
+
+    (*value) = input;
+    if (QFileInfo(input).isAbsolute())
+        (*icon) = QIcon(input);
+    else
+        (*icon) = QIcon(relativePathPrefix + '/' + input);
 }
 
 bool StreamingProviderParser::getBoolean(const QString &value)

@@ -5,6 +5,10 @@
 #include <QStringList>
 #include <QColor>
 
+#include "ConfigManager.hpp"
+
+class QIcon;
+
 class StreamingProviderParser
 {
     friend class StreamingProviderWriter;
@@ -26,6 +30,9 @@ public:
 
     const QStringList &providers() const
     { return this->m_providers; }
+
+    static void parseIcon(const QString &input, QString *value, QIcon *icon,
+                          const QString &relativePathPrefix = Config()->localProviderStoreDir());
 
 private:
     QStringList m_providers;

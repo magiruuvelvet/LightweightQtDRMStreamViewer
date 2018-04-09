@@ -2,6 +2,8 @@
 
 #include <QHeaderView>
 
+#include <Core/StreamingProviderParser.hpp>
+
 ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -144,10 +146,13 @@ void ProviderEditWidget::setProvider(const Provider &provider)
 {
     this->provider = provider;
     this->_update();
+    first_start = false;
 }
 
 void ProviderEditWidget::_update()
 {
+    is_updating = true;
+
     this->_name->setText(provider.name);
     this->_icon->setText(provider.icon.value);
     this->_url->setText(provider.url.toString());
@@ -185,28 +190,78 @@ void ProviderEditWidget::_update()
     this->_titleBarText->setText(provider.titleBarPermanentTitle);
     this->_titleBarColor->setText(provider.titleBarColor.name(QColor::HexRgb));
     this->_titleBarTextColor->setText(provider.titleBarTextColor.name(QColor::HexRgb));
+
+    is_updating = false;
 }
 
-void ProviderEditWidget::string_option_changed(const QString &text)
+void ProviderEditWidget::string_option_changed(const QString &)
 {
-    QObject *sender = this->sender();
-    qDebug() << sender->objectName() << text;
+    if (!first_start && !is_updating)
+    {
+        const auto option = this->sender()->objectName();
+
+        if (option == "name")
+        { provider.name = _name->text(); }
+        else if (option == "icon")
+        { StreamingProviderParser::parseIcon(_icon->text(), &provider.icon.value, &provider.icon.icon); }
+        else if (option == "url")
+        { provider.url = QUrl(_url->text()); }
+        else if (option == "useragent")
+        { provider.useragent = _useragent->text(); }
+        else if (option == "permanent_title")
+        { if (provider.titleBarHasPermanentTitle) provider.titleBarPermanentTitle = _titleBarText->text(); }
+        else if (option == "titlebar_color")
+        { if (provider.titleBarVisible) provider.titleBarColor = QColor(_titleBarColor->text()); }
+        else if (option == "titlebar_text_color")
+        { if (provider.titleBarVisible) provider.titleBarTextColor = QColor(_titleBarTextColor->text()); }
+    }
 }
 
 void ProviderEditWidget::textedit_option_changed()
 {
-    QObject *sender = this->sender();
-    qDebug() << sender->objectName();
+    if (!first_start && !is_updating)
+    {
+        const auto option = this->sender()->objectName();
+
+        if (option == "scripts")
+        {
+            const auto lines = _scripts->toPlainText().split(QRegExp("[\n\r]"), QString::SkipEmptyParts);
+            QList<Script> scripts;
+            for (auto&& line : lines)
+                scripts.append(Script::parse(line.simplified()));
+            provider.scripts.clear();
+            provider.scripts = scripts;
+        }
+    }
 }
 
-void ProviderEditWidget::boolean_option_changed(bool checked)
+void ProviderEditWidget::boolean_option_changed(bool)
 {
-    QObject *sender = this->sender();
-    qDebug() << sender->objectName() << checked;
+    if (!first_start && !is_updating)
+    {
+        const auto option = this->sender()->objectName();
+
+        if (option == "url_interceptor")
+        { provider.urlInterceptor = _urlInterceptor->isChecked(); }
+        else if (option == "show_titlebar")
+        { provider.titleBarVisible = _titleBar->isChecked(); }
+        else if (option == "use_permanent_title")
+        { provider.titleBarHasPermanentTitle = _permanentTitleBarText->isChecked(); }
+    }
 }
 
 void ProviderEditWidget::table_option_changed(int row, int column)
 {
-    QObject *sender = this->sender();
-    qDebug() << sender->objectName() << '('<<row<<','<<column<<')';
+    if (!first_start && !is_updating)
+    {
+        const auto option = this->sender()->objectName();
+
+        if (option == "url_interceptor_links")
+        {
+            if (column == 0) // pattern
+                provider.urlInterceptorLinks[row].pattern = QRegExp(_urlInterceptorLinks->itemAt(row, 0)->text());
+            else if (column == 1) // url target
+                provider.urlInterceptorLinks[row].target = _urlInterceptorLinks->itemAt(row, 1)->text();
+        }
+    }
 }
