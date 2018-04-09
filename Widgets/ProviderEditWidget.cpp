@@ -12,33 +12,44 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     static const auto stylesheet = "* {color: white; background-color: #444444;}";
 
-    static const auto create_label = [](const QString &text) {
+    // Notes for others
+    // don't make this lambda expressions `static`
+    // signals are connected in there, which causes a segfault
+    // on repeated execution
+
+    const auto create_label = [](const QString &text) {
         QLabel *l = new QLabel(text);
         l->setStyleSheet("* {color: white;}");
         return l;
     };
 
-    static const auto create_lineedit = [](const QString &placeholder, const QString &objectName) {
+    const auto create_lineedit = [&](const QString &placeholder, const QString &objectName) {
         QLineEdit *le = new QLineEdit();
         le->setObjectName(objectName);
         le->setPlaceholderText(placeholder);
         le->setToolTip(placeholder);
         le->setStyleSheet(stylesheet);
+
+        QObject::connect(le, &QLineEdit::textChanged, this, &ProviderEditWidget::string_option_changed);
         return le;
     };
 
-    static const auto create_checkbbox = [](const QString &text, const QString &objectName) {
+    const auto create_checkbbox = [&](const QString &text, const QString &objectName) {
         QCheckBox *cb = new QCheckBox(text);
         cb->setObjectName(objectName);
         cb->setStyleSheet("* {color: white;} /*QCheckBox::indicator {background:#444444;}*/");
+
+        QObject::connect(cb, &QCheckBox::toggled, this, &ProviderEditWidget::boolean_option_changed);
         return cb;
     };
 
-    static const auto create_tablewidget = [](int rows, int columns,
-                                              const QStringList &rowNames,
-                                              const QStringList &columNames,
-                                              bool hideRows = false, bool hideColums = false) {
+    const auto create_tablewidget = [&](int rows, int columns,
+                                        const QStringList &rowNames,
+                                        const QStringList &columNames,
+                                        const QString &objectName,
+                                        bool hideRows = false, bool hideColums = false) {
         QTableWidget *tw = new QTableWidget(rows, columns);
+        tw->setObjectName(objectName);
         tw->setStyleSheet(stylesheet);
         if (hideRows)
             tw->verticalHeader()->hide();
@@ -50,13 +61,17 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         tw->setHorizontalHeaderLabels(static_cast<TableWidgetUserData*>(tw->userData(1))->headerData);
         for (auto i = 0; i < columns; i++)
             tw->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
+
+        QObject::connect(tw, &QTableWidget::cellChanged, this, &ProviderEditWidget::table_option_changed);
         return tw;
     };
 
-    static const auto create_textedit = [](const QString &objectName) {
+    const auto create_textedit = [&](const QString &objectName) {
         QTextEdit *te = new QTextEdit();
         te->setObjectName(objectName);
         te->setStyleSheet(stylesheet);
+
+        QObject::connect(te, &QTextEdit::textChanged, this, &ProviderEditWidget::textedit_option_changed);
         return te;
     };
 
@@ -64,7 +79,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     this->_icon = create_lineedit("Icon", "icon");
     this->_url = create_lineedit("URL", "url");
     this->_urlInterceptor = create_checkbbox("URL Interceptor", "url_interceptor");
-    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, true, false);
+    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, "url_interceptor_links", true, false);
     this->_scriptsLabel = create_label("Scripts");
     this->_scripts = create_textedit("scripts");
     this->_useragent = create_lineedit("User Agent", "useragent");
@@ -94,21 +109,35 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
 ProviderEditWidget::~ProviderEditWidget()
 {
+    _name->disconnect();
     delete _name;
+    _icon->disconnect();
     delete _icon;
+    _url->disconnect();
     delete _url;
+    _urlInterceptor->disconnect();
     delete _urlInterceptor;
+    _urlInterceptorLinks->disconnect();
     delete _urlInterceptorLinks;
     _urlInterceptorLinkItems.clear();
     delete _scriptsLabel;
+    _scripts->disconnect();
     delete _scripts;
+    _useragent->disconnect();
     delete _useragent;
+    _titleBar->disconnect();
     delete _titleBar;
+    _permanentTitleBarText->disconnect();
     delete _permanentTitleBarText;
+    _titleBarText->disconnect();
     delete _titleBarText;
+    _titleBarColor->disconnect();
     delete _titleBarColor;
+    _titleBarTextColor->disconnect();
     delete _titleBarTextColor;
     delete _titleBarColors;
+
+    qDebug() << "ProviderEditWidget destroyed!";
 }
 
 void ProviderEditWidget::setProvider(const Provider &provider)
@@ -156,4 +185,28 @@ void ProviderEditWidget::_update()
     this->_titleBarText->setText(provider.titleBarPermanentTitle);
     this->_titleBarColor->setText(provider.titleBarColor.name(QColor::HexRgb));
     this->_titleBarTextColor->setText(provider.titleBarTextColor.name(QColor::HexRgb));
+}
+
+void ProviderEditWidget::string_option_changed(const QString &text)
+{
+    QObject *sender = this->sender();
+    qDebug() << sender->objectName() << text;
+}
+
+void ProviderEditWidget::textedit_option_changed()
+{
+    QObject *sender = this->sender();
+    qDebug() << sender->objectName();
+}
+
+void ProviderEditWidget::boolean_option_changed(bool checked)
+{
+    QObject *sender = this->sender();
+    qDebug() << sender->objectName() << checked;
+}
+
+void ProviderEditWidget::table_option_changed(int row, int column)
+{
+    QObject *sender = this->sender();
+    qDebug() << sender->objectName() << '('<<row<<','<<column<<')';
 }

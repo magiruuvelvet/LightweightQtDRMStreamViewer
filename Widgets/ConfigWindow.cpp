@@ -84,8 +84,12 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
 ConfigWindow::~ConfigWindow()
 {
+    m_tblView->disconnect();
     delete m_tblView;
+    m_editWidget->disconnect();
     delete m_editWidget;
+
+    qDebug() << "ConfigWindow destroyed!";
 }
 
 void ConfigWindow::closeEvent(QCloseEvent *event)

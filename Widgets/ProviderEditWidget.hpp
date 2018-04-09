@@ -45,6 +45,12 @@ private:
         QLabel *_titleBarColors;
 
     void _update();
+
+private slots:
+    void string_option_changed(const QString &text);
+    void textedit_option_changed();
+    void boolean_option_changed(bool);
+    void table_option_changed(int row, int column);
 };
 
 class TableWidgetUserData : public QObjectUserData
