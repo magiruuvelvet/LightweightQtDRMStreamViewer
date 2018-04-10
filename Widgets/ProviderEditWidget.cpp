@@ -256,10 +256,15 @@ void ProviderEditWidget::_save()
     if (provider_renamed)
     {
         // check for id conflict
-        if (StreamingProviderStore::instance()->contains(this->provider.id))
+        if (StreamingProviderStore::instance()->contains(this->provider.id) &&
+            !this->provider.isSystem)
         {
             qDebug() << "Error: ID" << this->provider.id << "is already taken! Canceling save...";
             return;
+        }
+        if (this->provider.isSystem)
+        {
+            qDebug() << "Hint: overriding shared (system-installed) provider file.";
         }
 
         // rename file on disk

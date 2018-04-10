@@ -91,6 +91,8 @@ struct Provider
 
     QList<UrlInterceptorLink> urlInterceptorLinks;
     QList<Script> scripts;
+
+    bool isSystem;
 };
 
 class StreamingProviderStore

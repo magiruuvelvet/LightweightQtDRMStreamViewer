@@ -85,7 +85,12 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
     Provider provider;
     provider.id = QFileInfo(provider_file).baseName();
     provider.path = provider_path;
+    if (provider_path == Config()->localProviderStoreDir())
+        provider.isSystem = false;
+    else
+        provider.isSystem = true;
     qDebug() << "<<<" << provider.id << provider.path;
+    qDebug() << "is shared (system-installed)?:" << (provider.isSystem ? "yes" : "no");
     bool hasErrors = false;
 
     for (auto&& i : props)
