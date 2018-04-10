@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QPushButton>
 
 #include <Core/StreamingProviderStore.hpp>
 
@@ -21,6 +22,9 @@ class ProviderEditWidget : public QWidget
 public:
     ProviderEditWidget(QWidget *parent = nullptr);
     ~ProviderEditWidget();
+
+signals:
+    void providersUpdated();
 
 public slots:
     void setProvider(Provider *provider);
@@ -52,6 +56,10 @@ private:
     QLineEdit *_titleBarTextColor;
         QLabel *_titleBarColors;
 
+    QPushButton *m_btnAddProvider;
+    QPushButton *m_btnAddUrlInterceptor;
+    QPushButton *m_btnRemUrlInterceptor;
+
     void _update();
     void _save();
 
@@ -60,6 +68,8 @@ private slots:
     void textedit_option_changed();
     void boolean_option_changed(bool);
     void table_option_changed(int row, int column);
+
+    void button_clicked();
 };
 
 class TableWidgetUserData : public QObjectUserData

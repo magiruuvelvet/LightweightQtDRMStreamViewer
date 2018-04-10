@@ -87,6 +87,10 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->containerWidget()->setLayout(this->_lV_main);
 
     this->setContentsMargins(0, 0, 0, 0);
+
+    QObject::connect(this->m_editWidget, &ProviderEditWidget::providersUpdated, this, [&]{
+        static_cast<ProviderListModel*>(this->m_tblView->model())->reload();
+    });
 }
 
 ConfigWindow::~ConfigWindow()

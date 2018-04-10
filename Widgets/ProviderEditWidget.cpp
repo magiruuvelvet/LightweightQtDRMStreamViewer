@@ -100,6 +100,20 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     this->_titleBarColor = create_lineedit("Title bar color", "titlebar_color");
     this->_titleBarTextColor = create_lineedit("Title bar text color", "titlebar_text_color");
 
+    const auto create_button = [&](const QString &text, const QString &objectName) {
+        QPushButton *btn = new QPushButton(text);
+        btn->setObjectName(objectName);
+        btn->setFlat(true);
+        btn->setStyleSheet("* {color: white; background-color: #444444;}");
+
+        QObject::connect(btn, &QPushButton::clicked, this, &ProviderEditWidget::button_clicked);
+        return btn;
+    };
+
+    this->m_btnAddProvider = create_button("+", "add_provider");
+    this->m_btnAddUrlInterceptor = create_button("+", "add_url_interceptor");
+    this->m_btnRemUrlInterceptor = create_button("─", "rem_url_interceptor");
+
     this->_layout->addWidget(this->_id,                    0, 0, 1, 2);
     this->_layout->addWidget(this->_name,                  1, 0, 1, 2);
     this->_layout->addWidget(this->_icon,                  2, 0, 1, 2);
@@ -149,6 +163,13 @@ ProviderEditWidget::~ProviderEditWidget()
     _titleBarTextColor->disconnect();
     delete _titleBarTextColor;
     delete _titleBarColors;
+
+    m_btnAddProvider->disconnect();
+    delete m_btnAddProvider;
+    m_btnAddUrlInterceptor->disconnect();
+    delete m_btnAddUrlInterceptor;
+    m_btnRemUrlInterceptor->disconnect();
+    delete m_btnRemUrlInterceptor;
 
     provider_ptr = nullptr;
 
@@ -275,6 +296,7 @@ void ProviderEditWidget::_save()
             // modify provider in memory on success
             (*this->provider_ptr) = this->provider;
             //static_cast<ProviderListModel*>(static_cast<ConfigWindow*>(this->parentWidget())->m_tblView->model())->reload();
+            emit providersUpdated();
             qDebug() << "Successfully saved" << this->provider_ptr->id;
             break;
         case StreamingProviderWriter::PERM_ERROR:
@@ -360,5 +382,20 @@ void ProviderEditWidget::table_option_changed(int row, int column)
             else if (column == 1) // url target
                 provider.urlInterceptorLinks[row].target = QUrl(_urlInterceptorLinks->item(row, 1)->text());
         }
+    }
+}
+
+void ProviderEditWidget::button_clicked()
+{
+    if (!first_start && !is_updating)
+    {
+        const auto option = this->sender()->objectName();
+
+        if (option == "add_provider")
+        {}
+        else if (option == "add_url_interceptor")
+        {}
+        else if (option == "rem_url_interceptor")
+        {}
     }
 }
