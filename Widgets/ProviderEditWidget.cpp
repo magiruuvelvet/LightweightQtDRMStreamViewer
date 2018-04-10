@@ -218,11 +218,6 @@ void ProviderEditWidget::_update()
 
 void ProviderEditWidget::_save()
 {
-    // saving code works, but is disabled due to a bug in StreamingProviderWriter
-    // removing scripts and url interceptors doesn't work and crashes the program
-    if (true)
-        return;
-
     qDebug() << "Saving" << this->provider_ptr->id << "...";
     if (provider_renamed)
         qDebug() << "Hint: Provider was renamed to" << this->provider.id;

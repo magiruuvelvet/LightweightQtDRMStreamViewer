@@ -95,6 +95,8 @@ ConfigWindow::~ConfigWindow()
     delete m_tblView;
     m_editWidget->disconnect();
     delete m_editWidget;
+    m_saveBtn->disconnect();
+    delete m_saveBtn;
 
     qDebug() << "ConfigWindow destroyed!";
 }
