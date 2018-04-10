@@ -45,10 +45,60 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
             const QString data = f.readAll();
             f.close();
 
+            QStringList props = data.split(QRegExp("[\r\n]"), QString::KeepEmptyParts);
+
+            ///
+            /// hacky workaround: remove all url interceptors and scripts when the size(count) changed
+            /// append them in the last step (alters position in file)
+            ///
+
+            // find all positions of stackable options
+            static const auto find_pos_of_all = [&](const QString &startsWith)
+            {
+                QList<int> pos;
+                for (auto i = 0; i < props.size(); i++)
+                    if (props.at(i).startsWith(startsWith, Qt::CaseInsensitive))
+                        pos.append(i);
+                return pos;
+            };
+
+            // find all url interceptor and script options
+            auto patternPositions = find_pos_of_all("urlInterceptorPattern:");
+            auto targetPositions = find_pos_of_all("urlInterceptorTarget:");
+            auto scriptPositions = find_pos_of_all("script:");
+
+            bool urlInterceptorsRemoved = false;
+            if (patternPositions.size() != provider.urlInterceptorLinks.size())
+            {
+                urlInterceptorsRemoved = true;
+
+                // remove all interceptors from the file to append the changed ones later
+                for (auto&& i : patternPositions)
+                    props[i].clear();
+                for (auto&& i : targetPositions)
+                    props[i].clear();
+
+                // avoid updating
+                patternPositions.clear();
+                targetPositions.clear();
+            }
+
+            bool scriptsRemoved = false;
+            if (scriptPositions.size() != provider.scripts.size())
+            {
+                scriptsRemoved = true;
+
+                // remove all scripts from the file to append the changed ones later
+                for (auto&& i : scriptPositions)
+                    props[i].clear();
+
+                // avoid updating
+                scriptPositions.clear();
+            }
+
             ///
             /// edit existing properties
             ///
-            QStringList props = data.split(QRegExp("[\r\n]"), QString::KeepEmptyParts);
             for (auto&& prop : props)
             {
                 if (prop.startsWith("name:", Qt::CaseInsensitive))
@@ -72,20 +122,6 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
                     replace_value(prop, provider.titleBarTextColor.name(QColor::HexRgb));
             }
 
-            // find all positions of stackable options
-            static const auto find_pos_of_all = [&](const QString &startsWith)
-            {
-                QList<int> pos;
-                for (auto i = 0; i < props.size(); i++)
-                    if (props.at(i).startsWith(startsWith, Qt::CaseInsensitive))
-                        pos.append(i);
-                return pos;
-            };
-
-            // find all url interceptor options
-            auto patternPositions = find_pos_of_all("urlInterceptorPattern:");
-            auto targetPositions = find_pos_of_all("urlInterceptorTarget:");
-
             // update url interceptors
             int internalCounter_Interceptors = 0;
             for (auto i = 0; i < patternPositions.size(); i++)
@@ -96,7 +132,6 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
             }
 
             // update scripts
-            auto scriptPositions = find_pos_of_all("script:");
             int internalCounter_Scripts = 0;
             for (auto i = 0; i < scriptPositions.size(); i++)
             {
