@@ -90,6 +90,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
     QObject::connect(this->m_editWidget, &ProviderEditWidget::providersUpdated, this, [&]{
         static_cast<ProviderListModel*>(this->m_tblView->model())->reload();
+        emit providersUpdated();
     });
 }
 

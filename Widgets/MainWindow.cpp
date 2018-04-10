@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->titleBar()->addButton("⚙", [&]{
         ConfigWindow *w = new ConfigWindow();
         w->setWindowModality(Qt::ApplicationModal);
+        QObject::connect(w, &ConfigWindow::providersUpdated, this, &MainWindow::updateProviderList);
         QObject::connect(w, &ConfigWindow::closed, w, &ConfigWindow::deleteLater);
         QObject::connect(w, &ConfigWindow::closed, this, [&]{
             this->setWindowOpacity(1.0);
@@ -72,12 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
         w->show();
     });
 
-    for (auto&& i : StreamingProviderStore::instance()->providers())
-    {
-        this->_providerBtns.append(ProviderButton::create(i));
-        this->_lF_providerButtonList->addWidget(this->_providerBtns.last());
-        QObject::connect(this->_providerBtns.last(), &QPushButton::clicked, this, &MainWindow::launchBrowserWindow);
-    }
+    this->updateProviderList();
 
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
 }
@@ -100,6 +96,29 @@ void MainWindow::launchBrowserWindow()
     w->setProfile(pr);
 
     Config()->fullScreenMode() ? w->showFullScreen() : w->showNormal();
+}
+
+void MainWindow::updateProviderList()
+{
+    // remove all button pointers
+    this->_providerBtns.clear();
+
+    // remove all buttons from layout
+    QLayoutItem *item;
+    while ( (item = this->_lF_providerButtonList->layout()->takeAt(0)) != nullptr)
+    {
+        delete item->widget();
+        delete item;
+    }
+    //delete this->_lF_providerButtonList->layout();
+
+    // create provider list
+    for (auto&& i : StreamingProviderStore::instance()->providers())
+    {
+        this->_providerBtns.append(ProviderButton::create(i));
+        this->_lF_providerButtonList->addWidget(this->_providerBtns.last());
+        QObject::connect(this->_providerBtns.last(), &QPushButton::clicked, this, &MainWindow::launchBrowserWindow);
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

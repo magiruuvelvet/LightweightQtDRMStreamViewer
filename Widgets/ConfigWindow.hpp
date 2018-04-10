@@ -17,6 +17,7 @@ public:
     ~ConfigWindow();
 
 signals:
+    void providersUpdated();
     void closed();
 
 protected:

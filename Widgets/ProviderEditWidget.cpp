@@ -295,7 +295,6 @@ void ProviderEditWidget::_save()
         case StreamingProviderWriter::SUCCESS:
             // modify provider in memory on success
             (*this->provider_ptr) = this->provider;
-            //static_cast<ProviderListModel*>(static_cast<ConfigWindow*>(this->parentWidget())->m_tblView->model())->reload();
             emit providersUpdated();
             qDebug() << "Successfully saved" << this->provider_ptr->id;
             break;

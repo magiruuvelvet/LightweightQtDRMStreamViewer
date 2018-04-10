@@ -16,6 +16,7 @@ public:
 
 private slots:
     void launchBrowserWindow();
+    void updateProviderList();
 
 protected:
     void closeEvent(QCloseEvent *event);
