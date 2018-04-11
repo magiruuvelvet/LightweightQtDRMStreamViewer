@@ -59,9 +59,11 @@ private:
         QLabel *_titleBarColors;
 
     QPushButton *m_btnAddProvider;
+    QPushButton *m_btnRemProvider;
     QPushButton *m_btnAddUrlInterceptor;
     QPushButton *m_btnRemUrlInterceptor;
-    QWidget *btnWrapper;
+    QWidget *btnWrapperProviders;
+    QWidget *btnWrapperUrlInterceptors;
 
     enum FieldId {
         ID,
@@ -80,6 +82,7 @@ private:
     };
     enum ButtonId {
         ADD_PROVIDER,
+        REM_PROVIDER,
         ADD_URL_INTERCEPTOR,
         REM_URL_INTERCEPTOR
     };

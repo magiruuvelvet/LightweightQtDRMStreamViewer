@@ -115,34 +115,41 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     };
 
     this->m_btnAddProvider = create_button("+", "Add Provider", QSize(20, 20), ADD_PROVIDER);
+    this->m_btnRemProvider = create_button("─", "Remove Provider", QSize(20, 20), REM_PROVIDER);
     this->m_btnAddUrlInterceptor = create_button("+", "Add URL Interceptor", QSize(20, 20), ADD_URL_INTERCEPTOR);
     this->m_btnRemUrlInterceptor = create_button("─", "Remove URL Interceptor", QSize(20, 20), REM_URL_INTERCEPTOR);
 
-    this->btnWrapper = new QWidget();
-    this->btnWrapper->setFixedSize(45, 20);
-    this->btnWrapper->setContentsMargins(0,0,0,0);
-    this->m_btnAddUrlInterceptor->setParent(this->btnWrapper);
-    this->m_btnAddUrlInterceptor->setGeometry(25, 0, this->m_btnAddUrlInterceptor->width(), this->m_btnAddUrlInterceptor->height());
-    this->m_btnRemUrlInterceptor->setParent(this->btnWrapper);
-    this->m_btnRemUrlInterceptor->setGeometry(0, 0, this->m_btnRemUrlInterceptor->width(), this->m_btnRemUrlInterceptor->height());
+    const auto create_button_wrapper_box = [&](QList<QPushButton*> buttons) {
+        QWidget *wrapper = new QWidget();
+        wrapper->setFixedSize(45, 20);
+        wrapper->setContentsMargins(0,0,0,0);
+        for (auto&& btn : buttons)
+            btn->setParent(wrapper);
+        buttons[0]->setGeometry(25, 0, buttons.at(0)->width(), buttons.at(0)->height());
+        buttons[1]->setGeometry(0, 0, buttons.at(1)->width(), buttons.at(1)->height());
+        return wrapper;
+    };
 
-    this->_layout->addWidget(this->m_btnAddProvider,        0, 0, 1, 6, Qt::AlignRight);
-    this->_layout->addWidget(this->_id,                     1, 0, 1, 6);
-    this->_layout->addWidget(this->_name,                   2, 0, 1, 6);
-    this->_layout->addWidget(this->_icon,                   3, 0, 1, 6);
-    this->_layout->addWidget(this->_url,                    4, 0, 1, 6);
-    this->_layout->addWidget(this->_urlInterceptor,         5, 0, 1, 5);
-    this->_layout->addWidget(this->btnWrapper,              5, 5, 1, 1, Qt::AlignRight);
-    this->_layout->addWidget(this->_urlInterceptorLinks,    6, 0, 1, 6);
-    this->_layout->addWidget(this->_scriptsLabel,           7, 0, 1, 6);
-    this->_layout->addWidget(this->_scripts,                8, 0, 1, 6);
-    this->_layout->addWidget(this->_useragent,              9, 0, 1, 6);
-    this->_layout->addWidget(this->_titleBar,              10, 0, 1, 3);
-    this->_layout->addWidget(this->_permanentTitleBarText, 10, 3, 1, 3);
-    this->_layout->addWidget(this->_titleBarText,          11, 0, 1, 6);
-    this->_layout->addWidget(this->_titleBarColors,        12, 0, 1, 6);
-    this->_layout->addWidget(this->_titleBarColor,         13, 0, 1, 3);
-    this->_layout->addWidget(this->_titleBarTextColor,     13, 3, 1, 3);
+    this->btnWrapperProviders = create_button_wrapper_box({this->m_btnAddProvider, this->m_btnRemProvider});
+    this->btnWrapperUrlInterceptors = create_button_wrapper_box({this->m_btnAddUrlInterceptor, this->m_btnRemUrlInterceptor});
+
+    this->_layout->addWidget(this->btnWrapperProviders,       0, 0, 1, 6, Qt::AlignRight);
+    this->_layout->addWidget(this->_id,                       1, 0, 1, 6);
+    this->_layout->addWidget(this->_name,                     2, 0, 1, 6);
+    this->_layout->addWidget(this->_icon,                     3, 0, 1, 6);
+    this->_layout->addWidget(this->_url,                      4, 0, 1, 6);
+    this->_layout->addWidget(this->_urlInterceptor,           5, 0, 1, 5);
+    this->_layout->addWidget(this->btnWrapperUrlInterceptors, 5, 5, 1, 1, Qt::AlignRight);
+    this->_layout->addWidget(this->_urlInterceptorLinks,      6, 0, 1, 6);
+    this->_layout->addWidget(this->_scriptsLabel,             7, 0, 1, 6);
+    this->_layout->addWidget(this->_scripts,                  8, 0, 1, 6);
+    this->_layout->addWidget(this->_useragent,                9, 0, 1, 6);
+    this->_layout->addWidget(this->_titleBar,                10, 0, 1, 3);
+    this->_layout->addWidget(this->_permanentTitleBarText,   10, 3, 1, 3);
+    this->_layout->addWidget(this->_titleBarText,            11, 0, 1, 6);
+    this->_layout->addWidget(this->_titleBarColors,          12, 0, 1, 6);
+    this->_layout->addWidget(this->_titleBarColor,           13, 0, 1, 3);
+    this->_layout->addWidget(this->_titleBarTextColor,       13, 3, 1, 3);
     this->setLayout(this->_layout);
 }
 
@@ -180,12 +187,15 @@ ProviderEditWidget::~ProviderEditWidget()
 
     m_btnAddProvider->disconnect();
     delete m_btnAddProvider;
+    m_btnRemProvider->disconnect();
+    delete m_btnRemProvider;
     m_btnAddUrlInterceptor->disconnect();
     delete m_btnAddUrlInterceptor;
     m_btnRemUrlInterceptor->disconnect();
     delete m_btnRemUrlInterceptor;
 
-    delete btnWrapper;
+    delete btnWrapperProviders;
+    delete btnWrapperUrlInterceptors;
 
     provider_ptr = nullptr;
 
@@ -412,6 +422,8 @@ void ProviderEditWidget::button_clicked()
         const auto option = static_cast<ButtonIdUserData*>(this->sender()->userData(0))->id;
 
         if (option == ADD_PROVIDER)
+        {}
+        else if (option == REM_PROVIDER)
         {}
         else if (option == ADD_URL_INTERCEPTOR)
         {}
