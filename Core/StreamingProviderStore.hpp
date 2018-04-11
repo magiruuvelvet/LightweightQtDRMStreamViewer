@@ -105,6 +105,7 @@ public:
     const QStringList &providerStorePaths() const;
 
     void addProvider(const Provider &provider);
+    void removeProvider(const QString &id);
     const QList<Provider> &providers() const
     { return this->m_providers; }
     const Provider &providerAt(int index) const

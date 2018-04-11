@@ -8,6 +8,7 @@
 #include <Gui/ProviderButton.hpp>
 #include <Core/StreamingProviderParser.hpp>
 #include <Core/StreamingProviderWriter.hpp>
+#include <Util/RandomString.hpp>
 
 #include "ConfigWindow.hpp"
 
@@ -426,10 +427,33 @@ void ProviderEditWidget::button_clicked()
     {
         const auto option = static_cast<ButtonIdUserData*>(this->sender()->userData(0))->id;
 
-        if (option == ADD_PROVIDER)
-        {}
-        else if (option == REM_PROVIDER)
-        {}
+        if (option == REM_PROVIDER)
+        {
+            // no provider selected
+            if (!this->provider_ptr)
+                return;
+
+            const auto filename = Config()->localProviderStoreDir() + '/' + this->provider_ptr->id + StreamingProviderParser::extension;
+            QFileInfo info(filename);
+            if (info.exists())
+            {
+                if (QFile(filename).remove())
+                {
+                    qDebug() << "Removed provider!";
+                    StreamingProviderStore::instance()->removeProvider(this->provider_ptr->id);
+                    emit providersUpdated();
+                }
+                else
+                {
+                    qDebug() << "Deletion of provider failed!";
+                }
+            }
+            else
+            {
+                qDebug() << "Hint: Provider seems to be a system-installed one.";
+                qDebug() << "Hiding of system-installed providers is not supported!";
+            }
+        }
         else if (option == ADD_URL_INTERCEPTOR)
         {
             _urlInterceptorLinks->insertRow(_urlInterceptorLinks->rowCount());
@@ -455,6 +479,22 @@ void ProviderEditWidget::button_clicked()
                     provider.urlInterceptorLinks.removeAt(i);
                 }
             }
+        }
+    }
+
+    // allow adding providers on dialog first start
+    else
+    {
+        const auto option = static_cast<ButtonIdUserData*>(this->sender()->userData(0))->id;
+
+        if (option == ADD_PROVIDER)
+        {
+            // init new Provider with required options
+            Provider p;
+            p.id = "new-" + RandomString::Hex(4);
+            p.name = "New Provider";
+            StreamingProviderStore::instance()->addProvider(p);
+            emit providersUpdated();
         }
     }
 }

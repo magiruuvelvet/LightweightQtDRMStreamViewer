@@ -24,7 +24,8 @@ SOURCES += \
     Widgets/ConfigWindow.cpp \
     Widgets/ProviderEditWidget.cpp \
     Util/UrlRequestInterceptor.cpp \
-    Util/UserAgent.cpp
+    Util/UserAgent.cpp \
+    Util/RandomString.cpp
 
 HEADERS += \
     Core/StreamingProviderStore.hpp \
@@ -40,7 +41,8 @@ HEADERS += \
     Widgets/BrowserWindow.hpp \
     Widgets/ProviderEditWidget.hpp \
     Util/UrlRequestInterceptor.hpp \
-    Util/UserAgent.hpp
+    Util/UserAgent.hpp \
+    Util/RandomString.hpp
 
 RESOURCES += \
     Resources/Resources.qrc

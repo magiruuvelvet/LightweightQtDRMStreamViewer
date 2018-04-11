@@ -66,7 +66,20 @@ const QStringList &StreamingProviderStore::providerStorePaths() const
 
 void StreamingProviderStore::addProvider(const Provider &provider)
 {
-    this->m_providers.append(provider);
+    if (!provider.id.isEmpty() && !this->contains(provider.id))
+        this->m_providers.append(provider);
+}
+
+void StreamingProviderStore::removeProvider(const QString &id)
+{
+    for (auto i = 0; i < this->m_providers.size(); i++)
+    {
+        if (this->m_providers.at(i).id == id)
+        {
+            this->m_providers.removeAt(i);
+            break;
+        }
+    }
 }
 
 const Provider &StreamingProviderStore::provider(const QString &id) const
