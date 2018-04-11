@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.2");
+    a.setApplicationVersion("0.3");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     if (a.arguments().contains("-c"))
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         w.show();
 
         auto status_code = a.exec();
-        delete BrowserWindow::getInstance();
+        //delete BrowserWindow::getInstance();
         return status_code;
     }
 

@@ -15,6 +15,7 @@ SOURCES += \
     Core/StreamingProviderParser.cpp \
     Core/StreamingProviderWriter.cpp \
     Core/ConfigManager.cpp \
+    Core/BrowserWindowProcess.cpp \
     Gui/BaseWindow.cpp \
     Gui/TitleBar.cpp \
     Gui/FlowLayout.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     Core/StreamingProviderParser.hpp \
     Core/StreamingProviderWriter.hpp \
     Core/ConfigManager.hpp \
+    Core/BrowserWindowProcess.hpp \
     Gui/BaseWindow.hpp \
     Gui/TitleBar.hpp \
     Gui/FlowLayout.hpp \

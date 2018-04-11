@@ -2,6 +2,7 @@
 
 #include <Core/ConfigManager.hpp>
 #include <Core/StreamingProviderStore.hpp>
+#include <Core/BrowserWindowProcess.hpp>
 
 #include <Gui/ProviderButton.hpp>
 
@@ -91,11 +92,20 @@ void MainWindow::launchBrowserWindow()
     QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
     const Provider pr = StreamingProviderStore::instance()->provider(button->objectName());
 
-    BrowserWindow *w = BrowserWindow::getInstance();
-    w->resetProfile();
-    w->setProfile(pr);
+    ///
+    /// segfaulty method
+    ///
+//    BrowserWindow *w = BrowserWindow::getInstance();
+//    w->resetProfile();
+//    w->setProfile(pr);
 
-    Config()->fullScreenMode() ? w->showFullScreen() : w->showNormal();
+//    Config()->fullScreenMode() ? w->showFullScreen() : w->showNormal();
+
+    ///
+    /// workaround random segfaults by spawning a new instance of the app
+    ///
+    BrowserWindowProcess *instance = new BrowserWindowProcess();
+    instance->start(pr);
 }
 
 void MainWindow::updateProviderList()
