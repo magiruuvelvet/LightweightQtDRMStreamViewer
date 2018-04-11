@@ -18,6 +18,8 @@ class ProviderEditWidget : public QWidget
     Q_OBJECT
 
     friend class ConfigWindow;
+    friend class FieldIdUserData;
+    friend class ButtonIdUserData;
 
 public:
     ProviderEditWidget(QWidget *parent = nullptr);
@@ -60,6 +62,27 @@ private:
     QPushButton *m_btnAddUrlInterceptor;
     QPushButton *m_btnRemUrlInterceptor;
 
+    enum FieldId {
+        ID,
+        NAME,
+        ICON,
+        URL,
+        URL_INTERCEPTOR,
+        URL_INTERCEPTOR_LINKS,
+        SCRIPTS,
+        USERAGENT,
+        SHOW_TITLEBAR,
+        USE_PERMANENT_TITLE,
+        PERMANENT_TITLE,
+        TITLEBAR_COLOR,
+        TITLEBAR_TEXT_COLOR,
+    };
+    enum ButtonId {
+        ADD_PROVIDER,
+        ADD_URL_INTERCEPTOR,
+        REM_URL_INTERCEPTOR
+    };
+
     void _update();
     void _save();
 
@@ -85,6 +108,28 @@ public:
     }
 
     QStringList headerData;
+};
+
+class FieldIdUserData : public QObjectUserData
+{
+public:
+    FieldIdUserData(const ProviderEditWidget::FieldId &id)
+    {
+        this->id = id;
+    }
+
+    ProviderEditWidget::FieldId id;
+};
+
+class ButtonIdUserData : public QObjectUserData
+{
+public:
+    ButtonIdUserData(const ProviderEditWidget::ButtonId &id)
+    {
+        this->id = id;
+    }
+
+    ProviderEditWidget::ButtonId id;
 };
 
 #endif // PROVIDEREDITWIDGET_HPP

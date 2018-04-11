@@ -32,9 +32,10 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         return l;
     };
 
-    const auto create_lineedit = [&](const QString &placeholder, const QString &objectName) {
+    const auto create_lineedit = [&](const QString &placeholder, const FieldId &id) {
         QLineEdit *le = new QLineEdit();
-        le->setObjectName(objectName);
+        //le->setObjectName(objectName);
+        le->setUserData(0, new FieldIdUserData(id));
         le->setPlaceholderText(placeholder);
         le->setToolTip(placeholder);
         le->setStyleSheet(stylesheet);
@@ -43,9 +44,10 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         return le;
     };
 
-    const auto create_checkbbox = [&](const QString &text, const QString &objectName) {
+    const auto create_checkbbox = [&](const QString &text, const FieldId &id) {
         QCheckBox *cb = new QCheckBox(text);
-        cb->setObjectName(objectName);
+        //cb->setObjectName(objectName);
+        cb->setUserData(0, new FieldIdUserData(id));
         cb->setStyleSheet("* {color: white;} /*QCheckBox::indicator {background:#444444;}*/");
 
         QObject::connect(cb, &QCheckBox::toggled, this, &ProviderEditWidget::boolean_option_changed);
@@ -55,10 +57,11 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     const auto create_tablewidget = [&](int rows, int columns,
                                         const QStringList &rowNames,
                                         const QStringList &columNames,
-                                        const QString &objectName,
+                                        const FieldId &id,
                                         bool hideRows = false, bool hideColums = false) {
         QTableWidget *tw = new QTableWidget(rows, columns);
-        tw->setObjectName(objectName);
+        //tw->setObjectName(objectName);
+        tw->setUserData(0, new FieldIdUserData(id));
         tw->setStyleSheet(stylesheet);
         if (hideRows)
             tw->verticalHeader()->hide();
@@ -75,34 +78,36 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         return tw;
     };
 
-    const auto create_textedit = [&](const QString &objectName) {
+    const auto create_textedit = [&](const FieldId &id) {
         QTextEdit *te = new QTextEdit();
-        te->setObjectName(objectName);
+        //te->setObjectName(objectName);
+        te->setUserData(0, new FieldIdUserData(id));
         te->setStyleSheet(stylesheet);
 
         QObject::connect(te, &QTextEdit::textChanged, this, &ProviderEditWidget::textedit_option_changed);
         return te;
     };
 
-    this->_id = create_lineedit("ID (Filename)", "id");
-    this->_name = create_lineedit("Name", "name");
-    this->_icon = create_lineedit("Icon", "icon");
-    this->_url = create_lineedit("URL", "url");
-    this->_urlInterceptor = create_checkbbox("URL Interceptor", "url_interceptor");
-    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, "url_interceptor_links", true, false);
+    this->_id = create_lineedit("ID (Filename)", ID);
+    this->_name = create_lineedit("Name", NAME);
+    this->_icon = create_lineedit("Icon", ICON);
+    this->_url = create_lineedit("URL", URL);
+    this->_urlInterceptor = create_checkbbox("URL Interceptor", URL_INTERCEPTOR);
+    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, URL_INTERCEPTOR_LINKS, true, false);
     this->_scriptsLabel = create_label("Scripts");
-    this->_scripts = create_textedit("scripts");
-    this->_useragent = create_lineedit("User Agent", "useragent");
-    this->_titleBar = create_checkbbox("Show title bar", "show_titlebar");
-    this->_permanentTitleBarText = create_checkbbox("Use permanent title bar text", "use_permanent_title");
-    this->_titleBarText = create_lineedit("Permanent title bar text", "permanent_title");
+    this->_scripts = create_textedit(SCRIPTS);
+    this->_useragent = create_lineedit("User Agent", USERAGENT);
+    this->_titleBar = create_checkbbox("Show title bar", SHOW_TITLEBAR);
+    this->_permanentTitleBarText = create_checkbbox("Use permanent title bar text", USE_PERMANENT_TITLE);
+    this->_titleBarText = create_lineedit("Permanent title bar text", PERMANENT_TITLE);
     this->_titleBarColors = create_label("Title bar colors");
-    this->_titleBarColor = create_lineedit("Title bar color", "titlebar_color");
-    this->_titleBarTextColor = create_lineedit("Title bar text color", "titlebar_text_color");
+    this->_titleBarColor = create_lineedit("Title bar color", TITLEBAR_COLOR);
+    this->_titleBarTextColor = create_lineedit("Title bar text color", TITLEBAR_TEXT_COLOR);
 
-    const auto create_button = [&](const QString &text, const QString &objectName) {
+    const auto create_button = [&](const QString &text, const ButtonId &id) {
         QPushButton *btn = new QPushButton(text);
-        btn->setObjectName(objectName);
+        //btn->setObjectName(objectName);
+        btn->setUserData(0, new ButtonIdUserData(id));
         btn->setFlat(true);
         btn->setStyleSheet("* {color: white; background-color: #444444;}");
 
@@ -110,9 +115,9 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
         return btn;
     };
 
-    this->m_btnAddProvider = create_button("+", "add_provider");
-    this->m_btnAddUrlInterceptor = create_button("+", "add_url_interceptor");
-    this->m_btnRemUrlInterceptor = create_button("─", "rem_url_interceptor");
+    this->m_btnAddProvider = create_button("+", ADD_PROVIDER);
+    this->m_btnAddUrlInterceptor = create_button("+", ADD_URL_INTERCEPTOR);
+    this->m_btnRemUrlInterceptor = create_button("─", REM_URL_INTERCEPTOR);
 
     this->_layout->addWidget(this->_id,                    0, 0, 1, 2);
     this->_layout->addWidget(this->_name,                  1, 0, 1, 2);
@@ -316,26 +321,26 @@ void ProviderEditWidget::string_option_changed(const QString &)
 {
     if (!first_start && !is_updating)
     {
-        const auto option = this->sender()->objectName();
+        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
 
-        if (option == "id")
+        if (option == ID)
         {
             provider_renamed = provider.id != _id->text() ? true : false;
             provider.id = _id->text();
         }
-        else if (option == "name")
+        else if (option == NAME)
         { provider.name = _name->text(); }
-        else if (option == "icon")
+        else if (option == ICON)
         { StreamingProviderParser::parseIcon(_icon->text(), &provider.icon.value, &provider.icon.icon); }
-        else if (option == "url")
+        else if (option == URL)
         { provider.url = QUrl(_url->text()); }
-        else if (option == "useragent")
+        else if (option == USERAGENT)
         { provider.useragent = _useragent->text(); }
-        else if (option == "permanent_title")
+        else if (option == PERMANENT_TITLE)
         { if (provider.titleBarHasPermanentTitle) provider.titleBarPermanentTitle = _titleBarText->text(); }
-        else if (option == "titlebar_color")
+        else if (option == TITLEBAR_COLOR)
         { if (provider.titleBarVisible) provider.titleBarColor = QColor(_titleBarColor->text()); }
-        else if (option == "titlebar_text_color")
+        else if (option == TITLEBAR_TEXT_COLOR)
         { if (provider.titleBarVisible) provider.titleBarTextColor = QColor(_titleBarTextColor->text()); }
     }
 }
@@ -344,9 +349,9 @@ void ProviderEditWidget::textedit_option_changed()
 {
     if (!first_start && !is_updating)
     {
-        const auto option = this->sender()->objectName();
+        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
 
-        if (option == "scripts")
+        if (option == SCRIPTS)
         {
             const auto lines = _scripts->toPlainText().split(QRegExp("[\n\r]"), QString::SkipEmptyParts);
             QList<Script> scripts;
@@ -362,13 +367,13 @@ void ProviderEditWidget::boolean_option_changed(bool)
 {
     if (!first_start && !is_updating)
     {
-        const auto option = this->sender()->objectName();
+        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
 
-        if (option == "url_interceptor")
+        if (option == URL_INTERCEPTOR)
         { provider.urlInterceptor = _urlInterceptor->isChecked(); }
-        else if (option == "show_titlebar")
+        else if (option == SHOW_TITLEBAR)
         { provider.titleBarVisible = _titleBar->isChecked(); }
-        else if (option == "use_permanent_title")
+        else if (option == USE_PERMANENT_TITLE)
         { provider.titleBarHasPermanentTitle = _permanentTitleBarText->isChecked(); }
     }
 }
@@ -377,9 +382,9 @@ void ProviderEditWidget::table_option_changed(int row, int column)
 {
     if (!first_start && !is_updating)
     {
-        const auto option = this->sender()->objectName();
+        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
 
-        if (option == "url_interceptor_links")
+        if (option == URL_INTERCEPTOR_LINKS)
         {
             if (column == 0) // pattern
                 provider.urlInterceptorLinks[row].pattern = QRegExp(_urlInterceptorLinks->item(row, 0)->text());
@@ -393,13 +398,13 @@ void ProviderEditWidget::button_clicked()
 {
     if (!first_start && !is_updating)
     {
-        const auto option = this->sender()->objectName();
+        const auto option = static_cast<ButtonIdUserData*>(this->sender()->userData(0))->id;
 
-        if (option == "add_provider")
+        if (option == ADD_PROVIDER)
         {}
-        else if (option == "add_url_interceptor")
+        else if (option == ADD_URL_INTERCEPTOR)
         {}
-        else if (option == "rem_url_interceptor")
+        else if (option == REM_URL_INTERCEPTOR)
         {}
     }
 }
