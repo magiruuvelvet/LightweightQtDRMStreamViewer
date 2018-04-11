@@ -61,6 +61,7 @@ private:
     QPushButton *m_btnAddProvider;
     QPushButton *m_btnAddUrlInterceptor;
     QPushButton *m_btnRemUrlInterceptor;
+    QWidget *btnWrapper;
 
     enum FieldId {
         ID,

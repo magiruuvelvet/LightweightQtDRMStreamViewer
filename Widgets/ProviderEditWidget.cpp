@@ -34,7 +34,6 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     const auto create_lineedit = [&](const QString &placeholder, const FieldId &id) {
         QLineEdit *le = new QLineEdit();
-        //le->setObjectName(objectName);
         le->setUserData(0, new FieldIdUserData(id));
         le->setPlaceholderText(placeholder);
         le->setToolTip(placeholder);
@@ -46,7 +45,6 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     const auto create_checkbbox = [&](const QString &text, const FieldId &id) {
         QCheckBox *cb = new QCheckBox(text);
-        //cb->setObjectName(objectName);
         cb->setUserData(0, new FieldIdUserData(id));
         cb->setStyleSheet("* {color: white;} /*QCheckBox::indicator {background:#444444;}*/");
 
@@ -60,7 +58,6 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
                                         const FieldId &id,
                                         bool hideRows = false, bool hideColums = false) {
         QTableWidget *tw = new QTableWidget(rows, columns);
-        //tw->setObjectName(objectName);
         tw->setUserData(0, new FieldIdUserData(id));
         tw->setStyleSheet(stylesheet);
         if (hideRows)
@@ -80,7 +77,6 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     const auto create_textedit = [&](const FieldId &id) {
         QTextEdit *te = new QTextEdit();
-        //te->setObjectName(objectName);
         te->setUserData(0, new FieldIdUserData(id));
         te->setStyleSheet(stylesheet);
 
@@ -104,36 +100,49 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     this->_titleBarColor = create_lineedit("Title bar color", TITLEBAR_COLOR);
     this->_titleBarTextColor = create_lineedit("Title bar text color", TITLEBAR_TEXT_COLOR);
 
-    const auto create_button = [&](const QString &text, const ButtonId &id) {
+    const auto create_button = [&](const QString &text, const QString &toolTip, const QSize &size, const ButtonId &id) {
         QPushButton *btn = new QPushButton(text);
-        //btn->setObjectName(objectName);
+        btn->setToolTip(toolTip);
         btn->setUserData(0, new ButtonIdUserData(id));
         btn->setFlat(true);
         btn->setStyleSheet("* {color: white; background-color: #444444;}");
+
+        if (!size.isNull())
+            btn->setFixedSize(size);
 
         QObject::connect(btn, &QPushButton::clicked, this, &ProviderEditWidget::button_clicked);
         return btn;
     };
 
-    this->m_btnAddProvider = create_button("+", ADD_PROVIDER);
-    this->m_btnAddUrlInterceptor = create_button("+", ADD_URL_INTERCEPTOR);
-    this->m_btnRemUrlInterceptor = create_button("─", REM_URL_INTERCEPTOR);
+    this->m_btnAddProvider = create_button("+", "Add Provider", QSize(20, 20), ADD_PROVIDER);
+    this->m_btnAddUrlInterceptor = create_button("+", "Add URL Interceptor", QSize(20, 20), ADD_URL_INTERCEPTOR);
+    this->m_btnRemUrlInterceptor = create_button("─", "Remove URL Interceptor", QSize(20, 20), REM_URL_INTERCEPTOR);
 
-    this->_layout->addWidget(this->_id,                    0, 0, 1, 2);
-    this->_layout->addWidget(this->_name,                  1, 0, 1, 2);
-    this->_layout->addWidget(this->_icon,                  2, 0, 1, 2);
-    this->_layout->addWidget(this->_url,                   3, 0, 1, 2);
-    this->_layout->addWidget(this->_urlInterceptor,        4, 0, 1, 2);
-    this->_layout->addWidget(this->_urlInterceptorLinks,   5, 0, 1, 2);
-    this->_layout->addWidget(this->_scriptsLabel,          6, 0, 1, 2);
-    this->_layout->addWidget(this->_scripts,               7, 0, 1, 2);
-    this->_layout->addWidget(this->_useragent,             8, 0, 1, 2);
-    this->_layout->addWidget(this->_titleBar,              9, 0, 1, 1);
-    this->_layout->addWidget(this->_permanentTitleBarText, 9, 1, 1, 1);
-    this->_layout->addWidget(this->_titleBarText,         10, 0, 1, 2);
-    this->_layout->addWidget(this->_titleBarColors,       11, 0, 1, 2);
-    this->_layout->addWidget(this->_titleBarColor,        12, 0, 1, 1);
-    this->_layout->addWidget(this->_titleBarTextColor,    12, 1, 1, 1);
+    this->btnWrapper = new QWidget();
+    this->btnWrapper->setFixedSize(45, 20);
+    this->btnWrapper->setContentsMargins(0,0,0,0);
+    this->m_btnAddUrlInterceptor->setParent(this->btnWrapper);
+    this->m_btnAddUrlInterceptor->setGeometry(25, 0, this->m_btnAddUrlInterceptor->width(), this->m_btnAddUrlInterceptor->height());
+    this->m_btnRemUrlInterceptor->setParent(this->btnWrapper);
+    this->m_btnRemUrlInterceptor->setGeometry(0, 0, this->m_btnRemUrlInterceptor->width(), this->m_btnRemUrlInterceptor->height());
+
+    this->_layout->addWidget(this->m_btnAddProvider,        0, 0, 1, 6, Qt::AlignRight);
+    this->_layout->addWidget(this->_id,                     1, 0, 1, 6);
+    this->_layout->addWidget(this->_name,                   2, 0, 1, 6);
+    this->_layout->addWidget(this->_icon,                   3, 0, 1, 6);
+    this->_layout->addWidget(this->_url,                    4, 0, 1, 6);
+    this->_layout->addWidget(this->_urlInterceptor,         5, 0, 1, 5);
+    this->_layout->addWidget(this->btnWrapper,              5, 5, 1, 1, Qt::AlignRight);
+    this->_layout->addWidget(this->_urlInterceptorLinks,    6, 0, 1, 6);
+    this->_layout->addWidget(this->_scriptsLabel,           7, 0, 1, 6);
+    this->_layout->addWidget(this->_scripts,                8, 0, 1, 6);
+    this->_layout->addWidget(this->_useragent,              9, 0, 1, 6);
+    this->_layout->addWidget(this->_titleBar,              10, 0, 1, 3);
+    this->_layout->addWidget(this->_permanentTitleBarText, 10, 3, 1, 3);
+    this->_layout->addWidget(this->_titleBarText,          11, 0, 1, 6);
+    this->_layout->addWidget(this->_titleBarColors,        12, 0, 1, 6);
+    this->_layout->addWidget(this->_titleBarColor,         13, 0, 1, 3);
+    this->_layout->addWidget(this->_titleBarTextColor,     13, 3, 1, 3);
     this->setLayout(this->_layout);
 }
 
@@ -175,6 +184,8 @@ ProviderEditWidget::~ProviderEditWidget()
     delete m_btnAddUrlInterceptor;
     m_btnRemUrlInterceptor->disconnect();
     delete m_btnRemUrlInterceptor;
+
+    delete btnWrapper;
 
     provider_ptr = nullptr;
 
