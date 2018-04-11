@@ -55,10 +55,12 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     const auto create_tablewidget = [&](int rows, int columns,
                                         const QStringList &rowNames,
                                         const QStringList &columNames,
-                                        const FieldId &id,
+                                        //const FieldId &id,
+                                        const QString &objectName,
                                         bool hideRows = false, bool hideColums = false) {
         QTableWidget *tw = new QTableWidget(rows, columns);
-        tw->setUserData(0, new FieldIdUserData(id));
+        //tw->setUserData(0, new FieldIdUserData(id));
+        tw->setObjectName(objectName);
         tw->setStyleSheet(stylesheet);
         if (hideRows)
             tw->verticalHeader()->hide();
@@ -89,7 +91,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     this->_icon = create_lineedit("Icon", ICON);
     this->_url = create_lineedit("URL", URL);
     this->_urlInterceptor = create_checkbbox("URL Interceptor", URL_INTERCEPTOR);
-    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, URL_INTERCEPTOR_LINKS, true, false);
+    this->_urlInterceptorLinks = create_tablewidget(0, 2, {}, {"Pattern", "Target URL"}, "URL_INTERCEPTOR_LINKS", true, false);
     this->_scriptsLabel = create_label("Scripts");
     this->_scripts = create_textedit(SCRIPTS);
     this->_useragent = create_lineedit("User Agent", USERAGENT);
@@ -403,9 +405,12 @@ void ProviderEditWidget::table_option_changed(int row, int column)
 {
     if (!first_start && !is_updating)
     {
-        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
+        // wrong enum value, in fact there is no enum value at all
+        // table widget is a bit more complex about user data as it seems
+        //const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
+        const auto option = this->sender()->objectName();
 
-        if (option == URL_INTERCEPTOR_LINKS)
+        if (option == "URL_INTERCEPTOR_LINKS")
         {
             if (column == 0) // pattern
                 provider.urlInterceptorLinks[row].pattern = QRegExp(_urlInterceptorLinks->item(row, 0)->text());
@@ -426,8 +431,30 @@ void ProviderEditWidget::button_clicked()
         else if (option == REM_PROVIDER)
         {}
         else if (option == ADD_URL_INTERCEPTOR)
-        {}
+        {
+            _urlInterceptorLinks->insertRow(_urlInterceptorLinks->rowCount());
+            provider.urlInterceptorLinks.append(UrlInterceptorLink{});
+        }
         else if (option == REM_URL_INTERCEPTOR)
-        {}
+        {
+            const auto selectedItems = _urlInterceptorLinks->selectedItems();
+            QList<int> toRemove;
+
+            qDebug() << selectedItems;
+
+            // avoid segfault
+            if (selectedItems.size() != 0)
+            {
+                for (auto&& i : selectedItems)
+                    if (!toRemove.contains(i->row()))
+                        toRemove.append(i->row());
+
+                for (auto&& i : toRemove)
+                {
+                    _urlInterceptorLinks->removeRow(i);
+                    provider.urlInterceptorLinks.removeAt(i);
+                }
+            }
+        }
     }
 }
