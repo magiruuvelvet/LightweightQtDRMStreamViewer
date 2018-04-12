@@ -7,6 +7,7 @@
 #include <Core/StreamingProviderStore.hpp>
 
 #include <Util/UserAgent.hpp>
+#include <Util/Color.hpp>
 
 BrowserWindow::BrowserWindow(QWidget *parent)
     : BaseWindow(parent)
@@ -17,6 +18,8 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
+    this->m_titleBarPalette = this->titleBar()->palette();
+    this->m_titleBarBgColor = this->m_titleBarPalette.color(QPalette::All, QPalette::Background);
     this->installEventFilter(this);
 
     this->m_layout = new QVBoxLayout();
@@ -285,6 +288,9 @@ void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColo
     titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
     this->titleBar()->setPalette(titleBarScheme);
     this->setPalette(titleBarScheme);
+
+    this->m_titleBarPalette = titleBarScheme;
+    this->m_titleBarBgColor = color;
 }
 
 void BrowserWindow::setBaseTitle(const QString &title, bool permanent)
@@ -408,12 +414,22 @@ void BrowserWindow::forceReload()
 
 void BrowserWindow::onLoadProgress(int progress)
 {
-    // soon™
+    QPalette p = this->m_titleBarPalette;
+
+    if (progress != 100)
+    {
+        const double value = static_cast<double>(progress) / 10;
+        p.setColor(QPalette::All, QPalette::Background, Color::changeSaturation(this->m_titleBarBgColor, value));
+    }
+
+    this->titleBar()->setPalette(p);
+    this->setPalette(p);
 }
 
-void BrowserWindow::onLoadFinished(bool ok)
+void BrowserWindow::onLoadFinished(bool /*ok*/)
 {
-    // soon™
+    this->titleBar()->setPalette(this->m_titleBarPalette);
+    this->setPalette(this->m_titleBarPalette);
 }
 
 void BrowserWindow::setUrlAboutBlank()
