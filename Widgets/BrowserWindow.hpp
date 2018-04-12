@@ -86,6 +86,8 @@ private:
 
     bool m_titleBarVisibility;
     bool m_titleBarVisibilityToggle;
+    QPalette m_titleBarPalette;
+    QColor m_titleBarBgColor;
 
     QWebEngineView *webView;
     QWebEngineCookieStore *m_cookieStore;
