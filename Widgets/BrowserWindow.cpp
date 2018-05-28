@@ -13,7 +13,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 {
     this->setWindowFlags(this->windowFlags() |
                          Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
-    QRect desktopSize = QApplication::desktop()->screenGeometry();
+    QRect desktopSize = QApplication::desktop()->screenGeometry(this);
     this->resize(desktopSize.width() / 1.2, (desktopSize.height() / 1.2) + 31);
     this->move(desktopSize.width() / 2 - this->size().width() / 2, desktopSize.height() / 2 - this->size().height() / 2);
 
@@ -260,7 +260,7 @@ void BrowserWindow::setWindowIcon(const QIcon &icon)
 
 void BrowserWindow::setTitleBarVisibility(bool visible)
 {
-    const QRect desktopSize = QApplication::desktop()->screenGeometry();
+    const QRect desktopSize = QApplication::desktop()->screenGeometry(this);
     this->m_titleBarVisibility = visible;
 
     if (this->m_titleBarVisibility)

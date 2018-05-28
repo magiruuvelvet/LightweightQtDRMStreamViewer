@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->resize(600, 138);
 
     // Center window on screen
-    QRect desktopSize = QApplication::desktop()->screenGeometry();
+    QRect desktopSize = QApplication::desktop()->screenGeometry(this);
     this->move(desktopSize.width() / 2 - this->size().width() / 2,
                desktopSize.height() / 2 - this->size().height() / 2);
 

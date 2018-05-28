@@ -66,6 +66,7 @@ BaseWindow::BaseWindow(QWidget *parent)
 
     _containerWidget = new QWidget();
     _containerWidget->setContentsMargins(0, 0, 0, 0);
+    _containerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     containerLayout->addWidget(_containerWidget);
 }
 
