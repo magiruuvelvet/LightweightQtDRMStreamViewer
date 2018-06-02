@@ -66,8 +66,10 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
     // other WebEngine settings
     this->webView->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
+    this->webView->settings()->setAttribute(QWebEngineSettings::WebGLEnabled, true);
     this->webView->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
     this->webView->settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
+    this->webView->settings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
 
     // load scripts for injection
     this->loadEmbeddedScript(this->mJs_hideScrollBars, "hide-scrollbars", true);
