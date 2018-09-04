@@ -22,9 +22,8 @@ I'm releasing this here on GitHub in case anyone else is looking for web browser
   - `/opt/google/chrome/PepperFlash` (the whole folder)
   - `/opt/google/chrome/libwidevinecdm.so`
   - `/opt/google/chrome/libwidevinecdmadapter.so`
-- To build: QMake, Qt development headers and a C++11 compiler
-  - CLI: `qmake LightweightQtDRMStreamViewer.pro`, `make`
-  - Qt Creator: Open Project and push the hammer icon  :D
+- To build: CMake 3.8+, Qt build tools and development headers and a C++14 compiler
+  - CLI: `cd build && cmake -DCMAKE_BUILD_TYPE=Release ..`, `make`
 
 **Note:** On some Linux distros you can find PepperFlash in the repositories for easy installation. You still need to download Widevine manually. Due to licensing issues I can't mirror it here.
 

@@ -1,5 +1,6 @@
 # Qt Creator generated files
 *.pro.user
+CMakeLists.txt.user
 
 # QMake
 *~
