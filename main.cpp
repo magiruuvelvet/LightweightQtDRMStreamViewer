@@ -14,6 +14,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
+
 void compress_plugin(const QString &in, int level = -1)
 {
     if (!QFileInfo::exists(in))
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.3");
+    a.setApplicationVersion("0.4");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     if (a.arguments().contains("-c"))
