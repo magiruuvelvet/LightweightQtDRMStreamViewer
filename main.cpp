@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     a.setApplicationName(QLatin1String("LightweightQtDRMStreamViewer"));
     a.setApplicationDisplayName(QLatin1String("Qt DRM Stream Viewer"));
-    a.setApplicationVersion("0.4");
+    a.setApplicationVersion("0.5");
     a.setWindowIcon(QIcon(":/app-icon.svgz"));
 
     if (a.arguments().contains("-c"))
