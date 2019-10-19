@@ -54,6 +54,8 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     new QShortcut(QKeySequence(Qt::Key_F5), this->webView, SLOT(reload()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F5), this, SLOT(forceReload()));
 
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F7), this, SLOT(clearCookies()));
+
     // Backup current user-agent
     this->m_originalUserAgent = this->webView->page()->profile()->httpUserAgent();
 
@@ -404,6 +406,12 @@ void BrowserWindow::toggleFullScreen()
 void BrowserWindow::forceReload()
 {
     this->webView->triggerPageAction(QWebEnginePage::ReloadAndBypassCache);
+}
+
+void BrowserWindow::clearCookies()
+{
+    qDebug() << ">>> Clearing all cookies!";
+    this->webView->page()->profile()->cookieStore()->deleteAllCookies();
 }
 
 void BrowserWindow::onLoadProgress(int progress)

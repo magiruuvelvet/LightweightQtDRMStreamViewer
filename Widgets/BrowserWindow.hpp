@@ -62,6 +62,7 @@ protected:
 public slots:
     void toggleFullScreen();
     void forceReload();
+    void clearCookies();
     void onLoadProgress(int);
     void onLoadFinished(bool);
 
