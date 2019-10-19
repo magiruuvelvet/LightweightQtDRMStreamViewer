@@ -88,7 +88,7 @@ private:
     bool m_titleBarVisibility;
     bool m_titleBarVisibilityToggle;
 
-    QWebEngineView *webView;
+    std::unique_ptr<QWebEngineView> webView;
     QWebEngineCookieStore *m_cookieStore;
     QVector<QNetworkCookie> m_cookies;
 

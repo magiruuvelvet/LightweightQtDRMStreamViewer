@@ -39,19 +39,19 @@ BrowserWindow::BrowserWindow(QWidget *parent)
     this->m_layout->addWidget(this->emergencyAddressBar);
     new QShortcut(QKeySequence(Qt::Key_F1), this, SLOT(toggleAddressBarVisibility()));
 
-    this->webView = new QWebEngineView();
+    this->webView = std::make_unique<QWebEngineView>();
     this->webView->setContextMenuPolicy(Qt::NoContextMenu);
-    this->m_layout->addWidget(this->webView);
+    this->m_layout->addWidget(this->webView.get());
     this->containerWidget()->setLayout(this->m_layout);
 
-    QObject::connect(this->webView, &QWebEngineView::titleChanged, this, &BrowserWindow::setWindowTitle);
-    QObject::connect(this->webView, &QWebEngineView::loadProgress, this, &BrowserWindow::onLoadProgress);
-    QObject::connect(this->webView, &QWebEngineView::loadFinished, this, &BrowserWindow::onLoadFinished);
+    QObject::connect(this->webView.get(), &QWebEngineView::titleChanged, this, &BrowserWindow::setWindowTitle);
+    QObject::connect(this->webView.get(), &QWebEngineView::loadProgress, this, &BrowserWindow::onLoadProgress);
+    QObject::connect(this->webView.get(), &QWebEngineView::loadFinished, this, &BrowserWindow::onLoadFinished);
 
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this, SLOT(toggleFullScreen()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(close()));
 
-    new QShortcut(QKeySequence(Qt::Key_F5), this->webView, SLOT(reload()));
+    new QShortcut(QKeySequence(Qt::Key_F5), this->webView.get(), SLOT(reload()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F5), this, SLOT(forceReload()));
 
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F7), this, SLOT(clearCookies()));
@@ -179,7 +179,6 @@ BrowserWindow::~BrowserWindow()
     this->mJs_hideScrollBars.clear();
     this->m_scripts.clear();
     this->scripts->clear();
-    //delete scripts;
 
     // delete url interceptor
     delete m_interceptor;
@@ -189,10 +188,6 @@ BrowserWindow::~BrowserWindow()
 
     // delete browser cookie store
     this->m_cookies.clear();
-    //delete m_cookieStore;
-
-    // destory the web view
-    delete webView;
 
     // delete layout
     delete m_layout;
