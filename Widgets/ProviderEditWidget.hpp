@@ -99,14 +99,14 @@ private slots:
     void button_clicked();
 };
 
-class TableWidgetUserData : public QObjectUserData
+class TableWidgetUserData
 {
 public:
     TableWidgetUserData(const QStringList &headerData)
     {
         this->headerData = headerData;
     }
-    ~TableWidgetUserData() override
+    ~TableWidgetUserData()
     {
         this->headerData.clear();
     }
@@ -114,7 +114,7 @@ public:
     QStringList headerData;
 };
 
-class FieldIdUserData : public QObjectUserData
+class FieldIdUserData
 {
 public:
     FieldIdUserData(const ProviderEditWidget::FieldId &id)
@@ -125,7 +125,7 @@ public:
     ProviderEditWidget::FieldId id;
 };
 
-class ButtonIdUserData : public QObjectUserData
+class ButtonIdUserData
 {
 public:
     ButtonIdUserData(const ProviderEditWidget::ButtonId &id)

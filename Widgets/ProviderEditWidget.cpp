@@ -35,7 +35,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     const auto create_lineedit = [&](const QString &placeholder, const FieldId &id) {
         QLineEdit *le = new QLineEdit();
-        le->setUserData(0, new FieldIdUserData(id));
+        le->setProperty("0", QVariant::fromValue(reinterpret_cast<std::uintptr_t>(new FieldIdUserData(id))));
         le->setPlaceholderText(placeholder);
         le->setToolTip(placeholder);
         le->setStyleSheet(stylesheet);
@@ -46,7 +46,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     const auto create_checkbbox = [&](const QString &text, const FieldId &id) {
         QCheckBox *cb = new QCheckBox(text);
-        cb->setUserData(0, new FieldIdUserData(id));
+        cb->setProperty("0", QVariant::fromValue(reinterpret_cast<std::uintptr_t>(new FieldIdUserData(id))));
         cb->setStyleSheet("* {color: white;} /*QCheckBox::indicator {background:#444444;}*/");
 
         QObject::connect(cb, &QCheckBox::toggled, this, &ProviderEditWidget::boolean_option_changed);
@@ -67,10 +67,10 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
             tw->verticalHeader()->hide();
         if (hideColums)
             tw->horizontalHeader()->hide();
-        tw->setUserData(0, new TableWidgetUserData(rowNames));
-        tw->setUserData(1, new TableWidgetUserData(columNames));
-        tw->setVerticalHeaderLabels(static_cast<TableWidgetUserData*>(tw->userData(0))->headerData);
-        tw->setHorizontalHeaderLabels(static_cast<TableWidgetUserData*>(tw->userData(1))->headerData);
+        tw->setProperty("0", QVariant::fromValue(reinterpret_cast<std::uintptr_t>(new TableWidgetUserData(rowNames))));
+        tw->setProperty("1", QVariant::fromValue(reinterpret_cast<std::uintptr_t>(new TableWidgetUserData(columNames))));
+        tw->setVerticalHeaderLabels(reinterpret_cast<TableWidgetUserData*>(tw->property("0").value<std::uintptr_t>())->headerData);
+        tw->setHorizontalHeaderLabels(reinterpret_cast<TableWidgetUserData*>(tw->property("1").value<std::uintptr_t>())->headerData);
         for (auto i = 0; i < columns; i++)
             tw->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
 
@@ -80,7 +80,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
 
     const auto create_textedit = [&](const FieldId &id) {
         QTextEdit *te = new QTextEdit();
-        te->setUserData(0, new FieldIdUserData(id));
+        te->setProperty("0", QVariant::fromValue(reinterpret_cast<std::uintptr_t>(new FieldIdUserData(id))));
         te->setStyleSheet(stylesheet);
 
         QObject::connect(te, &QTextEdit::textChanged, this, &ProviderEditWidget::textedit_option_changed);
@@ -106,7 +106,7 @@ ProviderEditWidget::ProviderEditWidget(QWidget *parent)
     const auto create_button = [&](const QString &text, const QString &toolTip, const QSize &size, const ButtonId &id) {
         QPushButton *btn = new QPushButton(text);
         btn->setToolTip(toolTip);
-        btn->setUserData(0, new ButtonIdUserData(id));
+        btn->setProperty("0", QVariant::fromValue(reinterpret_cast<std::uintptr_t>(new ButtonIdUserData(id))));
         btn->setFlat(true);
         btn->setStyleSheet("* {color: white; background-color: #444444;}");
 
@@ -233,7 +233,7 @@ void ProviderEditWidget::_update()
     this->_urlInterceptorLinks->clear();
     this->_urlInterceptorLinks->setRowCount(0);
     this->_urlInterceptorLinks->setHorizontalHeaderLabels(
-        static_cast<TableWidgetUserData*>(this->_urlInterceptorLinks->userData(1))->headerData);
+        reinterpret_cast<TableWidgetUserData*>(this->_urlInterceptorLinks->property("1").value<std::uintptr_t>())->headerData);
     this->_urlInterceptorLinkItems.clear();
 
     for (auto&& i : provider.urlInterceptorLinks)
@@ -345,7 +345,7 @@ void ProviderEditWidget::string_option_changed(const QString &)
 {
     if (!first_start && !is_updating)
     {
-        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
+        const auto option = reinterpret_cast<FieldIdUserData*>(this->sender()->property("0").value<std::uintptr_t>())->id;
 
         if (option == ID)
         {
@@ -373,7 +373,7 @@ void ProviderEditWidget::textedit_option_changed()
 {
     if (!first_start && !is_updating)
     {
-        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
+        const auto option = reinterpret_cast<FieldIdUserData*>(this->sender()->property("0").value<std::uintptr_t>())->id;
 
         if (option == SCRIPTS)
         {
@@ -391,7 +391,7 @@ void ProviderEditWidget::boolean_option_changed(bool)
 {
     if (!first_start && !is_updating)
     {
-        const auto option = static_cast<FieldIdUserData*>(this->sender()->userData(0))->id;
+        const auto option = reinterpret_cast<FieldIdUserData*>(this->sender()->property("0").value<std::uintptr_t>())->id;
 
         if (option == URL_INTERCEPTOR)
         { provider.urlInterceptor = _urlInterceptor->isChecked(); }
@@ -425,7 +425,7 @@ void ProviderEditWidget::button_clicked()
 {
     if (!first_start && !is_updating)
     {
-        const auto option = static_cast<ButtonIdUserData*>(this->sender()->userData(0))->id;
+        const auto option = reinterpret_cast<ButtonIdUserData*>(this->sender()->property("0").value<std::uintptr_t>())->id;
 
         if (option == REM_PROVIDER)
         {
@@ -485,7 +485,7 @@ void ProviderEditWidget::button_clicked()
     // allow adding providers on dialog first start
     else
     {
-        const auto option = static_cast<ButtonIdUserData*>(this->sender()->userData(0))->id;
+        const auto option = reinterpret_cast<ButtonIdUserData*>(this->sender()->property("0").value<std::uintptr_t>())->id;
 
         if (option == ADD_PROVIDER)
         {

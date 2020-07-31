@@ -32,14 +32,14 @@ BaseWindow::BaseWindow(QWidget *parent)
     //this->resize(450, 600);
 
     // Style Overrides
-    this->setBackgroundRole(QPalette::Background);
+    this->setBackgroundRole(QPalette::Window);
     QPalette rootWinColorScheme;
-    rootWinColorScheme.setColor(QPalette::All, QPalette::Background, QColor( 50,  50,  50, 255));
+    rootWinColorScheme.setColor(QPalette::All, QPalette::Window,     QColor( 50,  50,  50, 255));
     rootWinColorScheme.setColor(QPalette::All, QPalette::Text,       QColor(255, 255, 255, 255));
     rootWinColorScheme.setColor(QPalette::All, QPalette::ButtonText, QColor(255, 255, 255, 255));
     rootWinColorScheme.setColor(QPalette::All, QPalette::WindowText, QColor(255, 255, 255, 255));
 
-    this->setBackgroundRole(QPalette::Background);
+    this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
     this->setPalette(rootWinColorScheme);
     this->setStyle(new StyleOverrides);

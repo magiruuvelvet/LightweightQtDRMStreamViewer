@@ -21,7 +21,6 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 
     this->m_layout = new QVBoxLayout();
     this->m_layout->setContentsMargins(0, 0, 0, 0);
-    this->m_layout->setMargin(0);
     this->m_layout->setSizeConstraint(QLayout::SetMaximumSize);
 
     this->setContainerLayoutContentsMargins(0,0,0,0);
@@ -277,7 +276,7 @@ void BrowserWindow::setTitleBarVisibility(bool visible)
 void BrowserWindow::setTitleBarColor(const QColor &color, const QColor &textColor)
 {
     QPalette titleBarScheme = this->titleBar()->palette();
-    titleBarScheme.setColor(QPalette::All, QPalette::Background, color);
+    titleBarScheme.setColor(QPalette::All, QPalette::Window,     color);
     titleBarScheme.setColor(QPalette::All, QPalette::Text,       textColor);
     titleBarScheme.setColor(QPalette::All, QPalette::WindowText, textColor);
     this->titleBar()->setPalette(titleBarScheme);
@@ -316,7 +315,7 @@ void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorL
     {
         qDebug() << "URL Interceptor enabled!";
         this->m_interceptor = new UrlRequestInterceptor(urlInterceptorLinks);
-        this->webView->page()->profile()->setRequestInterceptor(this->m_interceptor);
+        this->webView->page()->profile()->setUrlRequestInterceptor(this->m_interceptor);
 
         this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
         this->webView->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
@@ -325,7 +324,7 @@ void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorL
     {
         qDebug() << "URL Interceptor disabled!";
         this->m_interceptor = nullptr;
-        this->webView->page()->profile()->setRequestInterceptor(nullptr);
+        this->webView->page()->profile()->setUrlRequestInterceptor(nullptr);
 
         this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, false);
         this->webView->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, false);
