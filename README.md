@@ -52,7 +52,7 @@ The main interface is just made of a client-side title bar, a really tiny close 
 
 #### Adding Services to the list
 
-Run the app for at least once (optimally from a terminal). It will create its configuration directory and tell you where it is.
+Run the app for at least once (optionally from a terminal). It will create its configuration directory and tell you where it is.
 
 Default is `~/.config/LightweightQtDRMStreamViewer` (on Linux) and `%LOCALAPPDATA%/LightweightQtDRMStreamViewer` (on Windows).
 
@@ -78,37 +78,40 @@ Lines starting with a hash (`#`) are ignored.
  - `name` (required):
    Sets the display name of the provider. Used in the main UI and as window title.
 
- - `icon` (optimal):
+ - `icon` (optional):
    Sets the display icon of the provider. Used in the main UI and as window icon. If this field is omitted the window icon will be blank and the main UI shows the `name` instead of an icon.
 
  - `url` (required):
    The base URL the browser window should load. Set the root URL of the streaming service there.
 
- - `urlInterceptor` (optimal, `true/false`, disabled by default):
+ - `urlInterceptor` (optional, `true/false`, disabled by default):
    Hijacks (redirects) specific links by regular expression and loads external sources. This is the master switch to enable/disable all given patterns. See the next 2 options on how to set up new patterns and targets. The Netflix sample config file provides a good example on how to use this feature. It injects a 1080p unlocker script to enjoy your shows in Full HD.
 
- - `urlInterceptorPattern` (optimal, requires a following `urlInterceptorTarget` afterwards, *stackable*):
+ - `urlInterceptorPattern` (optional, requires a following `urlInterceptorTarget` afterwards, *stackable*):
    Sets a regular expression to hijack specific URLs and redirect them to something else. You can add as many patterns as you want. Regular expressions must be in a [`QRegExp`](https://doc.qt.io/qt-5/qregexp.html#details) compatible format. The new Perl compatible format is not supported!
 
- - `urlInterceptorTarget` (optimal, requires a `urlInterceptorPattern` beforehand, *stackable*):
+ - `urlInterceptorTarget` (optional, requires a `urlInterceptorPattern` beforehand, *stackable*):
    Sets a valid target URL (usually http) to what a matched pattern should redirect. You can add as many target URLs as you want. There is no "error" detection so make sure the target links are valid.
 
- - `script` (optimal, format=`filename,injection_point(optimal)`, *stackable*):
+ - `httpAcceptLanguage` (optional, requires `urlInterceptor` to be enabled):
+   If set, sends the HTTP `Accept-Language` header in all requests with the given content.
+
+ - `script` (optional, format=`filename,injection_point(optional)`, *stackable*):
    A JavaScript file to inject into all pages of the current profile. This option can be stacked, which means added multiple times in a row. The app maintains a list internally and loads the scripts in the order of appearance. See **Script Injection** below for more usage details.
 
- - `user-agent` (optimal):
+ - `user-agent` (optional):
    Overrides the default Qt Web Engine user-agent and the ARM detection user-agent. Set your custom HTTP user-agent there. If the string is empty it falls back to auto detect.
 
- - `titlebar` (optimal, default is `false`):
+ - `titlebar` (optional, default is `false`):
    Set to `true` to show a client-side title bar for the browser window. The title bar can be used to move the window when your window manager doesn't support movement of frameless windows.
 
- - `titlebar-text` (optimal):
+ - `titlebar-text` (optional):
    Sets a permanent window title which never changes. Value can be empty to remove the window title. By default the title is constructed from the websites HTML `<title>` plus the providers `name` field separated by `─` and constantly changes depending on the current HTML loaded in the browser window.
 
- - `titlebar-color` (optimal, default is `#323232`):
+ - `titlebar-color` (optional, default is `#323232`):
    Colorize the title bar to match the primary color of the streaming website (example: Netflix has `#060606` on the very top).
 
- - `titlebar-text-color` (optimal, default is `#ffffff`):
+ - `titlebar-text-color` (optional, default is `#ffffff`):
    Sets the title bar text color to keep it readable on the specified background color.
 
 
@@ -145,11 +148,11 @@ A useful list of hacks you can make use of.
 
 ## Script Injection
 
-This app supports the injection of UserScripts into web pages. The format is `filename,injection_point(optimal)`, which means you may not have a comma sign (`,`) in filenames. Filenames can be relative to the current provider file or absolute.
+This app supports the injection of UserScripts into web pages. The format is `filename,injection_point(optional)`, which means you may not have a comma sign (`,`) in filenames. Filenames can be relative to the current provider file or absolute.
 
 #### Injection Points
 
-This is an optimal value. The default injection point is `auto` when this option is omitted.
+This is an optional value. The default injection point is `auto` when this option is omitted.
 
  - `create`: The script will be executed as soon as the document is created. This is not suitable for any DOM operation.
  - `ready`: The script will run as soon as the DOM is ready. This is equivalent to the DOMContentLoaded event firing in JavaScript.
