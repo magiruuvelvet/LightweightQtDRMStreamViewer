@@ -79,7 +79,7 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
         return FILE_EMPTY;
     }
 
-    QStringList props = data.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    QStringList props = data.split(QRegExp("[\r\n]"), Qt::SkipEmptyParts);
     data.clear();
 
     Provider provider;

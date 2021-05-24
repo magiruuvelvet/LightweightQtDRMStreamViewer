@@ -45,7 +45,7 @@ StreamingProviderWriter::StatusCode StreamingProviderWriter::write_private(
             const QString data = f.readAll();
             f.close();
 
-            QStringList props = data.split(QRegExp("[\r\n]"), QString::KeepEmptyParts);
+            QStringList props = data.split(QRegExp("[\r\n]"), Qt::KeepEmptyParts);
 
             ///
             /// hacky workaround: remove all url interceptors and scripts when the size(count) changed

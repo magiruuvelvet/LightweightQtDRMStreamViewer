@@ -377,7 +377,7 @@ void ProviderEditWidget::textedit_option_changed()
 
         if (option == SCRIPTS)
         {
-            const auto lines = _scripts->toPlainText().split(QRegExp("[\n\r]"), QString::SkipEmptyParts);
+            const auto lines = _scripts->toPlainText().split(QRegExp("[\n\r]"), Qt::SkipEmptyParts);
             QList<Script> scripts;
             for (auto&& line : lines)
                 scripts.append(Script::parse(line.simplified()));

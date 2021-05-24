@@ -5,7 +5,7 @@
 
 Script Script::parse(const QString &script)
 {
-    const auto scr = script.split(',', QString::KeepEmptyParts);
+    const auto scr = script.split(',', Qt::KeepEmptyParts);
     if (scr.size() > 1)
     {
         const auto injection_pt = scr.at(1);
