@@ -9,10 +9,12 @@ UrlRequestInterceptor::UrlRequestInterceptor(QObject *parent)
 }
 
 UrlRequestInterceptor::UrlRequestInterceptor(const QList<UrlInterceptorLink> &urlInterceptorLinks,
+                                             const QString &httpAcceptLanguage,
                                              QObject *parent)
     : QWebEngineUrlRequestInterceptor(parent)
 {
     this->urlInterceptorLinks = urlInterceptorLinks;
+    this->httpAcceptLanguage = httpAcceptLanguage;
 }
 
 void UrlRequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
@@ -27,5 +29,10 @@ void UrlRequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
             info.redirect(url.target);
             return;
         }
+    }
+
+    if (!this->httpAcceptLanguage.isEmpty())
+    {
+        info.setHttpHeader("Accept-Language", this->httpAcceptLanguage.toUtf8());
     }
 }

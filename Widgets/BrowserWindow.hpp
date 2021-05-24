@@ -43,7 +43,7 @@ public:
     void setTitleBarColor(const QColor &color, const QColor &textColor);
     void setBaseTitle(const QString &title, bool permanent = false);
     void setUrl(const QUrl &url);
-    void setUrlInterceptorEnabled(bool, const QList<UrlInterceptorLink> &urlInterceptorLinks = QList<UrlInterceptorLink>());
+    void setUrlInterceptorEnabled(bool, const QList<UrlInterceptorLink> &urlInterceptorLinks = QList<UrlInterceptorLink>(), const QString &httpAcceptLanguage = QString());
     void setProfile(const QString &id);
     void setScripts(const QList<Script> &scripts);
     void removeScripts();

@@ -151,7 +151,7 @@ void StreamingProviderStore::loadProfile(BrowserWindow *w, const Provider &pr)
     w->setWindowIcon(pr.icon.icon);
     w->setProfile(pr.id);
     w->setScripts(pr.scripts);
-    w->setUrlInterceptorEnabled(pr.urlInterceptor, pr.urlInterceptorLinks);
+    w->setUrlInterceptorEnabled(pr.urlInterceptor, pr.urlInterceptorLinks, pr.httpAcceptLanguage);
     w->setUrl(pr.url);
 }
 

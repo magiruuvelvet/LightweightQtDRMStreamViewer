@@ -305,7 +305,7 @@ void BrowserWindow::setUrl(const QUrl &url)
     emit urlChanged(url);
 }
 
-void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorLink> &urlInterceptorLinks)
+void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorLink> &urlInterceptorLinks, const QString &httpAcceptLanguage)
 {
     if (this->m_interceptor)
         delete this->m_interceptor;
@@ -314,7 +314,7 @@ void BrowserWindow::setUrlInterceptorEnabled(bool b, const QList<UrlInterceptorL
     if (b)
     {
         qDebug() << "URL Interceptor enabled!";
-        this->m_interceptor = new UrlRequestInterceptor(urlInterceptorLinks);
+        this->m_interceptor = new UrlRequestInterceptor(urlInterceptorLinks, httpAcceptLanguage);
         this->webView->page()->profile()->setUrlRequestInterceptor(this->m_interceptor);
 
         this->webView->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);

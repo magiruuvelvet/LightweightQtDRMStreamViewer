@@ -192,6 +192,13 @@ StreamingProviderParser::StatusCode StreamingProviderParser::parse(const QString
             }
         }
 
+        // http accept-language header
+        else if (i.startsWith("httpAcceptLanguage:", Qt::CaseInsensitive))
+        {
+            const auto header = i.mid(19).simplified();
+            provider.httpAcceptLanguage = header;
+        }
+
         // unknown option
         else
         {

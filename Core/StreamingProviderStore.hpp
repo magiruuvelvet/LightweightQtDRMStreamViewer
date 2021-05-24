@@ -92,6 +92,8 @@ struct Provider
     QList<UrlInterceptorLink> urlInterceptorLinks;
     QList<Script> scripts;
 
+    QString    httpAcceptLanguage;
+
     bool isSystem;
 };
 

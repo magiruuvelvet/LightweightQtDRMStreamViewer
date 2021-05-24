@@ -10,11 +10,12 @@ class UrlRequestInterceptor : public QWebEngineUrlRequestInterceptor
 
 public:
     UrlRequestInterceptor(QObject *parent = nullptr);
-    UrlRequestInterceptor(const QList<UrlInterceptorLink> &urlInterceptorLinks, QObject *parnet = nullptr);
+    UrlRequestInterceptor(const QList<UrlInterceptorLink> &urlInterceptorLinks, const QString &httpAcceptLanguage, QObject *parnet = nullptr);
     void interceptRequest(QWebEngineUrlRequestInfo &info) override;
 
 private:
     QList<UrlInterceptorLink> urlInterceptorLinks;
+    QString httpAcceptLanguage;
 };
 
 #endif // URLREQUESTINTERCEPTOR_HPP
